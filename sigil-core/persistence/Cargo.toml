@@ -1,0 +1,22 @@
+[package]
+name = "persistence"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sigil = { path = "../sigil" }
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+hex.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true
+hex.workspace = true
