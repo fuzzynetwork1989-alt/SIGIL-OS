@@ -2,8 +2,7 @@
 //!
 //! This module provides Ed25519 signature verification for sigils.
 
-use ed25519_dalek::{Verifier as Ed25519Verifier, VerifyingKey};
-use ed25519::Signature;
+use ed25519::{Verifier, PublicKey, Signature};
 use serde::Serialize;
 
 use crate::sigil::Sigil;
@@ -28,7 +27,7 @@ impl SigilVerifier {
         // Reconstruct the public key
         let public_key_bytes: [u8; 32] = sigil.signature.public_key.clone().try_into()
             .map_err(|_| anyhow::anyhow!("Invalid public key length"))?;
-        let public_key = VerifyingKey::from_bytes(&public_key_bytes)?;
+        let public_key = PublicKey::from_bytes(&public_key_bytes);
 
         // Verify
         match public_key.verify(&serialized, &signature) {
