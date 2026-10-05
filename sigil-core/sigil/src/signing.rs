@@ -2,7 +2,7 @@
 //!
 //! This module provides Ed25519 signing capabilities for sigils.
 
-use ed25519_dalek::{SigningKey, VerifyingKey, SecretKey, Signer as Ed25519Signer};
+use ed25519_dalek::{SigningKey, VerifyingKey, Signer as Ed25519Signer};
 use rand::rngs::OsRng;
 use rand::RngCore;
 use serde::Serialize;
@@ -27,7 +27,7 @@ impl KeyPair {
 
         Self {
             signing_key,
-            public_key: *public_key,
+            public_key,
         }
     }
 
