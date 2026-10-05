@@ -4,6 +4,7 @@
 
 use ed25519_dalek::{SigningKey, VerifyingKey, SecretKey, Signer as Ed25519Signer};
 use rand::rngs::OsRng;
+use rand::RngCore;
 use serde::Serialize;
 
 use crate::sigil::{Ed25519Signature, Sigil};
@@ -26,7 +27,7 @@ impl KeyPair {
 
         Self {
             signing_key,
-            public_key,
+            public_key: *public_key,
         }
     }
 
