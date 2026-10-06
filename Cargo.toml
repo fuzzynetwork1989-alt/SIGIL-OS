@@ -3,6 +3,7 @@ members = [
     "sigil-core/sigil",
     "sigil-core/persistence",
     "sigil-core/api",
+    "model-fabric",
 ]
 resolver = "2"
 

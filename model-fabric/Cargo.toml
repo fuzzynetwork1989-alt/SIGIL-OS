@@ -1,0 +1,37 @@
+[package]
+name = "model-fabric"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# HTTP (for cloud model integrations if needed)
+reqwest = { version = "0.11", features = ["json"] }
+
+# Configuration
+toml = "0.8"
+serde_yaml = "0.9"
+
+# Note: ML/LLM frameworks (candle, tokenizers) are temporarily disabled
+# due to dependency conflicts. They will be added back when the conflicts
+# are resolved. The current implementation provides the structural foundation
+# for Model Fabric with placeholder inference.
+
+[dev-dependencies]
+tempfile = { workspace = true }
