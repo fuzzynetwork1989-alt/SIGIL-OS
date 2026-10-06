@@ -4,6 +4,7 @@ members = [
     "sigil-core/persistence",
     "sigil-core/api",
     "model-fabric",
+    "ui-ux",
 ]
 resolver = "2"
 

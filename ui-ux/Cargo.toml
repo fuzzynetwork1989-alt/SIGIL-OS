@@ -1,0 +1,37 @@
+[package]
+name = "ui-ux"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# Slint UI framework
+slint = "1.6"
+
+# Graphics and rendering
+# Note: Slint handles rendering internally, but we may need additional graphics libraries
+
+# Asset management
+rust-embed = "8.0"
+
+# Image processing
+image = "0.25"
+
+[dev-dependencies]
+tempfile = { workspace = true }
