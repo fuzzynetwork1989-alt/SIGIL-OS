@@ -2,8 +2,9 @@
 //!
 //! This module provides Ed25519 signing capabilities for sigils.
 
-use ed25519::Keypair;
+use ed25519_dalek::{SigningKey, VerifyingKey, SecretKey, Signer};
 use rand::rngs::OsRng;
+use rand::RngCore;
 use serde::Serialize;
 
 use crate::sigil::{Ed25519Signature, Sigil};
@@ -11,21 +12,29 @@ use crate::sigil::{Ed25519Signature, Sigil};
 /// Key pair for signing
 #[derive(Debug, Clone)]
 pub struct KeyPair {
-    pub keypair: Keypair,
+    pub signing_key: SigningKey,
+    pub verifying_key: VerifyingKey,
 }
 
 impl KeyPair {
     /// Generate a new random key pair
     pub fn generate() -> Self {
         let mut csprng = OsRng;
-        let keypair = Keypair::generate(&mut csprng);
+        let mut secret_key_bytes = [0u8; 32];
+        csprng.fill_bytes(&mut secret_key_bytes);
+        let secret_key = SecretKey::from(secret_key_bytes);
+        let signing_key = SigningKey::from(&secret_key);
+        let verifying_key = VerifyingKey::from(&signing_key);
 
-        Self { keypair }
+        Self {
+            signing_key,
+            verifying_key,
+        }
     }
 
     /// Get the public key bytes
     pub fn public_key_bytes(&self) -> Vec<u8> {
-        self.keypair.public.to_bytes().to_vec()
+        self.verifying_key.to_bytes().to_vec()
     }
 }
 
@@ -55,17 +64,17 @@ impl SigilSigner {
         let sigil_for_signing = SigilForSigning::from(sigil);
         let serialized = serde_json::to_vec(&sigil_for_signing)?;
 
-        let signature = self.key_pair.sign(&serialized);
+        let signature = self.key_pair.signing_key.sign(&serialized);
 
         Ok(Ed25519Signature {
             bytes: signature.to_bytes().to_vec(),
-            public_key: self.key_pair.public.to_bytes().to_vec(),
+            public_key: self.key_pair.verifying_key.to_bytes().to_vec(),
         })
     }
 
-    /// Get the public key
-    pub fn public_key(&self) -> &ed25519::PublicKey {
-        &self.key_pair.public
+    /// Get the public key bytes
+    pub fn public_key_bytes(&self) -> Vec<u8> {
+        self.key_pair.public_key_bytes()
     }
 }
 
@@ -112,8 +121,8 @@ mod tests {
     #[test]
     fn test_signer_creation() {
         let signer = SigilSigner::new();
-        let public_key = signer.public_key();
-        assert_eq!(public_key.as_bytes().len(), 32);
+        let public_key = signer.public_key_bytes();
+        assert_eq!(public_key.len(), 32);
     }
 
     #[test]

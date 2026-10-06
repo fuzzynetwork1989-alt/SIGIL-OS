@@ -1,22 +1,22 @@
-# Autopilot Intake Report v2
+# Autopilot Intake Report V2 - Expanded Scope
 
-**Generated:** 2026-10-04T03:22:00Z
+**Generated:** 2026-10-05T11:45:00Z
 **Repository:** sigil-os
 **Owner:** fuzzynetwork1989-alt
 **Autopilot Mode:** SIGIL OS Autopilot Mode v1.0
-**Status:** Activated
+**Scope Change:** Major expansion from Phase 0 to full-stack implementation
 
 ## Autopilot State
 
 ```yaml
-autopilot_state: Inventorying
+autopilot_state: Planning
 repository_status: detected
 workspace_status: clean
-architecture_status: found
-requirements_status: found
-implementation_status: partial
+architecture_status: found (requires major update)
+requirements_status: found (requires major expansion)
+implementation_status: partial (Phase 0 only)
 toolchain_status: partial
-ci_cd_status: partial
+ci_cd_status: missing
 security_status: not_assessed
 model_fabric_status: missing
 sigil_ledger_status: partial
@@ -25,216 +25,299 @@ surface_status:
   desktop: missing
   mobile: missing
   xr: missing
-next_vertical_slice: Phase 0 - Foundations completion
+new_requirements:
+  dream_weaving: pending_invention
+  meta_quest_3: pending_implementation
+  model_fabric: pending_implementation
+  ui_ux_layer: pending_implementation
+  ci_cd: pending_implementation
+next_vertical_slice: Architecture update + Model Fabric foundation
 blockers:
   - Rust not installed
-  - GitHub repository not created
-required_approvals: []
-build_packet_reference: autopilot/BUILD_PACKET_PHASE0_COMPLETION.md
+  - No Android/Quest SDKs
+  - No base model selected
+  - Architecture needs major updates
+required_approvals:
+  - Scope expansion approval (this is massive)
+  - New architecture approval
+  - Toolchain additions (Android SDK, Quest SDK)
+build_packet_reference: autopilot/BUILD_PACKET_EXPANDED_SCOPE.md
 emitted_sigils: 0
 ```
 
 ## Repository Status
 
 **Detected:** Yes
-**Location:** C:\Users\Corey Smith\Devin Projects\sigil-os
-**Git Status:** Clean (all changes committed)
+**Location:** C:\Users\Corey Smith\Devin Projects\SIGIL OS
+**Git Status:** Clean
 **Branch:** main
-**Remote:** https://github.com/fuzzynetwork1989-alt/sigil-os.git (not created yet)
+**Remote:** https://github.com/fuzzynetwork1989-alt/sigil-os.git
 
-## Architecture Status
+## New Requirements - Major Scope Expansion
 
-**Status:** Found
-**Documentation:**
-- `docs/ARCHITECTURE.md` - Complete architecture specification
-- `docs/PROJECT_CONTRACT.md` - Project contract and requirements
-- `docs/SIGIL_AUTOPILOT_MODE.md` - SIGIL OS Autopilot Mode specification
-- `docs/RELEASE_GATES.md` - Release gates for all phases
-- `docs/SETUP.md` - Setup guide
+### 1. Dream Weaving Recursive Self-Evolving Remembrance (NEW)
 
-**Architecture Layers:**
-- Experience Surfaces: Not implemented
-- Cognitive Applications: Not implemented
-- SIGIL Runtime: Not implemented
-- Noetic Substrate: Not implemented
-- Anchor Governance: Not implemented
-- Inference Kernel: Not implemented
-- System Kernel: Not implemented
-- Hardware: N/A
+**Status:** To be invented and designed
+**Priority:** MUST-HAVE (user specified as most important)
 
-## Requirements Status
+**Concept (To be designed):**
+A self-evolving cognitive system that:
+- "Weaves" connections between memories, beliefs, and experiences in a dream-like state
+- Recursively improves its own cognitive architecture through self-reflection
+- Evolves its neural pathways and reasoning patterns over time
+- Maintains a "remembrance" system that preserves evolutionary history
+- Generates novel insights through cross-pollination of cognitive states
+- Has built-in safeguards against runaway self-modification
+- Every evolutionary step is warranted, reversible, and auditable
 
-**Status:** Found
-**Contract:** `docs/PROJECT_CONTRACT.md`
-**Non-Negotiable Requirements:**
-1. Warranted Cognition - Partially implemented (sigil type defined)
-2. Reversible State - Partially implemented (rollback key defined)
-3. Epistemic Decay - Not implemented
-4. Capability Leases - Partially implemented (capability types defined)
-5. Governance at Syscall Boundary - Not implemented
-6. Attested Provenance - Partially implemented (attestation fields defined)
-7. Frame-Aware Ethics - Not implemented
+**Implementation Components (Tentative):**
+- Dream state simulation engine
+- Recursive self-reflection mechanisms
+- Cognitive pathway mutation operators
+- Evolutionary history ledger
+- Insight generation system
+- Safeguard constraints and rollback
+- Warranted self-modification framework
 
-## Implementation Status
+### 2. Meta Quest 3 Integration (NEW)
 
-**Status:** Partial
-**Implemented:**
-- sigil-core/sigil: Sigil type, signing, verification (code written, not tested)
-- sigil-core/persistence: Ledger, store (code written, not tested)
-- sigil-core/api: HTTP API, CLI (code written, not tested)
-- Documentation: Complete
-- Skills: sigil-builder, sigil-autopilot, sigil-autopilot-orchestrator, ci-cd-manager, app-store-submitter, missing-layer-detector, security-auditor, performance-optimizer
-- Workflows: MASTER_WORKFLOW.md
-- Rules: BUILD_RULES.md
+**Status:** Pending SDK acquisition and implementation
+**Priority:** MUST-HAVE
 
-**Not Implemented:**
-- Noetic Substrate
-- Anchor Governance
-- Inference Kernel
-- System Kernel
-- Experience Surfaces
-- Cognitive Applications
+**Requirements:**
+- Meta Quest 3 3rd party voice assistant with vision
+- Android/Quest SDKs and toolchains
+- Mixed reality interface
+- Voice input/output
+- Vision/camera integration
+- Spatial mapping and anchors
+- Hand tracking integration
+- XR presence system ("The Presence" companion)
 
-**Missing:**
-- Tests (defined in code but not run)
-- Build verification (cargo not available)
-- CI/CD (partially configured)
-- Security assessment
-- Performance benchmarking
-- Sigil ledger integration (code exists but not integrated)
+**Required SDKs:**
+- Meta Quest SDK (Oculus SDK)
+- Android SDK/NDK
+- OpenXR runtime
+- Spatial Audio SDK
+- Hand Tracking SDK
+- Passthrough API
 
-## Toolchain Status
+### 3. Model Fabric Infrastructure (NEW)
 
-**Status:** Partial
-**Available:**
+**Status:** Missing
+**Priority:** MUST-HAVE
+
+**Requirements:**
+- Base model selection and integration
+- Modelfile creation and management
+- Model family creation
+- Enhanced next-generation brain/engine
+- Model integrations (multiple providers)
+- Model routing and selection
+- Model capability typing
+- Model performance monitoring
+
+**Base Model Candidates:**
+- Local: LLaMA, Mistral, Phi, Qwen
+- Cloud: OpenAI, Anthropic, Google, etc.
+- Hybrid: Local + Cloud fallback
+
+### 4. UI/UX Layer (NEW)
+
+**Status:** Missing
+**Priority:** MUST-HAVE
+
+**Requirements:**
+- Icon packs
+- Theme packs
+- Clickable icons and buttons
+- Interactive interface
+- Chatbot section
+- Digital model morphed into real life
+- Mixed reality visualization
+- Customizable bot/model appearance
+
+**Components:**
+- Icon system (SVG, PNG, 3D models)
+- Theme engine (light/dark/custom)
+- UI component library
+- Interaction framework
+- Avatar/character system
+- Morphing/transformation engine
+
+### 5. CI/CD Pipelines (NEW)
+
+**Status:** Missing
+**Priority:** MUST-HAVE
+
+**Requirements:**
+- Automated testing
+- Automated linting
+- Automated building
+- Automated deployment
+- Multi-platform builds (Windows, Linux, Android, Quest)
+- Security scanning
+- Dependency scanning
+- Sigil verification in CI
+
+### 6. VR/XR/AR Glasses Compatibility (NEW)
+
+**Status:** Missing
+**Priority:** MUST-HAVE
+
+**Requirements:**
+- OpenXR standard support
+- Multiple device compatibility
+- Apple Vision Pro support
+- Meta Quest support
+- HoloLens support
+- Generic XR glasses support
+
+### 7. Interactive Chatbot with Mixed Reality (NEW)
+
+**Status:** Missing
+**Priority:** MUST-HAVE
+
+**Requirements:**
+- Chat interface
+- Digital model/avatar
+- Mixed reality integration
+- Voice interaction
+- Spatial presence
+- Customizable appearance
+- Real-time morphing
+
+## Current Implementation Status
+
+**Phase 0 (Foundations) - Partial:**
+- [x] Repository structure
+- [x] Core documentation
+- [x] Sigil type definitions
+- [x] Signing infrastructure
+- [x] Verification infrastructure
+- [x] Persistence layer
+- [x] HTTP API scaffold
+- [x] CLI scaffold
+- [ ] Build verification (Rust not installed)
+- [ ] Test execution (Rust not installed)
+
+**Phase 1-6 (Not Started):**
+- [ ] Noetic Substrate
+- [ ] Anchor Governance
+- [ ] Inference Kernel
+- [ ] System Kernel
+- [ ] Experience Surfaces
+- [ ] Cognitive Applications
+- [ ] Model Fabric
+- [ ] Dream Weaving System
+- [ ] Meta Quest 3 Integration
+- [ ] UI/UX Layer
+- [ ] CI/CD Pipelines
+
+## Architecture Update Required
+
+The current ARCHITECTURE.md needs major updates to include:
+
+1. **Dream Weaving Recursive Self-Evolving Remembrance** as a new layer or subsystem
+2. **Model Fabric** as a new layer between Inference Kernel and System Kernel
+3. **Meta Quest 3 Integration** in Experience Surfaces
+4. **UI/UX Layer** as a new subsystem
+5. **CI/CD Infrastructure** in operational layer
+
+## Toolchain Gaps
+
+**Current:**
 - Git: Yes
 - Bash: Yes
 
 **Missing:**
-- Cargo: Not installed
-- Rust: Not installed
+- Rust: Not installed (BLOCKER)
+- Android SDK: Not installed
+- Meta Quest SDK: Not installed
+- OpenXR SDK: Not installed
+- Node.js (for web UI): Not installed
+- Python (for ML/model management): Not installed
+- Docker (for CI/CD): Not installed
 
-**Impact:** Cannot build or test the Rust code without installing Rust and Cargo.
+## Risk Assessment
 
-## CI/CD Status
+**Critical Risks:**
+1. **Massive scope expansion** - Going from Phase 0 to full-stack implementation
+2. **Toolchain complexity** - Requires multiple SDKs and toolchains
+3. **New invention required** - Dream Weaving system doesn't exist
+4. **Resource requirements** - Building all this requires significant compute/time
+5. **Integration complexity** - Many layers must work together
+6. **No existing model** - Need to select and integrate base model
+7. **Platform fragmentation** - Windows, Linux, Android, Quest builds
 
-**Status:** Partial
-**Implemented:**
-- GitHub Actions workflow: `.github/workflows/ci.yml`
-- Pre-commit config: `.pre-commit-config.yaml`
-
-**Missing:**
-- Automated testing (cannot run without Rust)
-- Security scanning (cannot run without Rust)
-- Performance benchmarking (cannot run without Rust)
-- Artifact signing
-- Deployment pipelines
-
-## Security Status
-
-**Status:** Not Assessed
-**Missing:**
-- Security audit
-- Dependency scanning
-- Secret scanning
-- Penetration testing
-- Cryptographic implementation review
-
-## Model Fabric Status
-
-**Status:** Missing
-**Note:** Model fabric is not required for Phase 0 (Foundations).
-
-## Sigil Ledger Status
-
-**Status:** Partial
-**Implemented:**
-- Ledger code in sigil-core/persistence
-- Sigil type with signature fields
-
-**Missing:**
-- Integration with build process
-- Sigil emission for state changes
-- Rollback functionality
-- Ledger integrity verification
-
-## Surface Status
-
-**Status:** All Missing
-- Web: Missing
-- Desktop: Missing
-- Mobile: Missing
-- XR: Deferred
-
-**Note:** Experience surfaces are Phase 6.
+**Mitigation Strategies:**
+- Start with Model Fabric foundation
+- Invent Dream Weaving incrementally
+- Focus on one platform first (e.g., desktop)
+- Use existing UI frameworks where possible
+- Implement CI/CD early to catch issues
+- Modular architecture for easier integration
 
 ## Next Vertical Slice
 
-**Phase 0 - Foundations Completion**
+**Recommended First Step:**
 
-Current progress:
-- [x] Repository structure
-- [x] Core documentation
-- [x] Sigil type implementation
-- [x] Signing infrastructure
-- [x] Verification infrastructure
-- [x] Persistence layer (ledger, store)
-- [x] HTTP API scaffold
-- [x] CLI scaffold
-- [x] Skills (8 skills created)
-- [x] Workflows (MASTER_WORKFLOW.md)
-- [x] Rules (BUILD_RULES.md)
-- [ ] Build verification (requires Rust installation)
-- [ ] Test execution (requires Rust installation)
-- [ ] CI/CD verification (requires Rust installation)
-- [ ] GitHub repository creation (requires manual action)
-- [ ] Sigil emission integration (requires implementation)
-
-## Blockers
-
-1. **Rust not installed** - Cannot build or test the code
-2. **GitHub repository not created** - Cannot push code to remote
-3. **Sigil emission not integrated** - Cannot emit sigils for state changes
+1. Update ARCHITECTURE.md with all new components
+2. Design Dream Weaving Recursive Self-Evolving Remembrance system
+3. Create Build Packet for Model Fabric (foundational for everything else)
+4. Install Rust and verify Phase 0 completion
+5. Begin Model Fabric implementation
 
 ## Required Approvals
 
-None for current phase (Phase 0 is foundations and documentation).
+This scope expansion requires:
+1. **Explicit approval** for massive scope change (Phase 0 → full-stack)
+2. **Architecture approval** for new components
+3. **Budget approval** for SDKs, cloud services, compute resources
+4. **Timeline approval** - this is now a multi-month/year project
+5. **Toolchain approval** - Android SDK, Quest SDK, etc.
 
-## Risks
+## Dependencies
 
-1. **Toolchain unavailable** - Without Rust/Cargo, cannot verify code compiles or tests pass
-2. **No GitHub repository** - Code is local only, not backed up to remote
-3. **No CI/CD verification** - No automated verification of changes
-4. **Security not assessed** - Cryptographic implementation not reviewed
-5. **Sigil emission not integrated** - Cannot emit sigils for state changes as required by Autopilot Mode
+**External Dependencies to Acquire:**
+- Android Studio / Android SDK
+- Meta Quest SDK / Oculus SDK
+- OpenXR runtime
+- Base model (local or cloud API keys)
+- Cloud services (if using cloud models)
+- CI/CD platform (GitHub Actions, GitLab CI, etc.)
+
+**Internal Dependencies:**
+- Phase 0 must complete first (build verification)
+- Model Fabric needed before Dream Weaving
+- UI/UX layer needs Model Fabric
+- Meta Quest integration needs base system working
+
+## Evidence Requirements
+
+Before proceeding, need:
+- [ ] User approval for scope expansion
+- [ ] Architecture document updates approved
+- [ ] Dream Weaving design document created and approved
+- [ ] Toolchain installation plan approved
+- [ ] Budget/cost estimate approved
 
 ## Recommendations
 
-1. Install Rust and Cargo to enable build and test verification
-2. Create GitHub repository to enable remote backup and collaboration
-3. Integrate sigil emission into build process
-4. Set up CI/CD with sigil ledger integration
-5. Conduct security review of cryptographic implementation
-6. Add integration tests for the ledger and signing infrastructure
-7. Implement rollback functionality via sigil rollback keys
+1. **Approve scope expansion** - This is now a major project, not Phase 0
+2. **Design Dream Weaving first** - Create detailed specification
+3. **Install Rust** - Unblock Phase 0 completion
+4. **Start with Model Fabric** - Foundation for everything else
+5. **Implement CI/CD early** - Catch issues early
+6. **Choose one platform first** - Don't try to build all platforms simultaneously
+7. **Create phased delivery plan** - Break into manageable milestones
 
-## Skills Available
+## Stop Conditions
 
-All 8 skills are available:
-1. sigil-autopilot-orchestrator ✓ (currently active)
-2. sigil-autopilot ✓
-3. sigil-builder ✓
-4. ci-cd-manager ✓
-5. app-store-submitter ✓
-6. missing-layer-detector ✓
-7. security-auditor ✓
-8. performance-optimizer ✓
-
-## Next Steps
-
-1. Invoke missing-layer-detector to detect gaps
-2. Invoke sigil-builder to complete Phase 0 if Rust is available
-3. Invoke ci-cd-manager to enhance CI/CD once Rust is available
-4. Invoke security-auditor once cryptographic implementation is testable
-5. Invoke performance-optimizer once code is buildable
-6. Invoke app-store-submitter in final phase
+Autopilot should stop if:
+- User does not approve scope expansion
+- Architecture updates are rejected
+- Dream Weaving design is not feasible
+- Toolchain installation fails
+- Budget/resources are insufficient
+- Any required approval is denied
