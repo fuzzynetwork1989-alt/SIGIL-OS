@@ -3,10 +3,7 @@
 //! This module provides icon pack loading, rendering, and management.
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use uuid::Uuid;
-
-use crate::UiUxError;
 
 /// Icon representation
 #[derive(Debug, Clone)]
@@ -57,7 +54,7 @@ pub struct IconPackLoader;
 
 impl IconPackLoader {
     /// Load an icon pack from a directory
-    pub fn load_from_directory(path: &str) -> Result<IconPack> {
+    pub fn load_from_directory(path: &str) -> std::result::Result<IconPack, crate::UiUxError> {
         // TODO: Implement actual directory loading
         // This would scan the directory for icon files and load them
         let mut icons = HashMap::new();
@@ -82,7 +79,7 @@ impl IconPackLoader {
     }
 
     /// Load an icon pack from an embedded resource
-    pub fn load_embedded(name: &str) -> Result<IconPack> {
+    pub fn load_embedded(name: &str) -> std::result::Result<IconPack, crate::UiUxError> {
         // TODO: Implement embedded resource loading using rust-embed
         Self::load_from_directory(name)
     }

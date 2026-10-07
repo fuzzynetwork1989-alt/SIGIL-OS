@@ -5,6 +5,8 @@ members = [
     "sigil-core/api",
     "model-fabric",
     "ui-ux",
+    "dream-weaving",
+    "quest-integration",
 ]
 resolver = "2"
 

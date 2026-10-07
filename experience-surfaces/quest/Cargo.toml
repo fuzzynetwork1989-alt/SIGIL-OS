@@ -1,0 +1,31 @@
+[package]
+name = "quest-integration"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# Note: Android/Quest SDK integration would require:
+# - jni crate for JNI bindings
+# - ndk crate for Android NDK
+# - OpenXR bindings
+# These are platform-specific and would need manual SDK installation
+
+[dev-dependencies]
+tempfile = { workspace = true }

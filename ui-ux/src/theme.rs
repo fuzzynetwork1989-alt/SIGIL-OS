@@ -84,7 +84,7 @@ pub struct Theme {
 }
 
 /// Theme mode
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ThemeMode {
     Light,
     Dark,
@@ -105,11 +105,11 @@ impl ThemePreset {
     /// Create a theme from a preset
     pub fn to_theme(&self) -> Theme {
         match self {
-            ThemePreset::Light => self::light_theme(),
-            ThemePreset::Dark => self::dark_theme(),
-            ThemePreset::Blue => self::blue_theme(),
-            ThemePreset::Green => self::green_theme(),
-            ThemePreset::Purple => self::purple_theme(),
+            ThemePreset::Light => ThemePreset::light_theme(),
+            ThemePreset::Dark => ThemePreset::dark_theme(),
+            ThemePreset::Blue => ThemePreset::blue_theme(),
+            ThemePreset::Green => ThemePreset::green_theme(),
+            ThemePreset::Purple => ThemePreset::purple_theme(),
         }
     }
 
@@ -290,7 +290,7 @@ impl ThemeEngine {
     }
 
     /// Set the current theme
-    pub fn set_theme(&mut self, name: &str) -> Result<()> {
+    pub fn set_theme(&mut self, name: &str) -> std::result::Result<(), UiUxError> {
         let theme = self
             .themes
             .get(name)
