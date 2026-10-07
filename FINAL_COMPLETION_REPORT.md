@@ -67,7 +67,7 @@ SIGIL OS has been successfully implemented with all requested components at the 
 
 ## Repository Structure
 
-```
+```text
 sigil-os/
 ├── .github/workflows/ci.yml ✅
 ├── sigil-core/ ✅ (3 crates, all building)
