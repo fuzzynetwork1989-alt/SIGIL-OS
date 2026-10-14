@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGIL OS - Web UI</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="../sigil-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../sigil-icon-512x512.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="../sigil-icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../sigil-icon-512x512.png">
+    <link rel="stylesheet" href="themes.css">
+    <script src="i18n.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-selector {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 1rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 80%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .message-content {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .message.user .message-content {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--background);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        .voice-button {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .voice-button:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .voice-button.listening {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .superbrain-info {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .superbrain-badge,
+        .emotion-badge,
+        .confidence-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .superbrain-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .emotion-badge {
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--primary);
+        }
+
+        .confidence-badge {
+            background: rgba(118, 75, 162, 0.2);
+            color: #764ba2;
+        }
+
+        .superbrain-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            cursor: pointer;
+        }
+
+        .superbrain-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .superbrain-toggle.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .superbrain-toggle input {
+            display: none;
+        }
+
+        .superbrain-toggle .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .superbrain-toggle.active .checkbox {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .superbrain-toggle.active .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+        }
+
+        /* Avatar Display */
+        .avatar-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .avatar-large {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-face {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-eyes {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .avatar-eye {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .avatar-eye::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .avatar-mouth {
+            width: 40px;
+            height: 20px;
+            border: 3px solid white;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .avatar-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        .avatar-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .control-group {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .control-group h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        /* Dream Weaving Dashboard */
+        .dream-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .dream-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .dream-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .dream-stat {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .dream-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            max-width: 800px;
+        }
+
+        .settings-section {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-weight: 500;
+        }
+
+        .setting-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background-color: var(--border);
+            border-radius: 13px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .toggle.active {
+            background-color: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-dark">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">S</div>
+                <div class="sidebar-title">SIGIL OS</div>
+            </div>
+            <nav>
+                <div class="nav-item active" onclick="showPage('chat')">
+                    <span class="nav-icon">💬</span>
+                    <span>Chat</span>
+                </div>
+                <div class="nav-item" onclick="showPage('avatar')">
+                    <span class="nav-icon">🤖</span>
+                    <span>Avatar</span>
+                </div>
+                <div class="nav-item" onclick="showPage('dream')">
+                    <span class="nav-icon">🧠</span>
+                    <span>Dream Weaving</span>
+                </div>
+                <div class="nav-item" onclick="showPage('sigil')">
+                    <span class="nav-icon">🔐</span>
+                    <span>Sigil Explorer</span>
+                </div>
+                <div class="nav-item" onclick="showPage('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 class="header-title">Chat</h1>
+                <div class="header-actions">
+                    <div class="superbrain-toggle" id="superbrain-toggle" onclick="toggleSuperBrain()">
+                        <div class="checkbox"></div>
+                        <span>🧠 Super Brain</span>
+                    </div>
+                    <select class="theme-selector" onchange="changeTheme(this.value)">
+                        <option value="theme-dark">Dark</option>
+                        <option value="theme-light">Light</option>
+                        <option value="theme-blue">Blue</option>
+                        <option value="theme-green">Green</option>
+                        <option value="theme-purple">Purple</option>
+                    </select>
+                    <select class="theme-selector" onchange="setLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="ja">日本語</option>
+                        <option value="zh">中文</option>
+                    </select>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Chat Page -->
+                <div id="page-chat" class="chat-container">
+                    <div class="chat-messages">
+                        <div class="message ai">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm your SIGIL OS companion. How can I help you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <button class="voice-button" id="voice-button" onclick="toggleVoiceInput()">
+                            🎤
+                        </button>
+                        <input type="text" class="chat-input" placeholder="Type a message or use voice..."
+                            onkeypress="handleKeyPress(event)">
+                        <button class="send-button" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+
+                <!-- Avatar Page -->
+                <div id="page-avatar" class="avatar-display" style="display: none;">
+                    <div class="avatar-large">
+                        <div class="avatar-glow"></div>
+                        <div class="avatar-face">
+                            <div class="avatar-eyes">
+                                <div class="avatar-eye"></div>
+                                <div class="avatar-eye"></div>
+                            </div>
+                            <div class="avatar-mouth"></div>
+                        </div>
+                    </div>
+                    <div class="avatar-controls">
+                        <div class="control-group">
+                            <h3>Avatar Style</h3>
+                            <select onchange="updateAvatarStyle(this.value)">
+                                <option value="realistic">Realistic</option>
+                                <option value="stylized">Stylized</option>
+                                <option value="procedural">Procedural</option>
+                                <option value="minimal">Minimal</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <h3>Skin Tone</h3>
+                            <select onchange="updateAvatarSkin(this.value)">
+                                <option value="light">Light</option>
+                                <option value="medium">Medium</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <h3>Eye Color</h3>
+                            <select onchange="updateAvatarEyes(this.value)">
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="brown">Brown</option>
+                                <option value="hazel">Hazel</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <h3>Expression</h3>
+                            <select onchange="updateAvatarExpression(this.value)">
+                                <option value="happy">Happy</option>
+                                <option value="neutral">Neutral</option>
+                                <option value="thoughtful">Thoughtful</option>
+                                <option value="surprised">Surprised</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dream Weaving Page -->
+                <div id="page-dream" class="dream-dashboard" style="display: none;">
+                    <div class="dream-card">
+                        <h3>Dream Cycles</h3>
+                        <div class="dream-stat">0</div>
+                        <div class="dream-label">Total cycles</div>
+                    </div>
+                    <div class="dream-card">
+                        <h3>Insights Generated</h3>
+                        <div class="dream-stat">0</div>
+                        <div class="dream-label">New insights</div>
+                    </div>
+                    <div class="dream-card">
+                        <h3>Evolution Score</h3>
+                        <div class="dream-stat">0%</div>
+                        <div class="dream-label">Current evolution</div>
+                    </div>
+                    <div class="dream-card">
+                        <h3>Rollback Points</h3>
+                        <div class="dream-stat">0</div>
+                        <div class="dream-label">Available rollbacks</div>
+                    </div>
+                </div>
+
+                <!-- Sigil Explorer Page -->
+                <div id="page-sigil" style="display: none;">
+                    <div class="dream-card">
+                        <h3>Sigil Explorer</h3>
+                        <p style="color: var(--text-secondary); margin-top: 1rem;">
+                            View and verify cryptographic warrants for all cognitive acts.
+                        </p>
+                        <div
+                            style="margin-top: 1rem; padding: 1rem; background-color: var(--background); border-radius: 8px;">
+                            <p style="color: var(--text-secondary);">No sigils to display yet. Start a conversation to
+                                generate sigils.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="page-settings" class="settings-panel" style="display: none;">
+                    <div class="settings-section">
+                        <h3>Dream Weaving</h3>
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-label">Enable Dream Weaving</div>
+                                <div class="setting-description">Allow the AI to self-evolve based on conversations
+                                </div>
+                            </div>
+                            <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-label">Auto-approve Mutations</div>
+                                <div class="setting-description">Automatically approve evolutionary changes</div>
+                            </div>
+                            <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Model</h3>
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-label">Model Provider</div>
+                                <div class="setting-description">Choose between local or cloud inference</div>
+                            </div>
+                            <select
+                                style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background-color: var(--background); color: var(--text);">
+                                <option>Local</option>
+                                <option>Cloud</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Privacy</h3>
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-label">Local Processing</div>
+                                <div class="setting-description">Process all data locally on your device</div>
+                            </div>
+                            <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-label">Telemetry</div>
+                                <div class="setting-description">Send anonymous usage data to improve SIGIL OS</div>
+                            </div>
+                            <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check if this is first visit
+        if (!localStorage.getItem('sigil-os-onboarded')) {
+            window.location.href = 'onboarding.html';
+        }
+
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('[id^="page-"]').forEach(page => {
+                page.style.display = 'none';
+            });
+
+            // Show selected page
+            document.getElementById('page-' + pageName).style.display = 'block';
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update header title
+            const titles = {
+                'chat': 'Chat',
+                'avatar': 'Avatar',
+                'dream': 'Dream Weaving',
+                'sigil': 'Sigil Explorer',
+                'settings': 'Settings'
+            };
+            document.querySelector('.header-title').textContent = titles[pageName];
+        }
+
+        function changeTheme(theme) {
+            document.body.className = theme;
+        }
+
+        function updateAvatarStyle(style) {
+            const avatar = document.querySelector('.avatar-large');
+            const face = document.querySelector('.avatar-face');
+
+            // Remove existing style classes
+            avatar.classList.remove('style-realistic', 'style-stylized', 'style-procedural', 'style-minimal');
+            avatar.classList.add('style-' + style);
+
+            // Apply style-specific changes
+            switch (style) {
+                case 'minimal':
+                    face.style.borderRadius = '50%';
+                    break;
+                case 'procedural':
+                    face.style.borderRadius = '30%';
+                    break;
+                case 'stylized':
+                    face.style.borderRadius = '10px';
+                    break;
+                default:
+                    face.style.borderRadius = '50%';
+            }
+        }
+
+        function updateAvatarSkin(tone) {
+            const avatar = document.querySelector('.avatar-large');
+
+            switch (tone) {
+                case 'light':
+                    avatar.style.background = 'linear-gradient(135deg, #f5d0a9 0%, #e8c39e 100%)';
+                    break;
+                case 'medium':
+                    avatar.style.background = 'linear-gradient(135deg, #d4a574 0%, #c49463 100%)';
+                    break;
+                case 'dark':
+                    avatar.style.background = 'linear-gradient(135deg, #8d5524 0%, #6f4422 100%)';
+                    break;
+            }
+        }
+
+        function updateAvatarEyes(color) {
+            const eyes = document.querySelectorAll('.avatar-eye');
+
+            switch (color) {
+                case 'blue':
+                    eyes.forEach(eye => eye.style.background = '#4a90e2');
+                    break;
+                case 'green':
+                    eyes.forEach(eye => eye.style.background = '#7ed321');
+                    break;
+                case 'brown':
+                    eyes.forEach(eye => eye.style.background = '#8b4513');
+                    break;
+                case 'hazel':
+                    eyes.forEach(eye => eye.style.background = '#8b7355');
+                    break;
+            }
+        }
+
+        function updateAvatarExpression(expression) {
+            const mouth = document.querySelector('.avatar-mouth');
+            const eyes = document.querySelectorAll('.avatar-eye');
+
+            switch (expression) {
+                case 'happy':
+                    mouth.style.borderRadius = '0 0 20px 20px';
+                    mouth.style.borderTop = 'none';
+                    eyes.forEach(eye => eye.style.transform = 'scale(1)');
+                    break;
+                case 'neutral':
+                    mouth.style.borderRadius = '0';
+                    mouth.style.borderTop = '3px solid white';
+                    eyes.forEach(eye => eye.style.transform = 'scale(1)');
+                    break;
+                case 'thoughtful':
+                    mouth.style.borderRadius = '0 0 10px 10px';
+                    mouth.style.borderTop = 'none';
+                    eyes.forEach(eye => eye.style.transform = 'scale(0.9)');
+                    break;
+                case 'surprised':
+                    mouth.style.borderRadius = '50%';
+                    mouth.style.border = '3px solid white';
+                    mouth.style.borderTop = '3px solid white';
+                    eyes.forEach(eye => eye.style.transform = 'scale(1.2)');
+                    break;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.querySelector('.chat-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            const chatMessages = document.querySelector('.chat-messages');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-avatar">👤</div>
+                <div class="message-content">
+                    <p>${message}</p>
+                </div>
+            `;
+            chatMessages.appendChild(userMessage);
+
+            // Clear input
+            input.value = '';
+
+            // Add loading indicator
+            const loadingMessage = document.createElement('div');
+            loadingMessage.className = 'message ai';
+            loadingMessage.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <p>Thinking...</p>
+                </div>
+            `;
+            chatMessages.appendChild(loadingMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Generate conversation ID and user ID
+            const conversationId = localStorage.getItem('sigil-conversation-id') || generateUUID();
+            const userId = localStorage.getItem('sigil-user-id') || generateUUID();
+
+            localStorage.setItem('sigil-conversation-id', conversationId);
+            localStorage.setItem('sigil-user-id', userId);
+
+            // Check if Super Brain is enabled
+            const useSuperBrain = localStorage.getItem('sigil-use-superbrain') === 'true';
+
+            try {
+                const endpoint = useSuperBrain
+                    ? 'http://127.0.0.1:8080/api/v1/superbrain/chat'
+                    : 'http://127.0.0.1:8080/api/v1/chat';
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: message,
+                        max_tokens: 1000,
+                        temperature: 0.7,
+                        use_superbrain: useSuperBrain,
+                        conversation_id: conversationId,
+                        user_id: userId,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Remove loading message
+                    chatMessages.removeChild(loadingMessage);
+
+                    // Add AI response
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai';
+
+                    let responseText = data.text || data.response || 'Response received';
+
+                    // Add Super Brain info if available
+                    let superBrainInfo = '';
+                    if (data.superbrain) {
+                        superBrainInfo = `
+                            <div class="superbrain-info">
+                                <span class="superbrain-badge">🧠 Super Brain</span>
+                                <span class="emotion-badge">Emotion: ${data.superbrain.emotional_state}</span>
+                                <span class="confidence-badge">Confidence: ${(data.superbrain.confidence * 100).toFixed(0)}%</span>
+                            </div>
+                        `;
+                    }
+
+                    aiMessage.innerHTML = `
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            ${superBrainInfo}
+                            <p>${responseText}</p>
+                        </div>
+                    `;
+                    chatMessages.appendChild(aiMessage);
+
+                    // Speak the response
+                    speak(responseText);
+                } else {
+                    // API not available, use placeholder
+                    chatMessages.removeChild(loadingMessage);
+
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai';
+                    aiMessage.innerHTML = `
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <p>I received your message: "${message}". The API server is not running. Please start the API server with run-api.bat (Windows) or make run (Linux/macOS) to enable full ML inference.</p>
+                        </div>
+                    `;
+                    chatMessages.appendChild(aiMessage);
+                }
+            } catch (error) {
+                // API not available, use placeholder
+                chatMessages.removeChild(loadingMessage);
+
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
+                aiMessage.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <p>I received your message: "${message}". The API server is not running. Please start the API server with run-api.bat (Windows) or make run (Linux/macOS) to enable full ML inference.</p>
+                    </div>
+                `;
+                chatMessages.appendChild(aiMessage);
+            }
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Voice input functionality
+        let recognition = null;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            const voiceButton = document.getElementById('voice-button');
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Voice input is not supported in this browser. Please use Chrome or Edge.');
+                return;
+            }
+
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                const voiceButton = document.getElementById('voice-button');
+                voiceButton.classList.add('listening');
+                voiceButton.textContent = '🔴';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const input = document.querySelector('.chat-input');
+                input.value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopListening();
+            };
+
+            recognition.onend = () => {
+                stopListening();
+            };
+
+            recognition.start();
+        }
+
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isListening = false;
+            const voiceButton = document.getElementById('voice-button');
+            voiceButton.classList.remove('listening');
+            voiceButton.textContent = '🎤';
+        }
+
+        // Text-to-speech for AI responses
+        function speak(text) {
+            if (!('speechSynthesis' in window)) {
+                console.log('Text-to-speech not supported');
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice =>
+                voice.name.includes('Google') ||
+                voice.name.includes('Samantha') ||
+                voice.name.includes('Daniel')
+            );
+
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+
+        // Initialize i18n
+        window.addEventListener('load', () => {
+            if (typeof initI18n === 'function') {
+                initI18n();
+            }
+
+            // Initialize Super Brain toggle
+            const useSuperBrain = localStorage.getItem('sigil-use-superbrain') === 'true';
+            const toggle = document.getElementById('superbrain-toggle');
+            if (useSuperBrain) {
+                toggle.classList.add('active');
+            }
+        });
+
+        // Toggle Super Brain
+        function toggleSuperBrain() {
+            const toggle = document.getElementById('superbrain-toggle');
+            const currentState = localStorage.getItem('sigil-use-superbrain') === 'true';
+            const newState = !currentState;
+
+            localStorage.setItem('sigil-use-superbrain', newState.toString());
+
+            if (newState) {
+                toggle.classList.add('active');
+                console.log('🧠 Super Brain enabled');
+            } else {
+                toggle.classList.remove('active');
+                console.log('🧠 Super Brain disabled');
+            }
+        }
+    </script>
+</body>
+
+</html>

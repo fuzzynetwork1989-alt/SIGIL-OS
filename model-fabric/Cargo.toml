@@ -22,16 +22,21 @@ uuid = { workspace = true }
 chrono = { workspace = true }
 
 # HTTP (for cloud model integrations if needed)
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }
 
 # Configuration
 toml = "0.8"
 serde_yaml = "0.9"
 
-# Note: ML/LLM frameworks (candle, tokenizers) are temporarily disabled
-# due to dependency conflicts. They will be added back when the conflicts
-# are resolved. The current implementation provides the structural foundation
-# for Model Fabric with placeholder inference.
+# ML/LLM Frameworks - Candle v0.11.0 (upgraded from v0.3.3 to fix dependency conflicts)
+candle-core = "0.11.0"
+candle-nn = "0.11.0"
+candle-transformers = "0.11.0"
+tokenizers = "0.15"
+hf-hub = "0.3"
+
+# Progress bars for downloads
+indicatif = "0.17"
 
 [dev-dependencies]
 tempfile = { workspace = true }

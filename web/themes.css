@@ -1,0 +1,264 @@
+/* SIGIL OS Theme CSS
+ * Generated from config/themes.yaml
+ */
+
+:root {
+    /* Light Theme */
+    --light-primary: #667eea;
+    --light-primary-dark: #5568d3;
+    --light-secondary: #764ba2;
+    --light-accent: #f093fb;
+    --light-background: #ffffff;
+    --light-surface: #f8f9fa;
+    --light-text: #1a1a2e;
+    --light-text-secondary: #6c757d;
+    --light-border: #dee2e6;
+    --light-success: #28a745;
+    --light-warning: #ffc107;
+    --light-danger: #dc3545;
+
+    /* Dark Theme */
+    --dark-primary: #667eea;
+    --dark-primary-dark: #5568d3;
+    --dark-secondary: #764ba2;
+    --dark-accent: #f093fb;
+    --dark-background: #1a1a2e;
+    --dark-surface: #16213e;
+    --dark-text: #f8f9fa;
+    --dark-text-secondary: #adb5bd;
+    --dark-border: #343a40;
+    --dark-success: #28a745;
+    --dark-warning: #ffc107;
+    --dark-danger: #dc3545;
+
+    /* Blue Theme */
+    --blue-primary: #0077b6;
+    --blue-primary-dark: #023e8a;
+    --blue-secondary: #0096c7;
+    --blue-accent: #48cae4;
+    --blue-background: #03045e;
+    --blue-surface: #023e8a;
+    --blue-text: #caf0f8;
+    --blue-text-secondary: #90e0ef;
+    --blue-border: #0077b6;
+    --blue-success: #2a9d8f;
+    --blue-warning: #e9c46a;
+    --blue-danger: #e76f51;
+
+    /* Green Theme */
+    --green-primary: #2d6a4f;
+    --green-primary-dark: #1b4332;
+    --green-secondary: #40916c;
+    --green-accent: #52b788;
+    --green-background: #081c15;
+    --green-surface: #1b4332;
+    --green-text: #d8f3dc;
+    --green-text-secondary: #b7e4c7;
+    --green-border: #2d6a4f;
+    --green-success: #52b788;
+    --green-warning: #e9c46a;
+    --green-danger: #e76f51;
+
+    /* Purple Theme */
+    --purple-primary: #7b2cbf;
+    --purple-primary-dark: #5a189a;
+    --purple-secondary: #9d4edd;
+    --purple-accent: #c77dff;
+    --purple-background: #10002b;
+    --purple-surface: #240046;
+    --purple-text: #e0aaff;
+    --purple-text-secondary: #c77dff;
+    --purple-border: #7b2cbf;
+    --purple-success: #06d6a0;
+    --purple-warning: #ffd166;
+    --purple-danger: #ef476f;
+}
+
+/* Default to dark theme */
+body {
+    --primary: var(--dark-primary);
+    --primary-dark: var(--dark-primary-dark);
+    --secondary: var(--dark-secondary);
+    --accent: var(--dark-accent);
+    --background: var(--dark-background);
+    --surface: var(--dark-surface);
+    --text: var(--dark-text);
+    --text-secondary: var(--dark-text-secondary);
+    --border: var(--dark-border);
+    --success: var(--dark-success);
+    --warning: var(--dark-warning);
+    --danger: var(--dark-danger);
+}
+
+/* Light Theme */
+body.theme-light {
+    --primary: var(--light-primary);
+    --primary-dark: var(--light-primary-dark);
+    --secondary: var(--light-secondary);
+    --accent: var(--light-accent);
+    --background: var(--light-background);
+    --surface: var(--light-surface);
+    --text: var(--light-text);
+    --text-secondary: var(--light-text-secondary);
+    --border: var(--light-border);
+    --success: var(--light-success);
+    --warning: var(--light-warning);
+    --danger: var(--light-danger);
+}
+
+/* Dark Theme */
+body.theme-dark {
+    --primary: var(--dark-primary);
+    --primary-dark: var(--dark-primary-dark);
+    --secondary: var(--dark-secondary);
+    --accent: var(--dark-accent);
+    --background: var(--dark-background);
+    --surface: var(--dark-surface);
+    --text: var(--dark-text);
+    --text-secondary: var(--dark-text-secondary);
+    --border: var(--dark-border);
+    --success: var(--dark-success);
+    --warning: var(--dark-warning);
+    --danger: var(--dark-danger);
+}
+
+/* Blue Theme */
+body.theme-blue {
+    --primary: var(--blue-primary);
+    --primary-dark: var(--blue-primary-dark);
+    --secondary: var(--blue-secondary);
+    --accent: var(--blue-accent);
+    --background: var(--blue-background);
+    --surface: var(--blue-surface);
+    --text: var(--blue-text);
+    --text-secondary: var(--blue-text-secondary);
+    --border: var(--blue-border);
+    --success: var(--blue-success);
+    --warning: var(--blue-warning);
+    --danger: var(--blue-danger);
+}
+
+/* Green Theme */
+body.theme-green {
+    --primary: var(--green-primary);
+    --primary-dark: var(--green-primary-dark);
+    --secondary: var(--green-secondary);
+    --accent: var(--green-accent);
+    --background: var(--green-background);
+    --surface: var(--green-surface);
+    --text: var(--green-text);
+    --text-secondary: var(--green-text-secondary);
+    --border: var(--green-border);
+    --success: var(--green-success);
+    --warning: var(--green-warning);
+    --danger: var(--green-danger);
+}
+
+/* Purple Theme */
+body.theme-purple {
+    --primary: var(--purple-primary);
+    --primary-dark: var(--purple-primary-dark);
+    --secondary: var(--purple-secondary);
+    --accent: var(--purple-accent);
+    --background: var(--purple-background);
+    --surface: var(--purple-surface);
+    --text: var(--purple-text);
+    --text-secondary: var(--purple-text-secondary);
+    --border: var(--purple-border);
+    --success: var(--purple-success);
+    --warning: var(--purple-warning);
+    --danger: var(--purple-danger);
+}
+
+/* Apply theme variables */
+body {
+    background-color: var(--background);
+    color: var(--text);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.card {
+    background-color: var(--surface);
+    border-color: var(--border);
+}
+
+.button-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+}
+
+.button-secondary {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    color: var(--text);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-success {
+    color: var(--success);
+}
+
+.text-warning {
+    color: var(--warning);
+}
+
+.text-danger {
+    color: var(--danger);
+}
+
+.border-primary {
+    border-color: var(--primary);
+}
+
+.background-surface {
+    background-color: var(--surface);
+}
+
+.background-primary {
+    background-color: var(--primary);
+}
+
+/* Gradient utilities */
+.gradient-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.gradient-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+}
+
+/* Avatar colors */
+.avatar-skin-tone-light {
+    background-color: #ffdbac;
+}
+
+.avatar-skin-tone-dark {
+    background-color: #e0ac69;
+}
+
+.avatar-hair-color-light {
+    color: #2c3e50;
+}
+
+.avatar-hair-color-dark {
+    color: #1a1a2e;
+}
+
+.avatar-eye-color-blue {
+    color: #3498db;
+}
+
+.avatar-eye-color-purple {
+    color: #667eea;
+}
+
+.avatar-eye-color-green {
+    color: #52b788;
+}

@@ -1,0 +1,197 @@
+# SIGIL OS Theme Configuration
+# Defines color schemes for all platforms
+
+themes:
+  light:
+    name: "Light"
+    description: "Clean and bright theme for daytime use"
+    colors:
+      primary: "#667eea"
+      primary-dark: "#5568d3"
+      secondary: "#764ba2"
+      accent: "#f093fb"
+      background: "#ffffff"
+      surface: "#f8f9fa"
+      text: "#1a1a2e"
+      text-secondary: "#6c757d"
+      border: "#dee2e6"
+      success: "#28a745"
+      warning: "#ffc107"
+      danger: "#dc3545"
+    avatar:
+      skin-tone: "#ffdbac"
+      hair-color: "#2c3e50"
+      eye-color: "#3498db"
+    gradients:
+      primary: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      accent: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+
+  dark:
+    name: "Dark"
+    description: "Dark theme for nighttime use"
+    colors:
+      primary: "#667eea"
+      primary-dark: "#5568d3"
+      secondary: "#764ba2"
+      accent: "#f093fb"
+      background: "#1a1a2e"
+      surface: "#16213e"
+      text: "#f8f9fa"
+      text-secondary: "#adb5bd"
+      border: "#343a40"
+      success: "#28a745"
+      warning: "#ffc107"
+      danger: "#dc3545"
+    avatar:
+      skin-tone: "#e0ac69"
+      hair-color: "#1a1a2e"
+      eye-color: "#667eea"
+    gradients:
+      primary: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      accent: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+
+  blue:
+    name: "Ocean Blue"
+    description: "Calming blue theme inspired by the ocean"
+    colors:
+      primary: "#0077b6"
+      primary-dark: "#023e8a"
+      secondary: "#0096c7"
+      accent: "#48cae4"
+      background: "#03045e"
+      surface: "#023e8a"
+      text: "#caf0f8"
+      text-secondary: "#90e0ef"
+      border: "#0077b6"
+      success: "#2a9d8f"
+      warning: "#e9c46a"
+      danger: "#e76f51"
+    avatar:
+      skin-tone: "#ffdbac"
+      hair-color: "#0077b6"
+      eye-color: "#48cae4"
+    gradients:
+      primary: "linear-gradient(135deg, #0077b6 0%, #0096c7 100%)"
+      accent: "linear-gradient(135deg, #48cae4 0%, #90e0ef 100%)"
+
+  green:
+    name: "Forest Green"
+    description: "Natural green theme inspired by forests"
+    colors:
+      primary: "#2d6a4f"
+      primary-dark: "#1b4332"
+      secondary: "#40916c"
+      accent: "#52b788"
+      background: "#081c15"
+      surface: "#1b4332"
+      text: "#d8f3dc"
+      text-secondary: "#b7e4c7"
+      border: "#2d6a4f"
+      success: "#52b788"
+      warning: "#e9c46a"
+      danger: "#e76f51"
+    avatar:
+      skin-tone: "#ffdbac"
+      hair-color: "#2d6a4f"
+      eye-color: "#52b788"
+    gradients:
+      primary: "linear-gradient(135deg, #2d6a4f 0%, #40916c 100%)"
+      accent: "linear-gradient(135deg, #52b788 0%, #74c69d 100%)"
+
+  purple:
+    name: "Royal Purple"
+    description: "Elegant purple theme with royal aesthetics"
+    colors:
+      primary: "#7b2cbf"
+      primary-dark: "#5a189a"
+      secondary: "#9d4edd"
+      accent: "#c77dff"
+      background: "#10002b"
+      surface: "#240046"
+      text: "#e0aaff"
+      text-secondary: "#c77dff"
+      border: "#7b2cbf"
+      success: "#06d6a0"
+      warning: "#ffd166"
+      danger: "#ef476f"
+    avatar:
+      skin-tone: "#ffdbac"
+      hair-color: "#7b2cbf"
+      eye-color: "#c77dff"
+    gradients:
+      primary: "linear-gradient(135deg, #7b2cbf 0%, #9d4edd 100%)"
+      accent: "linear-gradient(135deg, #c77dff 0%, #e0aaff 100%)"
+
+# Avatar styles
+avatar_styles:
+  realistic:
+    name: "Realistic"
+    description: "Photorealistic avatar rendering"
+    detail_level: "high"
+    animation: "subtle"
+
+  stylized:
+    name: "Stylized"
+    description: "Artistic stylized avatar"
+    detail_level: "medium"
+    animation: "moderate"
+
+  procedural:
+    name: "Procedural"
+    description: "Generative procedural avatar"
+    detail_level: "dynamic"
+    animation: "dynamic"
+
+  minimal:
+    name: "Minimal"
+    description: "Clean minimal avatar design"
+    detail_level: "low"
+    animation: "subtle"
+
+# Icon packs
+icon_packs:
+  default:
+    name: "Default"
+    description: "Default SIGIL OS icons"
+    style: "gradient"
+
+  flat:
+    name: "Flat"
+    description: "Flat design icons"
+    style: "flat"
+
+  neon:
+    name: "Neon"
+    description: "Neon glow icons"
+    style: "neon"
+
+  retro:
+    name: "Retro"
+    description: "Retro pixel art icons"
+    style: "pixel"
+
+# Platform-specific overrides
+platform_overrides:
+  desktop:
+    default_theme: "dark"
+    supported_themes: ["light", "dark", "blue", "green", "purple"]
+    default_avatar_style: "realistic"
+    default_icon_pack: "default"
+
+  web:
+    default_theme: "dark"
+    supported_themes: ["light", "dark", "blue", "green", "purple"]
+    default_avatar_style: "stylized"
+    default_icon_pack: "default"
+
+  mobile:
+    default_theme: "dark"
+    supported_themes: ["light", "dark"]
+    default_avatar_style: "stylized"
+    default_icon_pack: "flat"
+
+  quest:
+    default_theme: "dark"
+    supported_themes: ["dark", "blue"]
+    default_avatar_style: "realistic"
+    default_icon_pack: "neon"

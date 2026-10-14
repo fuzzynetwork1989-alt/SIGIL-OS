@@ -11,7 +11,7 @@
 
 **Download for Windows · macOS · Linux · Meta Quest 3**
 
-[Installation Guide](INSTALLATION_GUIDE.md) • [User Manual](USER_MANUAL.md) • [App Store Guide](APP_STORE_SUBMISSION_GUIDE.md)
+[Complete Setup Guide](COMPLETE_SETUP_GUIDE.md) • [Quick Reference](QUICK_REFERENCE.md) • [Quest SDK Guide](docs/QUEST_SDK_REQUIREMENTS.md) • [User Manual](USER_MANUAL.md)
 
 </div>
 
@@ -19,18 +19,38 @@
 
 ## ⚡ Quick Start
 
+### Windows (3 commands)
+
+```batch
+install-prerequisites.bat      # Install Rust, Git, VS Build Tools
+setup-environment.bat          # Create directories
+build-and-run.bat              # Build and run
+```
+
+### Linux/macOS (3 commands)
+
 ```bash
-# Clone the repository
+make install-deps              # Install dependencies
+make setup-env                 # Setup directories
+make run                       # Build and run
+```
+
+### Docker (1 command)
+
+```bash
+docker-compose up -d
+```
+
+**Or build from source:**
+
+```bash
 git clone https://github.com/fuzzynetwork1989-alt/SIGIL-OS.git
 cd SIGIL-OS
-
-# Build and run
 cargo build --release
 cargo run --release
-
-# Or install directly (coming soon)
-# cargo install sigil-os
 ```
+
+📖 **For detailed installation instructions, see [COMPLETE_SETUP_GUIDE.md](COMPLETE_SETUP_GUIDE.md)**
 
 ---
 
@@ -98,6 +118,32 @@ Experience SIGIL OS in full mixed reality with spatial anchors and hand tracking
 - Rust toolchain (1.70+)
 - Git
 - Build tools (platform-specific)
+
+### Quick Install
+
+**Windows:**
+
+```batch
+install-prerequisites.bat
+setup-environment.bat
+build-and-run.bat
+```
+
+**Linux/macOS:**
+
+```bash
+make install-deps
+make setup-env
+make run
+```
+
+**Docker:**
+
+```bash
+docker-compose up -d
+```
+
+📖 **See [COMPLETE_SETUP_GUIDE.md](COMPLETE_SETUP_GUIDE.md) for detailed instructions**
 
 See [Installation Guide](INSTALLATION_GUIDE.md) for detailed instructions.
 

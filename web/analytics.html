@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGIL OS - Analytics Dashboard</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="../sigil-icon-192x192.png">
+    <link rel="stylesheet" href="themes.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--dark-background) 0%, var(--dark-surface) 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            color: #4ade80;
+        }
+
+        .metric-change.negative {
+            color: #f87171;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+            position: relative;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text);
+        }
+
+        .activity-log {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .activity-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body class="theme-dark">
+    <div class="dashboard">
+        <a href="app.html" class="back-button">← Back to App</a>
+        
+        <div class="header">
+            <h1>Analytics Dashboard</h1>
+            <p>Real-time insights into your SIGIL OS usage</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Conversations</div>
+                <div class="metric-value">1,234</div>
+                <div class="metric-change positive">↑ 12% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Dream Cycles</div>
+                <div class="metric-value">567</div>
+                <div class="metric-change positive">↑ 8% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Sigils Generated</div>
+                <div class="metric-value">2,891</div>
+                <div class="metric-change positive">↑ 23% from last week</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Response Time</div>
+                <div class="metric-value">0.8s</div>
+                <div class="metric-change negative">↓ 5% from last week</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Conversations per Day</div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 60%;" data-value="60"></div>
+                    <div class="chart-bar" style="height: 80%;" data-value="80"></div>
+                    <div class="chart-bar" style="height: 45%;" data-value="45"></div>
+                    <div class="chart-bar" style="height: 90%;" data-value="90"></div>
+                    <div class="chart-bar" style="height: 70%;" data-value="70"></div>
+                    <div class="chart-bar" style="height: 55%;" data-value="55"></div>
+                    <div class="chart-bar" style="height: 85%;" data-value="85"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Dream Evolution Score</div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 40%;" data-value="40%"></div>
+                    <div class="chart-bar" style="height: 55%;" data-value="55%"></div>
+                    <div class="chart-bar" style="height: 62%;" data-value="62%"></div>
+                    <div class="chart-bar" style="height: 58%;" data-value="58%"></div>
+                    <div class="chart-bar" style="height: 70%;" data-value="70%"></div>
+                    <div class="chart-bar" style="height: 75%;" data-value="75%"></div>
+                    <div class="chart-bar" style="height: 82%;" data-value="82%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-log">
+            <div class="activity-header">Recent Activity</div>
+            <div class="activity-item">
+                <div class="activity-icon">💬</div>
+                <div class="activity-details">
+                    <div class="activity-title">New conversation started</div>
+                    <div class="activity-time">2 minutes ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🧠</div>
+                <div class="activity-details">
+                    <div class="activity-title">Dream cycle completed</div>
+                    <div class="activity-time">15 minutes ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🔐</div>
+                <div class="activity-details">
+                    <div class="activity-title">New sigil generated</div>
+                    <div class="activity-time">32 minutes ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🤖</div>
+                <div class="activity-details">
+                    <div class="activity-title">Avatar updated</div>
+                    <div class="activity-time">1 hour ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In production, this would fetch real data from the API
+        // For now, displaying simulated data
+        
+        // Simulate real-time updates
+        setInterval(() => {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                const currentValue = parseFloat(metric.textContent);
+                const change = (Math.random() - 0.5) * 2;
+                const newValue = Math.max(0, currentValue + change);
+                
+                if (metric.textContent.includes('s')) {
+                    metric.textContent = newValue.toFixed(1) + 's';
+                } else {
+                    metric.textContent = Math.floor(newValue).toLocaleString();
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

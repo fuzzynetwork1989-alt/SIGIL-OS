@@ -13,6 +13,7 @@ Cargo.lock
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Database
 *.db
@@ -25,3 +26,43 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Models (large files)
+*.safetensors
+*.gguf
+*.bin
+models/
+
+# Icons (generated)
+sigil-icon-*.png
+sigil-icon.ico
+temp-*.png
+
+# Configuration (user-specific)
+config.yaml
+config.yml
+config.json
+
+# Build artifacts
+*.exe
+*.dll
+*.dylib
+*.so
+*.a
+*.lib
+
+# Package manager
+Cargo.lock
+
+# Testing
+.cargo/
+coverage/
+
+# Misc
+*.bak
+*.backup

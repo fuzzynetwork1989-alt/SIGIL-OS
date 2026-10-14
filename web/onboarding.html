@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SIGIL OS</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="../sigil-icon-192x192.png">
+    <link rel="stylesheet" href="themes.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--dark-background) 0%, var(--dark-surface) 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .onboarding-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        /* Slide transitions */
+        .slide {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Intro Slides */
+        .intro-content {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .intro-icon {
+            font-size: 8rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .intro-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .intro-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+        }
+
+        .feature-text {
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin-top: auto;
+        }
+
+        .nav-button {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-button.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .nav-button.primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-button.secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+        }
+
+        .nav-button.secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            transform: scale(1.2);
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .form-button:hover {
+            transform: scale(1.02);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .auth-divider span {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .social-button:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* Pricing Plans */
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .pricing-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .pricing-features {
+            flex: 1;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .pricing-feature.disabled {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .feature-check {
+            color: var(--success);
+            font-size: 1.25rem;
+        }
+
+        .feature-cross {
+            color: var(--danger);
+            font-size: 1.25rem;
+        }
+
+        .pricing-button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .pricing-button:hover {
+            transform: scale(1.02);
+        }
+
+        .pricing-button.outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .pricing-button.outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .intro-title {
+                font-size: 2rem;
+            }
+
+            .intro-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-container {
+                padding: 2rem;
+            }
+
+            .pricing-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-dark">
+    <div class="onboarding-container">
+        <!-- Slide 1: Welcome -->
+        <div class="slide active" id="slide-1">
+            <div class="intro-content">
+                <div class="intro-icon">🔐</div>
+                <h1 class="intro-title">Welcome to SIGIL OS</h1>
+                <p class="intro-subtitle">The Post-AI Operating System with Cryptographic Warrant</p>
+                <p class="intro-description">
+                    SIGIL OS is a new category of computing where intelligence is the substrate and every act of
+                    cognition bears a sigil — a verifiable mark of provenance, authorization, and reversibility.
+                </p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🔐</span>
+                        <span class="feature-text">Cryptographic Warrants</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🧠</span>
+                        <span class="feature-text">Dream Weaving™</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🤖</span>
+                        <span class="feature-text">TrueHD Avatar</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔒</span>
+                        <span class="feature-text">Privacy-First</span>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="skipOnboarding()">Skip</button>
+                <div class="dots">
+                    <div class="dot active" onclick="goToSlide(1)"></div>
+                    <div class="dot" onclick="goToSlide(2)"></div>
+                    <div class="dot" onclick="goToSlide(3)"></div>
+                </div>
+                <button class="nav-button primary" onclick="goToSlide(2)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: Features -->
+        <div class="slide" id="slide-2">
+            <div class="intro-content">
+                <div class="intro-icon">🌟</div>
+                <h1 class="intro-title">Revolutionary Features</h1>
+                <p class="intro-subtitle">Experience the future of AI companionship</p>
+                <p class="intro-description">
+                    SIGIL OS combines the governed cognitive runtime of MERIDIAN with the inference-native substrate of
+                    AETHER OS, creating a system where every cognitive act is warranted, reversible, and auditable.
+                </p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Every action is cryptographically signed</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Full rollback capability</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Device-attested identity</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">No API keys or secrets</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Self-evolving intelligence</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Multi-platform support</span>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="goToSlide(1)">Back</button>
+                <div class="dots">
+                    <div class="dot" onclick="goToSlide(1)"></div>
+                    <div class="dot active" onclick="goToSlide(2)"></div>
+                    <div class="dot" onclick="goToSlide(3)"></div>
+                </div>
+                <button class="nav-button primary" onclick="goToSlide(3)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Get Started -->
+        <div class="slide" id="slide-3">
+            <div class="intro-content">
+                <div class="intro-icon">🚀</div>
+                <h1 class="intro-title">Get Started</h1>
+                <p class="intro-subtitle">Choose your path to begin</p>
+                <p class="intro-description">
+                    Start with our free tier to explore SIGIL OS, or unlock advanced features with our premium plans.
+                    All plans include our keyless cryptographic warrant system.
+                </p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">💻</span>
+                        <span class="feature-text">Desktop Application</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🌐</span>
+                        <span class="feature-text">Web Interface</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span class="feature-text">Mobile Apps (Coming Soon)</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🥽</span>
+                        <span class="feature-text">Meta Quest 3 MR</span>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="goToSlide(2)">Back</button>
+                <div class="dots">
+                    <div class="dot" onclick="goToSlide(1)"></div>
+                    <div class="dot" onclick="goToSlide(2)"></div>
+                    <div class="dot active" onclick="goToSlide(3)"></div>
+                </div>
+                <button class="nav-button primary" onclick="showPricing()">View Plans</button>
+            </div>
+        </div>
+
+        <!-- Pricing Slide -->
+        <div class="slide" id="slide-pricing">
+            <div class="intro-content" style="width: 100%;">
+                <h1 class="intro-title">Choose Your Plan</h1>
+                <p class="intro-subtitle">Select the plan that fits your needs</p>
+
+                <div class="pricing-container">
+                    <!-- Free Plan -->
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h2 class="pricing-name">Free</h2>
+                            <div class="pricing-price">$0<span>/month</span></div>
+                            <p class="pricing-description">Perfect for getting started</p>
+                        </div>
+                        <div class="pricing-features">
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Basic chat interface</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Single avatar</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>5 dream cycles/day</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Local processing</span>
+                            </div>
+                            <div class="pricing-feature disabled">
+                                <span class="feature-cross">✗</span>
+                                <span>Advanced Dream Weaving</span>
+                            </div>
+                            <div class="pricing-feature disabled">
+                                <span class="feature-cross">✗</span>
+                                <span>Custom themes</span>
+                            </div>
+                            <div class="pricing-feature disabled">
+                                <span class="feature-cross">✗</span>
+                                <span>Priority support</span>
+                            </div>
+                        </div>
+                        <button class="pricing-button outline" onclick="selectPlan('free')">Get Started Free</button>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="pricing-card featured">
+                        <div class="pricing-header">
+                            <h2 class="pricing-name">Pro</h2>
+                            <div class="pricing-price">$19<span>/month</span></div>
+                            <p class="pricing-description">Most popular for individuals</p>
+                        </div>
+                        <div class="pricing-features">
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Everything in Free</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Unlimited dream cycles</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Advanced Dream Weaving</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>5 custom avatars</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>All themes</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Email support</span>
+                            </div>
+                            <div class="pricing-feature disabled">
+                                <span class="feature-cross">✗</span>
+                                <span>API access</span>
+                            </div>
+                        </div>
+                        <button class="pricing-button" onclick="selectPlan('pro')">Choose Pro</button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h2 class="pricing-name">Enterprise</h2>
+                            <div class="pricing-price">$99<span>/month</span></div>
+                            <p class="pricing-description">For teams and organizations</p>
+                        </div>
+                        <div class="pricing-features">
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Everything in Pro</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Unlimited avatars</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Full API access</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Custom model training</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Dedicated support</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>SLA guarantee</span>
+                            </div>
+                            <div class="pricing-feature">
+                                <span class="feature-check">✓</span>
+                                <span>Team collaboration</span>
+                            </div>
+                        </div>
+                        <button class="pricing-button outline" onclick="selectPlan('enterprise')">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="goToSlide(3)">Back</button>
+                <div></div>
+                <button class="nav-button secondary" onclick="showAuth()">Skip for Now</button>
+            </div>
+        </div>
+
+        <!-- Sign Up Slide -->
+        <div class="slide" id="slide-signup">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h2 class="auth-title">Create Account</h2>
+                    <p class="auth-subtitle">Start your SIGIL OS journey</p>
+                </div>
+                <form class="auth-form" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="form-button">Create Account</button>
+                </form>
+                <div class="auth-divider">
+                    <span>or continue with</span>
+                </div>
+                <button class="social-button" onclick="handleSocialLogin('google')">
+                    <span>🔐</span>
+                    <span>Passkey (WebAuthn)</span>
+                </button>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" onclick="showLogin()">Sign in</a>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="showPricing()">Back</button>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- Login Slide -->
+        <div class="slide" id="slide-login">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h2 class="auth-title">Welcome Back</h2>
+                    <p class="auth-subtitle">Sign in to your SIGIL OS account</p>
+                </div>
+                <form class="auth-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="form-button">Sign In</button>
+                </form>
+                <div class="auth-divider">
+                    <span>or continue with</span>
+                </div>
+                <button class="social-button" onclick="handleSocialLogin('passkey')">
+                    <span>🔐</span>
+                    <span>Passkey (WebAuthn)</span>
+                </button>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" onclick="showSignup()">Sign up</a>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="nav-button secondary" onclick="showPricing()">Back</button>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let selectedPlan = 'free';
+
+        function skipOnboarding() {
+            localStorage.setItem('sigil-os-onboarded', 'true');
+            window.location.href = 'app.html';
+        }
+
+        function goToSlide(slideNumber) {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show target slide
+            document.getElementById('slide-' + slideNumber).classList.add('active');
+            currentSlide = slideNumber;
+        }
+
+        function showPricing() {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById('slide-pricing').classList.add('active');
+        }
+
+        function showAuth() {
+            showSignup();
+        }
+
+        function showSignup() {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById('slide-signup').classList.add('active');
+        }
+
+        function showLogin() {
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById('slide-login').classList.add('active');
+        }
+
+        function selectPlan(plan) {
+            selectedPlan = plan;
+            if (plan === 'free') {
+                showSignup();
+            } else {
+                // Redirect to checkout for paid plans
+                window.location.href = `checkout.html?plan=${plan}`;
+            }
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            // In production, this would call your API
+            alert('Account created! Plan: ' + selectedPlan + '\n\nIn production, this would create your account with keyless cryptographic authentication.');
+            // Mark as onboarded
+            localStorage.setItem('sigil-os-onboarded', 'true');
+            // Redirect to app
+            window.location.href = 'app.html';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            // In production, this would call your API
+            alert('Signed in successfully!\n\nIn production, this would authenticate you with keyless cryptographic warrants.');
+            // Mark as onboarded
+            localStorage.setItem('sigil-os-onboarded', 'true');
+            // Redirect to app
+            window.location.href = 'app.html';
+        }
+
+        async function handleSocialLogin(provider) {
+            if (provider === 'passkey' || provider === 'google') {
+                try {
+                    // Check if WebAuthn is supported
+                    if (!window.PublicKeyCredential) {
+                        alert('WebAuthn is not supported in this browser. Please use a modern browser.');
+                        return;
+                    }
+
+                    // Check if platform authenticator is available
+                    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                    if (!available) {
+                        alert('Platform authenticator (Face ID, Touch ID, Windows Hello) is not available on this device.');
+                        return;
+                    }
+
+                    // For registration (sign up)
+                    if (document.getElementById('slide-signup').classList.contains('active')) {
+                        await registerPasskey();
+                    } else {
+                        // For authentication (login)
+                        await authenticatePasskey();
+                    }
+                } catch (error) {
+                    console.error('WebAuthn error:', error);
+                    alert('Passkey authentication failed: ' + error.message);
+                }
+            }
+        }
+
+        async function registerPasskey() {
+            // In production, this would call your backend to get registration options
+            // For now, we'll use a mock implementation
+
+            const userId = crypto.getRandomValues(new Uint8Array(16));
+            const userIdBase64 = btoa(String.fromCharCode(...userId));
+
+            const challenge = crypto.getRandomValues(new Uint8Array(32));
+            const challengeBase64 = btoa(String.fromCharCode(...challenge));
+
+            const registrationOptions = {
+                challenge: challengeBase64,
+                rp: {
+                    name: "SIGIL OS",
+                    id: window.location.hostname,
+                },
+                user: {
+                    id: userIdBase64,
+                    name: "user@sigil-os.com",
+                    displayName: "SIGIL OS User",
+                },
+                pubKeyCredParams: [
+                    { type: "public-key", alg: -7 }, // ES256
+                    { type: "public-key", alg: -257 }, // RS256
+                ],
+                authenticatorSelection: {
+                    authenticatorAttachment: "platform",
+                    userVerification: "preferred",
+                },
+                timeout: 60000,
+                attestation: "direct",
+            };
+
+            try {
+                const credential = await navigator.credentials.create({
+                    publicKey: registrationOptions,
+                });
+
+                // In production, send credential to backend for verification
+                console.log('Credential created:', credential);
+
+                alert('Passkey registered successfully!\n\nIn production, this credential would be sent to the server for verification and storage.');
+
+                // Mark as onboarded and redirect
+                localStorage.setItem('sigil-os-onboarded', 'true');
+                localStorage.setItem('sigil-os-passkey-registered', 'true');
+                window.location.href = 'app.html';
+            } catch (error) {
+                console.error('Registration error:', error);
+                throw error;
+            }
+        }
+
+        async function authenticatePasskey() {
+            // In production, this would call your backend to get authentication options
+            const challenge = crypto.getRandomValues(new Uint8Array(32));
+            const challengeBase64 = btoa(String.fromCharCode(...challenge));
+
+            const authenticationOptions = {
+                challenge: challengeBase64,
+                rpId: window.location.hostname,
+                userVerification: "preferred",
+                timeout: 60000,
+            };
+
+            try {
+                const credential = await navigator.credentials.get({
+                    publicKey: authenticationOptions,
+                });
+
+                // In production, send credential to backend for verification
+                console.log('Credential authenticated:', credential);
+
+                alert('Passkey authentication successful!\n\nIn production, this credential would be verified by the server.');
+
+                // Mark as onboarded and redirect
+                localStorage.setItem('sigil-os-onboarded', 'true');
+                window.location.href = 'app.html';
+            } catch (error) {
+                console.error('Authentication error:', error);
+                throw error;
+            }
+        }
+    </script>
+</body>
+
+</html>

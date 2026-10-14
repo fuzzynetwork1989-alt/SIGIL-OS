@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  sigil-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sigil-os-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - sigil-data:/data
+      - ./config.yaml:/app/config.yaml:ro
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8080
+      - SIGIL_OS_DATA=/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  sigil-data:
+    driver: local
