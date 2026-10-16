@@ -8,6 +8,7 @@ members = [
     "sigil-core/api",
     "sigil-core/memory",
     "sigil-core/retrieval",
+    "sigil-core/context",
     "sigil-core/world-model",
     "sigil-core/tools",
     "sigil-core/recovery",

@@ -7,10 +7,14 @@ use uuid::Uuid;
 pub mod backup;
 pub mod disaster_recovery;
 pub mod recovery_runbook;
+pub mod encryption;
+pub mod redundancy;
 
 use backup::BackupManager;
 use disaster_recovery::DisasterRecovery;
 use recovery_runbook::RecoveryRunbook;
+use encryption::BackupEncryption;
+use redundancy::RedundancyManager;
 
 /// Recovery system
 pub struct RecoverySystem {

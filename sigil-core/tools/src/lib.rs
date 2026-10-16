@@ -9,10 +9,12 @@ use uuid::Uuid;
 pub mod registry;
 pub mod mcp;
 pub mod executor;
+pub mod adapter;
 
 use registry::ToolRegistry;
 use mcp::MCPClient;
 use executor::ToolExecutor;
+use adapter::ToolAdapter;
 
 /// Tool definition
 #[derive(Debug, Clone, Serialize, Deserialize)]

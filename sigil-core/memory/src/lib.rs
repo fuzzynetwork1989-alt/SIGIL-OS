@@ -7,10 +7,14 @@ use uuid::Uuid;
 pub mod confidence;
 pub mod memory;
 pub mod vector_db;
+pub mod environment;
+pub mod spatial;
 
 use confidence::ConfidenceCalculator;
 use memory::{MemoryEntry, MemoryOperation, MemoryStore, MemoryType};
 use vector_db::VectorDatabase;
+use environment::EnvironmentModel;
+use spatial::SpatialMemory;
 
 /// Memory source tracking
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -19,3 +19,4 @@ qdrant-client = "1.7"
 reqwest.workspace = true
 async-trait.workspace = true
 tracing.workspace = true
+float = "0.1"

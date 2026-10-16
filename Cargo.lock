@@ -1353,6 +1353,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c"
 
 [[package]]
+name = "context"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "memory",
+ "retrieval",
+ "serde",
+ "serde_json",
+ "sigil",
+ "thiserror 1.0.69",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2266,6 +2284,12 @@ dependencies = [
  "miniz_oxide 0.9.1",
  "zlib-rs",
 ]
+
+[[package]]
+name = "float"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02533c9a8066b7b9dd3c0d6b7622c37cfb8d08a68ce4fe08d894a152af69b47f"
 
 [[package]]
 name = "float-cmp"
@@ -4260,6 +4284,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
+ "float",
  "persistence",
  "qdrant-client",
  "reqwest 0.11.27",

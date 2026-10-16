@@ -7,10 +7,14 @@ use uuid::Uuid;
 pub mod entity;
 pub mod relationship;
 pub mod knowledge_graph;
+pub mod environment;
+pub mod spatial;
 
 use entity::{Entity, EntityType};
 use relationship::{Relationship, RelationshipType};
 use knowledge_graph::KnowledgeGraph;
+use environment::EnvironmentModel;
+use spatial::SpatialSystem;
 
 /// World model containing entities and relationships
 pub struct WorldModel {
