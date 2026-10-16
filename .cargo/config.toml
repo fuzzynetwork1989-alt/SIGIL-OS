@@ -1,0 +1,20 @@
+# Cargo configuration to prevent lock issues
+
+[build]
+# Use single job to prevent lock contention
+jobs = 1
+
+[net]
+# Retry on network failures
+retry = 3
+git-fetch-with-cli = true
+
+[http]
+# Timeouts
+timeout = 30
+
+[registry]
+default = "sparse+https://index.crates.io/"
+
+[source.crates-io]
+registry = "sparse+https://index.crates.io/"

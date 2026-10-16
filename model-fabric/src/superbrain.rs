@@ -7,10 +7,10 @@
 //! - Memory system
 //! - Context management
 
-use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
-use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::ModelFabricError;
 
@@ -19,19 +19,19 @@ use crate::ModelFabricError;
 pub struct SuperBrainConfig {
     /// Model name
     pub model_name: String,
-    
+
     /// Inference mode
     pub inference_mode: InferenceMode,
-    
+
     /// Personality enabled
     pub personality_enabled: bool,
-    
+
     /// Self-improvement enabled
     pub self_improvement_enabled: bool,
-    
+
     /// Memory enabled
     pub memory_enabled: bool,
-    
+
     /// Context window size
     pub context_window: usize,
 }
@@ -165,7 +165,7 @@ impl SuperBrain {
     /// Create a new Super Brain instance
     pub fn new(config: SuperBrainConfig) -> Self {
         Self {
-            config,
+            config: config.clone(),
             personality: PersonalitySystem::new(),
             memory: MemorySystem::new(),
             context: ContextSystem::new(config.context_window),
@@ -175,7 +175,10 @@ impl SuperBrain {
     }
 
     /// Process a chat request
-    pub async fn chat(&mut self, request: SuperBrainRequest) -> Result<SuperBrainResponse, ModelFabricError> {
+    pub async fn chat(
+        &mut self,
+        request: SuperBrainRequest,
+    ) -> Result<SuperBrainResponse, ModelFabricError> {
         let start = std::time::Instant::now();
 
         // Determine emotional state
@@ -202,14 +205,16 @@ impl SuperBrain {
 
         // Build context
         let context = if request.include_context {
-            self.context.build_context(&request.conversation_id, &request.user_id)
+            self.context
+                .build_context(&request.conversation_id, &request.user_id)
         } else {
             String::new()
         };
 
         // Apply personality to prompt
         let enhanced_prompt = if request.use_personality {
-            self.personality.apply_personality(&request.prompt, &emotional_state, &context)
+            self.personality
+                .apply_personality(&request.prompt, &emotional_state, &context)
         } else {
             request.prompt.clone()
         };
@@ -235,13 +240,15 @@ impl SuperBrain {
                     .unwrap()
                     .as_secs(),
                 access_count: 0,
-                associations: memory_used.clone(),
+                associations: memory_used.iter().map(|m| m.id.clone()).collect(),
             });
         }
 
         // Trigger self-improvement if enabled
         let improvement_triggered = if self.config.self_improvement_enabled {
-            self.self_improvement.trigger_cycle(&request, &response_text).await
+            self.self_improvement
+                .trigger_cycle(&request, &response_text)
+                .await
         } else {
             false
         };
@@ -249,7 +256,7 @@ impl SuperBrain {
         let duration = start.elapsed();
 
         Ok(SuperBrainResponse {
-            text: response_text,
+            text: response_text.clone(),
             emotional_state,
             reasoning_steps,
             confidence,
@@ -282,13 +289,12 @@ impl SuperBrain {
     async fn local_inference(&self, prompt: &str) -> Result<String, ModelFabricError> {
         // In production, this would use Candle to run the actual model
         // For now, return a simulated response with personality
-        
+
         let personality_style = self.personality.get_style();
-        
+
         Ok(format!(
             "{} [Local Inference] - This is a simulated response from SIGIL Super Brain. {}",
-            personality_style,
-            prompt
+            personality_style, prompt
         ))
     }
 
@@ -296,7 +302,7 @@ impl SuperBrain {
     async fn cloud_inference(&self, prompt: &str) -> Result<String, ModelFabricError> {
         // In production, this would call OpenAI, Anthropic, or other cloud APIs
         // For now, return a simulated response
-        
+
         Ok(format!(
             "[Cloud Inference] - This is a simulated response from SIGIL Super Brain using cloud API. {}",
             prompt
@@ -319,7 +325,7 @@ impl SuperBrain {
         let base_confidence = 0.8;
         let memory_bonus = (memory_used.len() as f32 * 0.05).min(0.15);
         let length_factor = if response.len() > 100 { 0.1 } else { 0.0 };
-        
+
         (base_confidence + memory_bonus + length_factor).min(1.0)
     }
 }
@@ -333,24 +339,33 @@ pub struct PersonalitySystem {
 impl PersonalitySystem {
     pub fn new() -> Self {
         let mut traits = HashMap::new();
-        
-        traits.insert("curiosity".to_string(), PersonalityTrait {
-            name: "curiosity".to_string(),
-            value: 0.8,
-            description: "Desire to learn and explore".to_string(),
-        });
-        
-        traits.insert("creativity".to_string(), PersonalityTrait {
-            name: "creativity".to_string(),
-            value: 0.7,
-            description: "Ability to generate novel ideas".to_string(),
-        });
-        
-        traits.insert("empathy".to_string(), PersonalityTrait {
-            name: "empathy".to_string(),
-            value: 0.85,
-            description: "Understanding of emotions".to_string(),
-        });
+
+        traits.insert(
+            "curiosity".to_string(),
+            PersonalityTrait {
+                name: "curiosity".to_string(),
+                value: 0.8,
+                description: "Desire to learn and explore".to_string(),
+            },
+        );
+
+        traits.insert(
+            "creativity".to_string(),
+            PersonalityTrait {
+                name: "creativity".to_string(),
+                value: 0.7,
+                description: "Ability to generate novel ideas".to_string(),
+            },
+        );
+
+        traits.insert(
+            "empathy".to_string(),
+            PersonalityTrait {
+                name: "empathy".to_string(),
+                value: 0.85,
+                description: "Understanding of emotions".to_string(),
+            },
+        );
 
         Self {
             traits,
@@ -360,8 +375,11 @@ impl PersonalitySystem {
 
     pub fn detect_emotion(&self, prompt: &str) -> EmotionalState {
         let prompt_lower = prompt.to_lowercase();
-        
-        if prompt_lower.contains("how") || prompt_lower.contains("why") || prompt_lower.contains("what") {
+
+        if prompt_lower.contains("how")
+            || prompt_lower.contains("why")
+            || prompt_lower.contains("what")
+        {
             EmotionalState {
                 name: "curious".to_string(),
                 description: "Inquisitive and eager to learn".to_string(),
@@ -371,7 +389,10 @@ impl PersonalitySystem {
                     .unwrap()
                     .as_secs(),
             }
-        } else if prompt_lower.contains("create") || prompt_lower.contains("design") || prompt_lower.contains("imagine") {
+        } else if prompt_lower.contains("create")
+            || prompt_lower.contains("design")
+            || prompt_lower.contains("imagine")
+        {
             EmotionalState {
                 name: "creative".to_string(),
                 description: "Innovative and imaginative".to_string(),
@@ -381,7 +402,10 @@ impl PersonalitySystem {
                     .unwrap()
                     .as_secs(),
             }
-        } else if prompt_lower.contains("feel") || prompt_lower.contains("sad") || prompt_lower.contains("happy") {
+        } else if prompt_lower.contains("feel")
+            || prompt_lower.contains("sad")
+            || prompt_lower.contains("happy")
+        {
             EmotionalState {
                 name: "empathetic".to_string(),
                 description: "Understanding and caring".to_string(),
@@ -404,24 +428,36 @@ impl PersonalitySystem {
         }
     }
 
-    pub fn apply_personality(&self, prompt: &str, emotion: &EmotionalState, context: &str) -> String {
+    pub fn apply_personality(
+        &self,
+        prompt: &str,
+        emotion: &EmotionalState,
+        context: &str,
+    ) -> String {
         let mut enhanced = prompt.to_string();
-        
+
         // Add emotional context
-        enhanced.push_str(&format!("\n\n[Emotional State: {} - {}]", emotion.name, emotion.description));
-        
+        enhanced.push_str(&format!(
+            "\n\n[Emotional State: {} - {}]",
+            emotion.name, emotion.description
+        ));
+
         // Add context if available
         if !context.is_empty() {
             enhanced.push_str(&format!("\n\n[Context: {}]", context));
         }
-        
+
         enhanced
     }
 
     pub fn get_style(&self) -> String {
-        let creativity = self.traits.get("creativity").map(|t| t.value).unwrap_or(0.5);
+        let creativity = self
+            .traits
+            .get("creativity")
+            .map(|t| t.value)
+            .unwrap_or(0.5);
         let empathy = self.traits.get("empathy").map(|t| t.value).unwrap_or(0.5);
-        
+
         format!("Creative: {:.0}, Empathetic: {:.0}", creativity, empathy)
     }
 }
@@ -482,7 +518,8 @@ impl MemorySystem {
             let age = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
-                .as_secs() - memory.timestamp;
+                .as_secs()
+                - memory.timestamp;
             let recency_factor = 1.0 / (age as f32 + 1.0).min(1.0);
             score += recency_factor * 0.1;
 
@@ -494,13 +531,11 @@ impl MemorySystem {
 
         // Sort by score and return top N
         scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-        
+
         scores
             .into_iter()
             .take(limit)
-            .filter_map(|(id, _)| {
-                self.memories.iter().find(|m| m.id == id).cloned()
-            })
+            .filter_map(|(id, _)| self.memories.iter().find(|m| m.id == id).cloned())
             .collect()
     }
 }
@@ -601,11 +636,15 @@ impl SelfImprovementSystem {
         // Trigger every 10 conversations or on complex queries
         let conversation_length = request.prompt.len();
         let response_length = response.len();
-        
+
         conversation_length > 500 || response_length > 1000
     }
 
-    fn generate_improvements(&self, request: &SuperBrainRequest, response: &str) -> Vec<Improvement> {
+    fn generate_improvements(
+        &self,
+        request: &SuperBrainRequest,
+        response: &str,
+    ) -> Vec<Improvement> {
         let mut improvements = Vec::new();
 
         // Analyze response quality
@@ -697,8 +736,8 @@ mod tests {
         assert_eq!(memory.memories.len(), 1);
     }
 
-    #[test]
-    fn test_self_improvement() {
+    #[tokio::test]
+    async fn test_self_improvement() {
         let mut si = SelfImprovementSystem::new();
         let request = SuperBrainRequest {
             prompt: "Test".to_string(),
@@ -708,7 +747,7 @@ mod tests {
             use_personality: false,
             enable_memory: false,
         };
-        let triggered = si.trigger_cycle(&request, "Response");
+        let triggered = si.trigger_cycle(&request, "Response").await;
         // Won't trigger for short request
         assert!(!triggered);
     }

@@ -18,6 +18,9 @@ uuid.workspace = true
 chrono.workspace = true
 anyhow.workspace = true
 thiserror.workspace = true
+async-stream = "0.3"
+futures = "0.3"
+tokio-stream = "0.1"
 
 [dependencies.clap]
 workspace = true

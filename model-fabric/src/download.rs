@@ -87,18 +87,16 @@ impl ModelDownloader {
             println!("  Size: {} MB", total_size / (1024 * 1024));
         }
 
-        for chunk in response.bytes() {
-            let chunk = chunk.map_err(|e| {
-                ModelFabricError::Io(std::io::Error::new(std::io::ErrorKind::Other, e))
-            })?;
-            file.write_all(&chunk)
-                .map_err(|e| ModelFabricError::Io(e))?;
-            downloaded += chunk.len() as u64;
+        let bytes = response
+            .bytes()
+            .map_err(|e| ModelFabricError::Io(std::io::Error::new(std::io::ErrorKind::Other, e)))?;
+        file.write_all(&bytes)
+            .map_err(|e| ModelFabricError::Io(e))?;
+        downloaded += bytes.len() as u64;
 
-            if total_size > 0 && downloaded % (1024 * 1024) == 0 {
-                let progress = (downloaded as f64 / total_size as f64) * 100.0;
-                println!("  Progress: {:.1}%", progress);
-            }
+        if total_size > 0 && downloaded % (1024 * 1024) == 0 {
+            let progress = (downloaded as f64 / total_size as f64) * 100.0;
+            println!("  Progress: {:.1}%", progress);
         }
 
         println!("  Complete: {} MB", downloaded / (1024 * 1024));

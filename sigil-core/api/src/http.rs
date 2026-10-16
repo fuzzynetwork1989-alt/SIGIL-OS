@@ -4,15 +4,20 @@
 
 use axum::{
     extract::State,
-    response::Json,
-    routing::{get, post, put},
+    response::{sse::Event, Json, Sse},
+    routing::{delete, get, post, put},
     Router,
 };
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use tower_http::cors::CorsLayer;
+use std::sync::Arc;
+use std::time::Duration;
+use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use uuid::Uuid;
+
+use crate::conversation::{Conversation, ConversationStore, ConversationSummary, Message};
 
 /// Health check response
 #[derive(Serialize)]
@@ -58,6 +63,38 @@ struct SuperBrainInfo {
     confidence: f32,
     memory_used: Vec<String>,
     improvement_triggered: bool,
+}
+
+/// API state with conversation store
+#[derive(Clone)]
+pub struct ApiState {
+    pub version: String,
+    pub superbrain_enabled: bool,
+    pub conversation_store: Arc<ConversationStore>,
+}
+
+/// Create conversation request
+#[derive(Deserialize)]
+struct CreateConversationRequest {
+    user_id: String,
+    title: String,
+    #[serde(default = "default_model")]
+    model: String,
+    #[serde(default)]
+    superbrain_enabled: bool,
+}
+
+fn default_model() -> String {
+    "sigil-default".to_string()
+}
+
+/// Add message request
+#[derive(Deserialize)]
+struct AddMessageRequest {
+    role: String,
+    content: String,
+    #[serde(default)]
+    tokens: Option<u32>,
 }
 
 /// Super Brain request
@@ -120,13 +157,6 @@ struct AvatarSettings {
     expression: String,
 }
 
-/// API state
-#[derive(Clone)]
-pub struct ApiState {
-    pub version: String,
-    pub superbrain_enabled: bool,
-}
-
 /// Create the API router
 pub fn create_router(state: ApiState) -> Router {
     Router::new()
@@ -149,8 +179,24 @@ pub fn create_router(state: ApiState) -> Router {
             "/api/v1/superbrain/improve",
             post(superbrain_improve_endpoint),
         )
+        .route("/api/v1/conversations", post(create_conversation))
+        .route("/api/v1/conversations", get(list_conversations))
+        .route("/api/v1/conversations/:id", get(get_conversation))
+        .route("/api/v1/conversations/:id", delete(delete_conversation))
+        .route("/api/v1/conversations/:id/messages", post(add_message))
+        .route("/api/v1/conversations/:id/export", get(export_conversation))
         .layer(TraceLayer::new_for_http())
-        .layer(CorsLayer::permissive())
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods([
+                    axum::http::Method::GET,
+                    axum::http::Method::POST,
+                    axum::http::Method::PUT,
+                    axum::http::Method::DELETE,
+                ])
+                .allow_headers(Any),
+        )
         .with_state(state)
 }
 
@@ -184,7 +230,7 @@ async fn chat_endpoint(
     let duration = start.elapsed();
 
     Json(ChatResponse {
-        text: response_text,
+        text: response_text.clone(),
         tokens_generated: response_text.len() as u32,
         duration_ms: duration.as_millis() as u64,
         request_id: Uuid::new_v4().to_string(),
@@ -219,7 +265,7 @@ async fn superbrain_endpoint(
     let duration = start.elapsed();
 
     Json(SuperBrainResponse {
-        text: response_text,
+        text: response_text.clone(),
         emotional_state: "helpful".to_string(),
         reasoning_steps: vec![
             "1. Analyzed emotional state".to_string(),
@@ -306,6 +352,118 @@ async fn superbrain_improve_endpoint(State(_state): State<ApiState>) -> Json<ser
         "cycle_number": 1,
         "improvements": []
     }))
+}
+
+/// Streaming chat endpoint (SSE - like ChatGPT)
+async fn chat_stream_endpoint(
+    State(_state): State<ApiState>,
+    Json(request): Json<ChatRequest>,
+) -> Sse<impl futures::Stream<Item = Result<Event, anyhow::Error>>> {
+    let prompt = request.prompt.clone();
+    let use_superbrain = request.use_superbrain;
+
+    // Simulate token-by-token streaming
+    let response_text = if use_superbrain {
+        format!(
+            "[Super Brain] I received your message: \"{}\".\n\nProcessing with personality and reasoning...",
+            prompt
+        )
+    } else {
+        format!("I received your message: \"{}\".", prompt)
+    };
+
+    let stream = async_stream::try_stream! {
+        // Stream token by token
+        for token in response_text.split_whitespace() {
+            yield Event::default().data(format!("{} ", token));
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+        yield Event::default().data("[DONE]");
+    };
+
+    Sse::new(stream)
+        .keep_alive(axum::response::sse::KeepAlive::new().interval(Duration::from_secs(10)))
+}
+
+/// Create a new conversation
+async fn create_conversation(
+    State(state): State<ApiState>,
+    Json(request): Json<CreateConversationRequest>,
+) -> Json<Conversation> {
+    let conversation = state.conversation_store.create_conversation(
+        request.user_id,
+        request.title,
+        request.model,
+        request.superbrain_enabled,
+    );
+    Json(conversation)
+}
+
+/// List all conversations for a user
+async fn list_conversations(
+    State(state): State<ApiState>,
+    axum::extract::Query(params): axum::extract::Query<std::collections::HashMap<String, String>>,
+) -> Json<Vec<ConversationSummary>> {
+    let user_id = params
+        .get("user_id")
+        .unwrap_or(&"default".to_string())
+        .clone();
+    let conversations = state.conversation_store.list_conversations(&user_id);
+    Json(conversations)
+}
+
+/// Get a specific conversation
+async fn get_conversation(
+    State(state): State<ApiState>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> Result<Json<Conversation>, axum::http::StatusCode> {
+    match state.conversation_store.get_conversation(&id) {
+        Some(conversation) => Ok(Json(conversation)),
+        None => Err(axum::http::StatusCode::NOT_FOUND),
+    }
+}
+
+/// Delete a conversation
+async fn delete_conversation(
+    State(state): State<ApiState>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> Result<axum::http::StatusCode, axum::http::StatusCode> {
+    if state.conversation_store.delete_conversation(&id) {
+        Ok(axum::http::StatusCode::NO_CONTENT)
+    } else {
+        Err(axum::http::StatusCode::NOT_FOUND)
+    }
+}
+
+/// Add a message to a conversation
+async fn add_message(
+    State(state): State<ApiState>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+    Json(request): Json<AddMessageRequest>,
+) -> Result<Json<Message>, axum::http::StatusCode> {
+    let message = Message {
+        id: Uuid::new_v4().to_string(),
+        role: request.role,
+        content: request.content,
+        timestamp: Utc::now(),
+        tokens: request.tokens,
+    };
+
+    match state.conversation_store.add_message(&id, message.clone()) {
+        Ok(_) => Ok(Json(message)),
+        Err(_) => Err(axum::http::StatusCode::NOT_FOUND),
+    }
+}
+
+/// Export a conversation as Markdown
+async fn export_conversation(
+    State(state): State<ApiState>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> Result<String, axum::http::StatusCode> {
+    match state.conversation_store.export_conversation(&id) {
+        Ok(markdown) => Ok(markdown),
+        Err(_) => Err(axum::http::StatusCode::NOT_FOUND),
+    }
 }
 
 /// Start the HTTP server

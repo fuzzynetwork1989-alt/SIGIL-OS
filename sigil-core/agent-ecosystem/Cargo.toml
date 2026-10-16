@@ -1,0 +1,13 @@
+[package]
+name = "agent-ecosystem"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+chrono = "0.4"
+anyhow = "1.0"
+uuid = { version = "1", features = ["v4", "serde"] }
+thiserror = "1.0"

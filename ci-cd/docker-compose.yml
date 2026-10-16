@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  ci-builder:
+    image: rust:1.75
+    volumes:
+      - .:/workspace
+      - cargo-cache:/root/.cargo
+      - target-cache:/workspace/target
+    working_dir: /workspace
+    environment:
+      CARGO_TERM_COLOR: always
+
+  ci-test:
+    image: rust:1.75
+    volumes:
+      - .:/workspace
+      - cargo-cache:/root/.cargo
+      - target-cache:/workspace/target
+    working_dir: /workspace
+    environment:
+      CARGO_TERM_COLOR: always
+    command: cargo test --all-targets --all-features
+
+  ci-lint:
+    image: rust:1.75
+    volumes:
+      - .:/workspace
+      - cargo-cache:/root/.cargo
+      - target-cache:/workspace/target
+    working_dir: /workspace
+    environment:
+      CARGO_TERM_COLOR: always
+    command: cargo clippy --all-targets --all-features -- -D warnings
+
+  ci-security:
+    image: rust:1.75
+    volumes:
+      - .:/workspace
+      - cargo-cache:/root/.cargo
+      - target-cache:/workspace/target
+    working_dir: /workspace
+    command: cargo audit
+
+  ci-build:
+    image: rust:1.75
+    volumes:
+      - .:/workspace
+      - cargo-cache:/root/.cargo
+      - target-cache:/workspace/target
+    working_dir: /workspace
+    environment:
+      CARGO_TERM_COLOR: always
+    command: cargo build --release --all-targets
+
+volumes:
+  cargo-cache:
+  target-cache:

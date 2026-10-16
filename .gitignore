@@ -13,56 +13,47 @@ Cargo.lock
 # OS
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# Environment
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
 
 # Logs
 *.log
 
 # Temporary files
-tmp/
-temp/
+*.tmp
+*.temp
 
-# Environment
-.env
-.env.local
-.env.*.local
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Models (large files)
-*.safetensors
-*.gguf
-*.bin
-models/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
 
-# Icons (generated)
-sigil-icon-*.png
-sigil-icon.ico
-temp-*.png
+# Mobile
+sigil-mobile/.expo/
+sigil-mobile/exponent/
+sigil-mobile/dist/
+sigil-mobile/*.apk
+sigil-mobile/*.ipa
 
-# Configuration (user-specific)
-config.yaml
-config.yml
-config.json
-
-# Build artifacts
-*.exe
-*.dll
-*.dylib
-*.so
-*.a
-*.lib
-
-# Package manager
-Cargo.lock
-
-# Testing
-.cargo/
-coverage/
-
-# Misc
-*.bak
-*.backup
+# Quest 3
+*.apk
+*.aab

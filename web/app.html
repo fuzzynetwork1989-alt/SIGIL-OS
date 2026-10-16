@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="../sigil-icon-512x512.png">
     <link rel="apple-touch-icon" sizes="192x192" href="../sigil-icon-192x192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="../sigil-icon-512x512.png">
-    <link rel="stylesheet" href="themes.css">
+    <link rel="stylesheet" href="../configs/themes.css">
     <script src="i18n.js"></script>
     <style>
         * {
@@ -781,13 +781,57 @@
                         <h3>Model</h3>
                         <div class="setting-row">
                             <div>
-                                <div class="setting-label">Model Provider</div>
-                                <div class="setting-description">Choose between local or cloud inference</div>
+                                <div class="setting-label">Model Selection</div>
+                                <div class="setting-description">Choose the AI model for inference</div>
+                                </div>
+                                <select id="model-select"
+                                    style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background-color: var(--background); color: var(--text);">
+                                    <option value="sigil-default">SIGIL Default (Local)</option>
+                                    <option value="sigil-fast">SIGIL Fast (Local)</option>
+                                    <option value="sigil-quality">SIGIL Quality (Local)</option>
+                                    <option value="gpt-4">GPT-4 (Cloud)</option>
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cloud)</option>
+                                    <option value="claude-3-opus">Claude 3 Opus (Cloud)</option>
+                                    <option value="claude-3-sonnet">Claude 3 Sonnet (Cloud)</option>
+                                </select>
+                                </div>
+                                <div class="setting-row">
+                                    <div>
+                                        <div class="setting-label">Temperature</div>
+                                        <div class="setting-description">Controls randomness (0.0 = focused, 1.0 = creative)
+                                        </div>
+                                    </div>
+                                    <input type="range" id="temperature-slider" min="0" max="1" step="0.1" value="0.7" style="width: 150px;">
+                                    <span id="temperature-value" style="margin-left: 0.5rem;">0.7</span>
+                                </div>
+                                <div class="setting-row">
+                                    <div>
+                                        <div class="setting-label">Max Tokens</div>
+                                        <div class="setting-description">Maximum response length</div>
+                                    </div>
+                                    <select id="max-tokens-select"
+                                        style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background-color: var(--background); color: var(--text);">
+                                        <option value="512">512 (Short)</option>
+                                        <option value="2048" selected>2048 (Medium)</option>
+                                        <option value="4096">4096 (Long)</option>
+                                        <option value="8192">8192 (Very Long)</option>
+                                    </select>
+                                </div>
+                                </div>
+                                
+                                <div class="settings-section">
+                                    <h3>System Prompt</h3>
+                                    <div class="setting-row">
+                                        <div>
+                                            <div class="setting-label">System Prompt</div>
+                                            <div class="setting-description">Choose the AI's personality and behavior</div>
                             </div>
-                            <select
+                            <select id="system-prompt-select"
                                 style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background-color: var(--background); color: var(--text);">
-                                <option>Local</option>
-                                <option>Cloud</option>
+                                <option value="default">Default SIGIL OS</option>
+                                <option value="superbrain">Super Brain</option>
+                                <option value="creative">Creative Mode</option>
+                                <option value="analytical">Analytical Mode</option>
                             </select>
                         </div>
                     </div>
@@ -815,10 +859,91 @@
     </div>
 
     <script>
+                // API Configuration
+                const API_BASE_URL = 'http://127.0.0.1:8080';
+                const API_TIMEOUT = 10000; // 10 seconds
+                const MAX_RETRIES = 3;
+
         // Check if this is first visit
         if (!localStorage.getItem('sigil-os-onboarded')) {
             window.location.href = 'onboarding.html';
         }
+
+                // API Connection Helper with Retry Logic
+                async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, {
+                                ...options,
+                                signal: AbortSignal.timeout(API_TIMEOUT),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+
+                            return response;
+                        } catch (error) {
+                            console.warn(`API call failed (attempt ${i + 1}/${retries}):`, error);
+
+                            if (i === retries - 1) {
+                                throw error;
+                            }
+
+                            // Exponential backoff
+                            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+                        }
+                    }
+                }
+
+                // Health Check with Auto-Fallback
+                async function checkApiHealth() {
+                    try {
+                        const response = await fetchWithRetry(`${API_BASE_URL}/health`);
+                        const data = await response.json();
+                        console.log('✅ API Health:', data);
+                        return true;
+                    } catch (error) {
+                        console.error('❌ API Health Check Failed:', error);
+                        showApiConnectionError();
+                        return false;
+                    }
+                }
+
+                // Show API Connection Error
+                function showApiConnectionError() {
+                    const chatInput = document.querySelector('.chat-input');
+                    if (chatInput) {
+                        chatInput.placeholder = '⚠️ API not connected. Starting API server?';
+                        chatInput.disabled = true;
+                    }
+
+                    // Show error banner
+                    const banner = document.createElement('div');
+                    banner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #f44336;
+                color: white;
+                padding: 1rem;
+                text-align: center;
+                z-index: 10000;
+                font-weight: bold;
+            `;
+                    banner.innerHTML = `
+                ⚠️ Cannot connect to API Server
+                <button onclick="this.parentElement.remove()" style="margin-left: 1rem; padding: 0.5rem 1rem; background: white; color: #f44336; border: none; border-radius: 4px; cursor: pointer;">Dismiss</button>
+            `;
+                    document.body.appendChild(banner);
+                }
+
+                // Initialize API Connection Check
+                checkApiHealth();
+
+                // Periodic Health Check (every 30 seconds)
+                setInterval(checkApiHealth, 30000);
 
         function showPage(pageName) {
             // Hide all pages
@@ -849,6 +974,48 @@
         function changeTheme(theme) {
             document.body.className = theme;
         }
+
+                // Settings handlers
+                document.getElementById('temperature-slider').addEventListener('input', function (e) {
+                    document.getElementById('temperature-value').textContent = e.target.value;
+                    localStorage.setItem('sigil-temperature', e.target.value);
+                });
+
+                document.getElementById('model-select').addEventListener('change', function (e) {
+                    localStorage.setItem('sigil-model', e.target.value);
+                });
+
+                document.getElementById('max-tokens-select').addEventListener('change', function (e) {
+                    localStorage.setItem('sigil-max-tokens', e.target.value);
+                });
+
+                document.getElementById('system-prompt-select').addEventListener('change', function (e) {
+                    localStorage.setItem('sigil-system-prompt', e.target.value);
+                });
+
+                // Load saved settings
+                document.addEventListener('DOMContentLoaded', function () {
+                    const savedTemperature = localStorage.getItem('sigil-temperature');
+                    if (savedTemperature) {
+                        document.getElementById('temperature-slider').value = savedTemperature;
+                        document.getElementById('temperature-value').textContent = savedTemperature;
+                    }
+
+                    const savedModel = localStorage.getItem('sigil-model');
+                    if (savedModel) {
+                        document.getElementById('model-select').value = savedModel;
+                    }
+
+                    const savedMaxTokens = localStorage.getItem('sigil-max-tokens');
+                    if (savedMaxTokens) {
+                        document.getElementById('max-tokens-select').value = savedMaxTokens;
+                    }
+
+                    const savedSystemPrompt = localStorage.getItem('sigil-system-prompt');
+                    if (savedSystemPrompt) {
+                        document.getElementById('system-prompt-select').value = savedSystemPrompt;
+                    }
+                });
 
         function updateAvatarStyle(style) {
             const avatar = document.querySelector('.avatar-large');
@@ -989,10 +1156,10 @@
 
             try {
                 const endpoint = useSuperBrain
-                    ? 'http://127.0.0.1:8080/api/v1/superbrain/chat'
-                    : 'http://127.0.0.1:8080/api/v1/chat';
+                    ? `${API_BASE_URL}/api/v1/superbrain/chat`
+                    : `${API_BASE_URL}/api/v1/chat`;
 
-                const response = await fetch(endpoint, {
+                const response = await fetchWithRetry(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1007,44 +1174,44 @@
                     }),
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await response.json();
 
-                    // Remove loading message
-                    chatMessages.removeChild(loadingMessage);
+                // Remove loading message
+                chatMessages.removeChild(loadingMessage);
 
-                    // Add AI response
-                    const aiMessage = document.createElement('div');
-                    aiMessage.className = 'message ai';
+                // Add AI response
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
 
-                    let responseText = data.text || data.response || 'Response received';
+                let responseText = data.text || data.response || 'Response received';
 
-                    // Add Super Brain info if available
-                    let superBrainInfo = '';
-                    if (data.superbrain) {
-                        superBrainInfo = `
-                            <div class="superbrain-info">
-                                <span class="superbrain-badge">🧠 Super Brain</span>
-                                <span class="emotion-badge">Emotion: ${data.superbrain.emotional_state}</span>
-                                <span class="confidence-badge">Confidence: ${(data.superbrain.confidence * 100).toFixed(0)}%</span>
-                            </div>
-                        `;
-                    }
-
-                    aiMessage.innerHTML = `
-                        <div class="message-avatar">🤖</div>
-                        <div class="message-content">
-                            ${superBrainInfo}
-                            <p>${responseText}</p>
+                // Add Super Brain info if available
+                let superBrainInfo = '';
+                if (data.superbrain) {
+                    superBrainInfo = `
+                        <div class="superbrain-info">
+                            <span class="superbrain-badge">🧠 Super Brain</span>
+                            <span class="emotion-badge">Emotion: ${data.superbrain.emotional_state}</span>
+                            <span class="confidence-badge">Confidence: ${(data.superbrain.confidence * 100).toFixed(0)}%</span>
                         </div>
                     `;
-                    chatMessages.appendChild(aiMessage);
+                }
 
-                    // Speak the response
-                    speak(responseText);
-                } else {
-                    // API not available, use placeholder
-                    chatMessages.removeChild(loadingMessage);
+                aiMessage.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        ${superBrainInfo}
+                        <p>${responseText}</p>
+                    </div>
+                `;
+                chatMessages.appendChild(aiMessage);
+
+                // Speak the response
+                speak(responseText);
+            } catch (error) {
+                console.error('Chat error:', error);
+                // API not available, use placeholder
+                chatMessages.removeChild(loadingMessage);
 
                     const aiMessage = document.createElement('div');
                     aiMessage.className = 'message ai';

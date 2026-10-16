@@ -2,7 +2,9 @@
 //!
 //! This library provides HTTP API and CLI interfaces for SIGIL OS.
 
+pub mod conversation;
 pub mod http;
+pub mod retry;
 pub mod webauthn;
 
 #[cfg(feature = "cli")]

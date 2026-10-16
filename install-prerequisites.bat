@@ -33,12 +33,22 @@ if %errorLevel% neq 0 (
     echo Rust not found. Installing via winget...
     winget install Rustlang.Rustup --accept-package-agreements --accept-source-agreements
     if %errorLevel% neq 0 (
-        echo ERROR: Failed to install Rust.
-        echo Please install manually from https://rustup.rs/
-        pause
-        exit /b 1
+        echo ERROR: Failed to install Rust via winget.
+        echo Trying direct installation...
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        if %errorLevel% neq 0 (
+            echo ERROR: Failed to install Rust.
+            echo Please install manually from https://rustup.rs/
+            pause
+            exit /b 1
+        )
     )
     echo Rust installed successfully.
+    echo.
+    echo Adding Rust to PATH...
+    for /f "delims=" %%i in ('"%USERPROFILE%\.cargo\bin"') do set PATH=%%i;%PATH%
+    setx PATH "%PATH%" /M
+    echo Rust added to PATH.
     echo.
     echo Please restart your terminal or run: refreshenv
     echo Then run this script again.
@@ -46,6 +56,7 @@ if %errorLevel% neq 0 (
     exit /b 0
 ) else (
     rustc --version
+    cargo --version
     echo Rust already installed.
 )
 
@@ -56,9 +67,16 @@ if %errorLevel% neq 0 (
     echo Git not found. Installing via winget...
     winget install Git.Git --accept-package-agreements --accept-source-agreements
     if %errorLevel% neq 0 (
-        echo ERROR: Failed to install Git.
-        pause
-        exit /b 1
+        echo ERROR: Failed to install Git via winget.
+        echo Trying direct installation...
+        powershell -Command "Invoke-WebRequest -Uri https://github.com/git-for-windows/git/releases/download/v2.43.0.windows.1/MinGit-2.43.0-64-bit.exe -OutFile MinGit.exe"
+        MinGit.exe /silent
+        if %errorLevel% neq 0 (
+            echo ERROR: Failed to install Git.
+            echo Please install manually from https://git-scm.com/download/win
+            pause
+            exit /b 1
+        )
     )
     echo Git installed successfully.
 ) else (
