@@ -1,3 +1,17 @@
     Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
+    Checking sigil v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\sigil-core\sigil)
+error: could not compile `sigil` (lib) due to 24 previous errors
+error: could not compile `sigil` (lib test) due to 24 previous errors
+    Checking quest-integration v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\quest-integration)
+    Checking testing-framework v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\sigil-core\testing-framework)
+error: could not compile `testing-framework` (lib test) due to 8 previous errors
+error: could not compile `testing-framework` (lib) due to 8 previous errors
+    Checking agent-ecosystem v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\sigil-core\agent-ecosystem)
+error: could not compile `agent-ecosystem` (lib test) due to 8 previous errors; 2 warnings emitted
+error: could not compile `agent-ecosystem` (lib) due to 8 previous errors; 2 warnings emitted
+    Checking architecture-genome v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\sigil-core\architecture-genome)
+error: could not compile `architecture-genome` (lib) due to 8 previous errors; 1 warning emitted
+    Checking economic-engine v0.1.0 (C:\Users\Corey Smith\Devin Projects\SIGIL OS\sigil-core\economic-engine)
+error: could not compile `economic-engine` (lib test) due to 4 previous errors
+error: could not compile `economic-engine` (lib) due to 4 previous errors
+error: could not compile `architecture-genome` (lib test) due to 8 previous errors; 1 warning emitted

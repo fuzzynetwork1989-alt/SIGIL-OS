@@ -7,12 +7,14 @@
 pub mod companion;
 pub mod hand_tracking;
 pub mod mixed_reality;
+pub mod mr_avatar_assistant;
 pub mod spatial_mapping;
 pub mod voice_assistant;
 
 pub use companion::{CompanionState, InteractionMode, PersonalCompanion};
 pub use hand_tracking::{Gesture, GestureRecognition, HandTracking};
 pub use mixed_reality::{MRInterface, Passthrough, SpatialAnchor};
+pub use mr_avatar_assistant::{MRAvatarAssistant, FullBodyAvatar, TutorialSystem};
 pub use spatial_mapping::{Mesh, SceneUnderstanding, SpatialMapping};
 pub use voice_assistant::{VoiceAssistant, VoiceCommand, TTS};
 

@@ -1,0 +1,22 @@
+[package]
+name = "auth"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sigil = { path = "../sigil" }
+persistence = { path = "../persistence" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
+argon2 = "0.5"
+jsonwebtoken = "9.2"
+rand = "0.8"

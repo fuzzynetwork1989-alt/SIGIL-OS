@@ -2286,12 +2286,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "float"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02533c9a8066b7b9dd3c0d6b7622c37cfb8d08a68ce4fe08d894a152af69b47f"
-
-[[package]]
 name = "float-cmp"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4284,7 +4278,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
- "float",
  "persistence",
  "qdrant-client",
  "reqwest 0.11.27",

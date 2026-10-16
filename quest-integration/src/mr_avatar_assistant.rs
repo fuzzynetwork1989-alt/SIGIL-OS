@@ -10,7 +10,7 @@
 
 use uuid::Uuid;
 
-use crate::Result;
+use crate::{QuestError, Result};
 
 /// MR Avatar Assistant - Next-generation mixed reality companion
 #[derive(Debug, Clone)]
@@ -599,7 +599,7 @@ pub enum WindowLayout {
 }
 
 /// Assistant state
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AssistantState {
     /// Idle
     Idle,
@@ -674,7 +674,7 @@ impl MRAvatarAssistant {
             .iter()
             .find(|t| t.id == tutorial_id)
             .ok_or_else(|| {
-                crate::QuestError::MRRenderingFailed("Tutorial not found".to_string())
+                QuestError::MRRenderingFailed("Tutorial not found".to_string())
             })?;
 
         self.tutorials.active_tutorial = Some(tutorial.clone());
@@ -703,8 +703,9 @@ impl MRAvatarAssistant {
 
     /// Open a virtual window
     pub fn open_window(&mut self, title: String, content: WindowContent) -> Result<()> {
+        let window_id = Uuid::new_v4();
         let window = VirtualWindow {
-            id: Uuid::new_v4(),
+            id: window_id,
             title,
             content,
             position: SpatialPosition { x: 0.0, y: 1.2, z: -0.5 },
@@ -713,7 +714,7 @@ impl MRAvatarAssistant {
         };
 
         self.windows.windows.push(window);
-        self.windows.focused_window = Some(window.id);
+        self.windows.focused_window = Some(window_id);
 
         Ok(())
     }
@@ -728,7 +729,7 @@ impl MRAvatarAssistant {
     }
 
     /// Speak with animation
-    pub fn speak(&mut self, text: String) -> Result<()> {
+    pub fn speak(&mut self, _text: String) -> Result<()> {
         // TODO: Trigger TTS
         // Animate avatar speaking
         // Display subtitle if needed
@@ -736,7 +737,7 @@ impl MRAvatarAssistant {
     }
 
     /// Gesture to point at something
-    pub fn point_at(&mut self, target: SpatialPosition) -> Result<()> {
+    pub fn point_at(&mut self, _target: SpatialPosition) -> Result<()> {
         // TODO: Animate pointing gesture
         // Orient avatar toward target
         Ok(())
