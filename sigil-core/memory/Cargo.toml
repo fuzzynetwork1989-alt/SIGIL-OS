@@ -1,0 +1,21 @@
+[package]
+name = "memory"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sigil = { path = "../sigil" }
+persistence = { path = "../persistence" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+qdrant-client = "1.7"
+reqwest.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
