@@ -471,6 +471,7 @@ pub async fn serve(addr: SocketAddr, state: ApiState) -> anyhow::Result<()> {
     let app = create_router(state);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
+    println!("Server bound to {}", addr);
     axum::serve(listener, app).await?;
 
     Ok(())

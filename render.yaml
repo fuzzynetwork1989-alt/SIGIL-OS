@@ -1,0 +1,33 @@
+# Render deployment configuration for SIGIL OS
+# Deploy with: render-blueprint apply
+
+services:
+  - type: web
+    name: sigil-os-api
+    env: docker
+    plan: free
+    region: oregon
+
+    # Docker configuration
+    dockerContext: .
+    dockerfilePath: Dockerfile
+
+    # Environment variables
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: RUST_LOG
+        value: info
+
+    # Health check
+    healthCheckPath: /health
+
+    # Auto-scaling (only for paid plans)
+    # numInstances: 1
+
+# Optional: Add PostgreSQL database (expires after 30 days on free tier)
+# databases:
+#   - name: sigil-db
+#     databaseName: sigil
+#     user: sigil
+#     plan: free

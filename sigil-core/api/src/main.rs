@@ -20,32 +20,16 @@ async fn main() -> anyhow::Result<()> {
         conversation_store: Arc::new(ConversationStore::new()),
     };
 
-    // Try default port 8080, fall back to alternatives if occupied
-    let ports = vec![8080u16, 8081, 8082, 8083, 8084];
-    let mut addr = None;
+    // Use PORT environment variable for cloud hosting, default to 8080
+    let port: u16 = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8080);
 
-    for port in ports {
-        let test_addr = SocketAddr::from(([127, 0, 0, 1], port));
-        match tokio::net::TcpListener::bind(&test_addr).await {
-            Ok(_) => {
-                addr = Some(test_addr);
-                println!("📍 Server listening on: http://{}", test_addr);
-                break;
-            }
-            Err(e) => {
-                println!("⚠️  Port {} is in use, trying next port...", port);
-            }
-        }
-    }
+    // Bind to 0.0.0.0 for cloud hosting (accepts connections from any interface)
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
 
-    let addr = match addr {
-        Some(a) => a,
-        None => {
-            eprintln!("❌ ERROR: All ports 8080-8084 are in use!");
-            eprintln!("Please free up one of these ports or specify a different port.");
-            std::process::exit(1);
-        }
-    };
+    println!("📍 Server listening on: http://{}", addr);
 
     println!("✅ Server started successfully!");
     println!("📝 Health check: http://{}/health", addr);

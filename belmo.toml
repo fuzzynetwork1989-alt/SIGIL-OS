@@ -1,0 +1,28 @@
+# Belmo deployment configuration for SIGIL OS
+# Belmo auto-detects Cargo.toml, but this file provides additional configuration
+
+[build]
+# Binary to run (if multiple binaries)
+binary = "api"
+
+# Build command (default: cargo build --release)
+# command = "cargo build --release"
+
+[deploy]
+# Port to expose (default: auto-detected)
+port = 8080
+
+# Health check path
+healthcheck = "/health"
+
+# Environment variables
+[env]
+RUST_LOG = "info"
+PORT = "8080"
+
+[resources]
+# Memory limit (free tier: 512MB)
+# memory = "512MB"
+
+# CPU limit (free tier: 0.25 vCPU)
+# cpu = "0.25"

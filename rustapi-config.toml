@@ -1,0 +1,22 @@
+# RustAPI Cloud configuration for SIGIL OS
+# This is a reference configuration - RustAPI Cloud uses CLI commands for deployment
+
+# Build configuration
+[build]
+binary = "api"
+release = true
+
+# Deployment configuration
+[deploy]
+port = 8080
+healthcheck = "/health"
+
+# Environment variables
+[env]
+RUST_LOG = "info"
+PORT = "8080"
+
+# Deployment commands:
+# 1. cargo build --release --bin api
+# 2. cargo rustapi login
+# 3. cargo rustapi deploy cloud
