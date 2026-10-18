@@ -1,0 +1,5 @@
+packages:
+  - 'web-console'
+  - 'mobile-client'
+  - 'design-system'
+  - 'packages/*'
