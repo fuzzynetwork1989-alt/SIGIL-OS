@@ -9,3 +9,6 @@ pub mod webauthn;
 
 #[cfg(feature = "cli")]
 pub mod cli;
+
+#[cfg(feature = "cli")]
+pub use cli::run;

@@ -5,9 +5,15 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 
+[[bin]]
+name = "sigil"
+path = "src/bin.rs"
+required-features = ["cli"]
+
 [dependencies]
 sigil = { path = "../sigil" }
 persistence = { path = "../persistence" }
+config = { path = "../config" }
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
@@ -21,6 +27,12 @@ thiserror.workspace = true
 async-stream = "0.3"
 futures = "0.3"
 tokio-stream = "0.1"
+reqwest.workspace = true
+ed25519-dalek.workspace = true
+rand.workspace = true
+hex.workspace = true
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["json", "env-filter"] }
 
 [dependencies.clap]
 workspace = true
@@ -29,3 +41,6 @@ optional = true
 [features]
 default = []
 cli = ["clap"]
+
+[dev-dependencies]
+reqwest.workspace = true

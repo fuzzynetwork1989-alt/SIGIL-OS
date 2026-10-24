@@ -6,26 +6,28 @@ members = [
     "sigil-core/sigil",
     "sigil-core/persistence",
     "sigil-core/api",
+    "sigil-core/config",
+    "sigil-core/errors",
     "sigil-core/memory",
     "sigil-core/retrieval",
     "sigil-core/context",
-    "sigil-core/world-model",
-    "sigil-core/tools",
-    "sigil-core/recovery",
-    "sigil-core/evaluation-os",
-    "sigil-core/runtime-orchestration",
     "sigil-core/observability-os",
-    "sigil-core/architecture-genome",
-    "sigil-core/economic-engine",
-    "sigil-core/agent-ecosystem",
-    "sigil-core/testing-framework",
+    "sigil-core/recovery",
     "model-fabric",
     "ui-ux",
     "dream-weaving",
     "quest-integration",
 ]
 exclude = [
-    "desktop-client/src-tauri"
+    "desktop-client/src-tauri",
+    "sigil-core/world-model",
+    "sigil-core/tools",
+    "sigil-core/evaluation-os",
+    "sigil-core/runtime-orchestration",
+    "sigil-core/architecture-genome",
+    "sigil-core/economic-engine",
+    "sigil-core/agent-ecosystem",
+    "sigil-core/testing-framework",
 ]
 
 [workspace.package]
@@ -50,10 +52,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 reqwest = { version = "0.11", features = ["json"] }
 ed25519-dalek = "2.0"
 rand = "0.8"
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 hex = "0.4"
 proptest = "1.0"
-rusqlite = "0.30"
+rusqlite = { version = "0.30", features = ["bundled"] }
 tempfile = "3.8"
 clap = { version = "4.4", features = ["derive"] }
 async-stream = "0.3"
@@ -62,3 +64,4 @@ tokio-stream = "0.1"
 candle-core = "0.11"
 opentelemetry = { version = "0.23", features = ["trace"] }
 prometheus = "0.13"
+toml = "0.8"
