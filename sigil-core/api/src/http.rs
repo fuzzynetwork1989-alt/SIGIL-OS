@@ -16,6 +16,7 @@ use std::time::Duration;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::conversation::{Conversation, ConversationStore, ConversationSummary, Message};
 
@@ -29,11 +30,14 @@ struct HealthResponse {
 }
 
 /// Chat request
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 struct ChatRequest {
+    #[validate(length(min = 1, max = 10000, message = "Prompt must be between 1 and 10000 characters"))]
     prompt: String,
-    #[serde(default)]
+    #[validate(range(min = 1, max = 8192, message = "Max tokens must be between 1 and 8192"))]
+    #[serde(default = "default_max_tokens")]
     max_tokens: u32,
+    #[validate(range(min = 0.0, max = 2.0, message = "Temperature must be between 0.0 and 2.0"))]
     #[serde(default)]
     temperature: f32,
     #[serde(default)]
@@ -44,6 +48,10 @@ struct ChatRequest {
     conversation_id: Option<String>,
     #[serde(default)]
     user_id: Option<String>,
+}
+
+fn default_max_tokens() -> u32 {
+    1024
 }
 
 /// Chat response
@@ -214,7 +222,13 @@ async fn health_check(State(state): State<ApiState>) -> Json<HealthResponse> {
 async fn chat_endpoint(
     State(_state): State<ApiState>,
     Json(request): Json<ChatRequest>,
-) -> Json<ChatResponse> {
+) -> Result<Json<ChatResponse>, axum::http::StatusCode> {
+    // Validate request
+    if let Err(errors) = request.validate() {
+        tracing::error!("Validation failed: {:?}", errors);
+        return Err(axum::http::StatusCode::BAD_REQUEST);
+    }
+
     let start = std::time::Instant::now();
 
     let response_text = format!(
@@ -229,7 +243,7 @@ async fn chat_endpoint(
 
     let duration = start.elapsed();
 
-    Json(ChatResponse {
+    Ok(Json(ChatResponse {
         text: response_text.clone(),
         tokens_generated: response_text.len() as u32,
         duration_ms: duration.as_millis() as u64,
@@ -244,7 +258,7 @@ async fn chat_endpoint(
         } else {
             None
         },
-    })
+    }))
 }
 
 /// Super Brain endpoint

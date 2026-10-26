@@ -47,6 +47,26 @@ pub enum SigilError {
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
 
+    /// Reality validation error
+    #[error("Reality validation error: {0}")]
+    RealityValidation(String),
+
+    /// Cognitive assembly error
+    #[error("Cognitive assembly error: {0}")]
+    CognitiveAssembly(String),
+
+    /// Mission error
+    #[error("Mission error: {0}")]
+    Mission(String),
+
+    /// Action error
+    #[error("Action error: {0}")]
+    Action(String),
+
+    /// Presence error
+    #[error("Presence error: {0}")]
+    Presence(String),
+
     /// Internal error
     #[error("Internal error: {0}")]
     Internal(String),
@@ -119,6 +139,31 @@ impl SigilError {
         Self::PermissionDenied(msg.into())
     }
 
+    /// Create a reality validation error
+    pub fn reality_validation(msg: impl Into<String>) -> Self {
+        Self::RealityValidation(msg.into())
+    }
+
+    /// Create a cognitive assembly error
+    pub fn cognitive_assembly(msg: impl Into<String>) -> Self {
+        Self::CognitiveAssembly(msg.into())
+    }
+
+    /// Create a mission error
+    pub fn mission(msg: impl Into<String>) -> Self {
+        Self::Mission(msg.into())
+    }
+
+    /// Create an action error
+    pub fn action(msg: impl Into<String>) -> Self {
+        Self::Action(msg.into())
+    }
+
+    /// Create a presence error
+    pub fn presence(msg: impl Into<String>) -> Self {
+        Self::Presence(msg.into())
+    }
+
     /// Create an internal error
     pub fn internal(msg: impl Into<String>) -> Self {
         Self::Internal(msg.into())
@@ -143,6 +188,36 @@ impl SigilError {
 
 /// Result type alias for SIGIL OS
 pub type Result<T> = std::result::Result<T, SigilError>;
+
+/// Reality validation result type alias
+pub type RealityValidationResult<T> = std::result::Result<T, SigilError>;
+
+/// Cognitive assembly result type alias
+pub type CognitiveAssemblyResult<T> = std::result::Result<T, SigilError>;
+
+/// Mission result type alias
+pub type MissionResult<T> = std::result::Result<T, SigilError>;
+
+/// Action result type alias
+pub type ActionResult<T> = std::result::Result<T, SigilError>;
+
+/// Presence result type alias
+pub type PresenceResult<T> = std::result::Result<T, SigilError>;
+
+/// Type alias for RealityValidationError for convenience
+pub type RealityValidationError = SigilError;
+
+/// Type alias for CognitiveAssemblyError for convenience
+pub type CognitiveAssemblyError = SigilError;
+
+/// Type alias for MissionError for convenience
+pub type MissionError = SigilError;
+
+/// Type alias for ActionError for convenience
+pub type ActionError = SigilError;
+
+/// Type alias for PresenceError for convenience
+pub type PresenceError = SigilError;
 
 #[cfg(test)]
 mod tests {
