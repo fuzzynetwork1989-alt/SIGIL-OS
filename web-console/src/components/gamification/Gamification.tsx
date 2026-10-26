@@ -21,7 +21,7 @@ import {
   Share2,
   Download
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const Gamification: React.FC = () => {
   const [userStats, setUserStats] = useState({

@@ -20,7 +20,7 @@ import {
   Check,
   Loader2
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const AdvancedSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);

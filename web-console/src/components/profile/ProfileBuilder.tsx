@@ -20,7 +20,7 @@ import {
   Flame,
   Gem
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const ProfileBuilder: React.FC = () => {
   const [saving, setSaving] = useState(false);

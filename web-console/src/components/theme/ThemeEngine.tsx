@@ -19,7 +19,7 @@ import {
   Wallpaper,
   MagicWand
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const ThemeEngine: React.FC = () => {
   const [saving, setSaving] = useState(false);

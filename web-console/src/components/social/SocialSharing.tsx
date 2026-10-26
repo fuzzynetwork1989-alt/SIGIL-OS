@@ -23,7 +23,7 @@ import {
   TrendingUp,
   Zap
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const SocialSharing: React.FC = () => {
   const [copied, setCopied] = useState(false);
