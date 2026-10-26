@@ -51,7 +51,7 @@ emitted_sigils: 0
 **Location:** C:\Users\Corey Smith\Devin Projects\SIGIL OS
 **Git Status:** Clean
 **Branch:** main
-**Remote:** https://github.com/fuzzynetwork1989-alt/sigil-os.git
+**Remote:** <https://github.com/fuzzynetwork1989-alt/sigil-os.git>
 
 ## New Requirements - Major Scope Expansion
 
@@ -62,6 +62,7 @@ emitted_sigils: 0
 
 **Concept (To be designed):**
 A self-evolving cognitive system that:
+
 - "Weaves" connections between memories, beliefs, and experiences in a dream-like state
 - Recursively improves its own cognitive architecture through self-reflection
 - Evolves its neural pathways and reasoning patterns over time
@@ -71,6 +72,7 @@ A self-evolving cognitive system that:
 - Every evolutionary step is warranted, reversible, and auditable
 
 **Implementation Components (Tentative):**
+
 - Dream state simulation engine
 - Recursive self-reflection mechanisms
 - Cognitive pathway mutation operators
@@ -85,6 +87,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - Meta Quest 3 3rd party voice assistant with vision
 - Android/Quest SDKs and toolchains
 - Mixed reality interface
@@ -95,6 +98,7 @@ A self-evolving cognitive system that:
 - XR presence system ("The Presence" companion)
 
 **Required SDKs:**
+
 - Meta Quest SDK (Oculus SDK)
 - Android SDK/NDK
 - OpenXR runtime
@@ -108,6 +112,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - Base model selection and integration
 - Modelfile creation and management
 - Model family creation
@@ -118,6 +123,7 @@ A self-evolving cognitive system that:
 - Model performance monitoring
 
 **Base Model Candidates:**
+
 - Local: LLaMA, Mistral, Phi, Qwen
 - Cloud: OpenAI, Anthropic, Google, etc.
 - Hybrid: Local + Cloud fallback
@@ -128,6 +134,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - Icon packs
 - Theme packs
 - Clickable icons and buttons
@@ -138,6 +145,7 @@ A self-evolving cognitive system that:
 - Customizable bot/model appearance
 
 **Components:**
+
 - Icon system (SVG, PNG, 3D models)
 - Theme engine (light/dark/custom)
 - UI component library
@@ -151,6 +159,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - Automated testing
 - Automated linting
 - Automated building
@@ -166,6 +175,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - OpenXR standard support
 - Multiple device compatibility
 - Apple Vision Pro support
@@ -179,6 +189,7 @@ A self-evolving cognitive system that:
 **Priority:** MUST-HAVE
 
 **Requirements:**
+
 - Chat interface
 - Digital model/avatar
 - Mixed reality integration
@@ -190,6 +201,7 @@ A self-evolving cognitive system that:
 ## Current Implementation Status
 
 **Phase 0 (Foundations) - Partial:**
+
 - [x] Repository structure
 - [x] Core documentation
 - [x] Sigil type definitions
@@ -202,6 +214,7 @@ A self-evolving cognitive system that:
 - [ ] Test execution (Rust not installed)
 
 **Phase 1-6 (Not Started):**
+
 - [ ] Noetic Substrate
 - [ ] Anchor Governance
 - [ ] Inference Kernel
@@ -227,10 +240,12 @@ The current ARCHITECTURE.md needs major updates to include:
 ## Toolchain Gaps
 
 **Current:**
+
 - Git: Yes
 - Bash: Yes
 
 **Missing:**
+
 - Rust: Not installed (BLOCKER)
 - Android SDK: Not installed
 - Meta Quest SDK: Not installed
@@ -242,6 +257,7 @@ The current ARCHITECTURE.md needs major updates to include:
 ## Risk Assessment
 
 **Critical Risks:**
+
 1. **Massive scope expansion** - Going from Phase 0 to full-stack implementation
 2. **Toolchain complexity** - Requires multiple SDKs and toolchains
 3. **New invention required** - Dream Weaving system doesn't exist
@@ -251,6 +267,7 @@ The current ARCHITECTURE.md needs major updates to include:
 7. **Platform fragmentation** - Windows, Linux, Android, Quest builds
 
 **Mitigation Strategies:**
+
 - Start with Model Fabric foundation
 - Invent Dream Weaving incrementally
 - Focus on one platform first (e.g., desktop)
@@ -271,6 +288,7 @@ The current ARCHITECTURE.md needs major updates to include:
 ## Required Approvals
 
 This scope expansion requires:
+
 1. **Explicit approval** for massive scope change (Phase 0 → full-stack)
 2. **Architecture approval** for new components
 3. **Budget approval** for SDKs, cloud services, compute resources
@@ -280,6 +298,7 @@ This scope expansion requires:
 ## Dependencies
 
 **External Dependencies to Acquire:**
+
 - Android Studio / Android SDK
 - Meta Quest SDK / Oculus SDK
 - OpenXR runtime
@@ -288,6 +307,7 @@ This scope expansion requires:
 - CI/CD platform (GitHub Actions, GitLab CI, etc.)
 
 **Internal Dependencies:**
+
 - Phase 0 must complete first (build verification)
 - Model Fabric needed before Dream Weaving
 - UI/UX layer needs Model Fabric
@@ -296,6 +316,7 @@ This scope expansion requires:
 ## Evidence Requirements
 
 Before proceeding, need:
+
 - [ ] User approval for scope expansion
 - [ ] Architecture document updates approved
 - [ ] Dream Weaving design document created and approved
@@ -315,6 +336,7 @@ Before proceeding, need:
 ## Stop Conditions
 
 Autopilot should stop if:
+
 - User does not approve scope expansion
 - Architecture updates are rejected
 - Dream Weaving design is not feasible
