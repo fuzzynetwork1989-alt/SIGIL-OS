@@ -86,7 +86,81 @@
 
 ---
 
-### 16. HTTP API Missing Input Validation (2026-10-26)
+### 16. Web Console Resource Configuration Error (2026-10-26)
+
+**Problem:**
+
+- Quick Review Failed: Resource Not Found error in web console
+- Web console had Vite config but Next.js app structure
+- Missing Next.js type definitions (next-env.d.ts)
+- Duplicate Tailwind config files
+- Incorrect import paths using @/ alias not configured
+- Missing ESLint config
+
+**Solution:**
+
+- Converted package.json from Vite to Next.js dependencies
+- Removed vite.config.ts (conflicting with Next.js)
+- Added .eslintrc.json for Next.js linting
+- Added next-env.d.ts for TypeScript type definitions
+- Removed duplicate tailwind.config.ts (kept .js version)
+- Fixed all import paths from @/lib/utils to relative paths
+- Updated tailwind.config.js content paths for Next.js app directory
+
+**Root Cause:**
+
+Initial web console setup mixed Vite and Next.js configurations, causing resource resolution failures. The @/ alias was referenced in tsconfig.json but not properly configured for the build system.
+
+**Lesson Learned:**
+
+Always ensure build tool configuration matches the actual framework structure (Next.js vs Vite). When using Next.js app directory, ensure proper type definitions and import path configuration.
+
+**Files Changed:**
+
+- `web-console/package.json` - Converted to Next.js
+- `web-console/.eslintrc.json` - Added ESLint config
+- `web-console/next-env.d.ts` - Added type definitions
+- `web-console/tailwind.config.js` - Updated for Next.js
+- `web-console/tailwind.config.ts` - Removed (duplicate)
+- `web-console/vite.config.ts` - Removed (conflicting)
+- All component files - Fixed import paths
+
+---
+
+### 17. Desktop Client Build Disk Space Insufficient (2026-10-26)
+
+**Problem:**
+
+- Desktop Client build failed at 55% (201/365 crates compiled)
+- OS error 112: "There is not enough space on the disk"
+- Only 25 GB free space required ~5-10 GB for Rust build artifacts
+- target directory was 13.4 GB
+
+**Solution:**
+
+- Ran `cargo clean` to remove build artifacts
+- Freed 13.4 GB of disk space
+- Free space increased from 25 GB to 37.8 GB
+- Build can now proceed
+
+**Root Cause:**
+
+Rust build artifacts accumulate over time, especially in large workspaces with many crates. Previous builds left significant target directory bloat.
+
+**Lesson Learned:**
+
+Regularly run `cargo clean` before large builds to ensure sufficient disk space. Monitor target directory size, especially in monorepo workspaces. Consider using `cargo-sweep` for selective cleanup.
+
+**Resolution:**
+
+- Disk space before: 25 GB free
+- Disk space after: 37.8 GB free
+- Freed: 13.4 GB
+- Ready to retry Desktop Client build
+
+---
+
+### 18. HTTP API Missing Input Validation (2026-10-26)
 
 **Problem:**
 
