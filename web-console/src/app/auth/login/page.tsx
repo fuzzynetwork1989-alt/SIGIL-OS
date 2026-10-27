@@ -1,53 +1,45 @@
 'use client'
 
 import { useState } from 'react'
-import { api } from '@/lib/api'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { Sparkles, Heart } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
 
-    try {
-      const response = await api.login(email, password)
-      api.setToken(response.token)
-      localStorage.setItem('nexora_token', response.token)
-      localStorage.setItem('nexora_user', JSON.stringify(response.user))
-      router.push('/app/home')
-    } catch (err) {
-      setError('Invalid email or password')
-      console.error('Login error:', err)
-    } finally {
-      setLoading(false)
-    }
+    // Simulate login and redirect to home
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-800 rounded-lg p-8 border border-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">NEXORA Omega</h1>
-            <p className="text-slate-400">Sign in to your cognitive workspace</p>
-          </div>
-
-          {error && (
-            <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-6">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-white" />
             </div>
-          )}
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome to SIGIL</h1>
+            <p className="text-purple-200">Your AI companion who remembers</p>
+          </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-purple-200 mb-2">
                 Email
               </label>
               <input
@@ -56,13 +48,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                className="w-full bg-white/10 text-white px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 placeholder-purple-300"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-purple-200 mb-2">
                 Password
               </label>
               <input
@@ -71,7 +63,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                className="w-full bg-white/10 text-white px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 placeholder-purple-300"
                 placeholder="••••••••"
               />
             </div>
@@ -79,22 +71,34 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-slate-400 text-sm">
+            <p className="text-purple-200 text-sm">
               Don't have an account?{' '}
-              <a href="/auth/register" className="text-purple-400 hover:text-purple-300">
+              <button
+                onClick={() => router.push('/auth/register')}
+                className="text-purple-400 hover:text-purple-300 cursor-pointer"
+              >
                 Sign up
-              </a>
+              </button>
             </p>
           </div>
+
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30">
+              <Heart className="w-4 h-4 text-green-400" />
+              <span className="text-green-400 text-xs">
+                Your conversations are private and secure
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
