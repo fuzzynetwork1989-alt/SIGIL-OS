@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip } from 'lucide-react'
+import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface Message {
   id: string
@@ -11,7 +12,19 @@ interface Message {
   timestamp: Date
 }
 
+const aiResponses = [
+  "That's a great question! Let me think about that for a moment. Based on what you've shared, I'd suggest focusing on the key points first.",
+  "I understand what you're looking for. Here's my perspective on this - it's important to consider both the short-term and long-term implications.",
+  "Interesting! I remember we talked about something similar before. Building on that, I think you might want to explore this approach.",
+  "That's a thoughtful question. From my understanding, there are a few different ways to approach this. Let me share the most effective one.",
+  "I'm here to help with that. Based on our previous conversations, I know you prefer practical solutions, so here's what I'd recommend.",
+  "Great point! Let me break this down for you. First, we should consider the main factors, then look at the specific details.",
+  "I appreciate you sharing that with me. This is something I can definitely help you work through. Let's start with the basics.",
+  "That makes sense. Here's my take on it - focus on what matters most to you right now, and we can build from there.",
+]
+
 export default function ChatPage() {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -46,17 +59,20 @@ export default function ChatPage() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response
+    // Simulate AI response with varied responses
+    const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)]
+    const responseTime = 1000 + Math.random() * 2000
+
     setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "I understand. Let me help you with that. I remember that we've talked about similar topics before, and I can build on that understanding.",
+        content: randomResponse,
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, assistantMessage])
       setIsTyping(false)
-    }, 1500)
+    }, responseTime)
   }
 
   const formatTime = (date: Date) => {
@@ -69,6 +85,12 @@ export default function ChatPage() {
       <div className="bg-white/10 backdrop-blur-lg border-b border-white/20 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push('/')}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
