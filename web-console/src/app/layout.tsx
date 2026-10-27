@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'NEXORA Omega - Cognitive Operating System',
-  description: 'A post-AI powered operating system and cognitive companion platform',
+  title: 'SIGIL OS - Your AI Companion',
+  description: 'A beautiful AI companion who remembers and helps you',
 }
 
 export default function RootLayout({
