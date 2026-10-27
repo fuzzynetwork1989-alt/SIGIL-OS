@@ -16,6 +16,10 @@ WORKDIR /app
 # Copy Cargo files for dependency caching
 COPY Cargo.toml Cargo.lock ./
 COPY sigil-core/ ./sigil-core/
+COPY model-fabric/ ./model-fabric/
+COPY ui-ux/ ./ui-ux/
+COPY dream-weaving/ ./dream-weaving/
+COPY quest-integration/ ./quest-integration/
 
 # Build release binary
 RUN cargo build --release --bin api
