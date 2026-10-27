@@ -7,6 +7,7 @@ import * as Crypto from 'expo-crypto';
 
 // Screens
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import HomeScreen from './src/screens/HomeScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import AvatarScreen from './src/screens/AvatarScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -49,36 +50,30 @@ export default function App() {
       <StatusBar style="auto" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={isOnboarded ? (isAuthenticated ? 'Chat' : 'Onboarding') : 'Onboarding'}
+          initialRouteName={isOnboarded ? (isAuthenticated ? 'Home' : 'Onboarding') : 'Onboarding'}
           screenOptions={{
-            headerStyle: {
-              backgroundColor: '#667eea',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
+            headerShown: false,
           }}
         >
           <Stack.Screen
             name="Onboarding"
             component={OnboardingScreen}
-            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
           />
           <Stack.Screen
             name="Chat"
             component={ChatScreen}
-            options={{ title: 'SIGIL OS Chat' }}
           />
           <Stack.Screen
             name="Avatar"
             component={AvatarScreen}
-            options={{ title: 'Avatar' }}
           />
           <Stack.Screen
             name="Settings"
             component={SettingsScreen}
-            options={{ title: 'Settings' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
