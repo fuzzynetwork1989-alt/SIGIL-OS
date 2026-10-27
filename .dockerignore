@@ -8,7 +8,6 @@ target/
 **/target/
 
 # Cargo
-Cargo.lock
 
 # Documentation
 *.md
