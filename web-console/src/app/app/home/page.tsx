@@ -1,180 +1,139 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { api } from '@/lib/api'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { MessageSquare, Heart, Sparkles, Clock, TrendingUp, ChevronRight } from 'lucide-react'
 
-interface DashboardStats {
-  activeProcesses: number
-  totalMemories: number
-  pendingApprovals: number
-  systemHealth: number
-}
-
-interface ActivityItem {
-  id: string
-  type: string
-  description: string
-  timestamp: string
-}
-
-export default function AppHomePage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [activities, setActivities] = useState<ActivityItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default function CompanionHome() {
+  const [greeting, setGreeting] = useState('')
 
   useEffect(() => {
-    loadDashboardData()
+    const hour = new Date().getHours()
+    if (hour < 12) setGreeting('Good morning')
+    else if (hour < 18) setGreeting('Good afternoon')
+    else setGreeting('Good evening')
   }, [])
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true)
-      // Real API calls to fetch dashboard data
-      const [statsResponse, activitiesResponse] = await Promise.all([
-        api.get<DashboardStats>('/dashboard/stats'),
-        api.get<ActivityItem[]>('/dashboard/activities')
-      ])
-      setStats(statsResponse)
-      setActivities(activitiesResponse)
-    } catch (err) {
-      setError('Failed to load dashboard data')
-      console.error('Dashboard loading error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const recentConversations = [
+    { id: 1, title: 'Planning my trip to Japan', preview: 'Let me help you plan an amazing trip...', time: '2 hours ago' },
+    { id: 2, title: 'Learning Python programming', preview: 'I can guide you through the basics...', time: 'Yesterday' },
+    { id: 3, title: 'Recipe ideas for dinner', preview: 'How about something simple and delicious...', time: '2 days ago' },
+  ]
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">Loading dashboard...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
-        <p className="text-red-400">{error}</p>
-        <button
-          onClick={loadDashboardData}
-          className="mt-2 text-red-300 hover:text-red-200 underline"
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
-  if (!stats) {
-    return (
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-        <p className="text-slate-400">No dashboard data available</p>
-      </div>
-    )
-  }
+  const quickActions = [
+    { icon: MessageSquare, label: 'Start a chat', color: 'from-purple-500 to-pink-500' },
+    { icon: Heart, label: 'My memories', color: 'from-pink-500 to-rose-500' },
+    { icon: Sparkles, label: 'Personalize', color: 'from-blue-500 to-cyan-500' },
+  ]
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome to NEXORA Omega</h1>
-        <p className="text-slate-400">Your cognitive operating system workspace</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        {/* Greeting Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl font-bold text-white mb-4">
+            {greeting}, I'm SIGIL
+          </h1>
+          <p className="text-xl text-purple-200">
+            Your AI companion who remembers and helps you
+          </p>
+        </motion.div>
 
-      {/* Real Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <h3 className="text-slate-400 text-sm mb-1">Active Processes</h3>
-          <p className="text-2xl font-bold text-white">{stats.activeProcesses}</p>
-        </div>
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <h3 className="text-slate-400 text-sm mb-1">Total Memories</h3>
-          <p className="text-2xl font-bold text-white">{stats.totalMemories}</p>
-        </div>
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <h3 className="text-slate-400 text-sm mb-1">Pending Approvals</h3>
-          <p className="text-2xl font-bold text-white">{stats.pendingApprovals}</p>
-        </div>
-        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <h3 className="text-slate-400 text-sm mb-1">System Health</h3>
-          <p className="text-2xl font-bold text-green-400">{stats.systemHealth}%</p>
-        </div>
-      </div>
-
-      {/* Real Recent Activity */}
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-        <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
-        {activities.length === 0 ? (
-          <p className="text-slate-400">No recent activity</p>
-        ) : (
-          <div className="space-y-3">
-            {activities.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-3 p-3 bg-slate-700/50 rounded">
-                <span className="text-2xl">{getActivityIcon(activity.type)}</span>
-                <div className="flex-1">
-                  <p className="text-white text-sm">{activity.description}</p>
-                  <p className="text-slate-400 text-xs">{formatTimestamp(activity.timestamp)}</p>
-                </div>
+        {/* Main Chat Input */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-12"
+        >
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-2xl">
+            <textarea
+              placeholder="What would you like to talk about today?"
+              className="w-full bg-transparent text-white text-lg placeholder-purple-300 resize-none focus:outline-none min-h-[120px]"
+              rows={4}
+            />
+            <div className="flex justify-between items-center mt-4">
+              <div className="flex gap-2">
+                <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+                  <Sparkles className="w-5 h-5" />
+                </button>
+                <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+                  <Clock className="w-5 h-5" />
+                </button>
               </div>
+              <button className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all flex items-center gap-2">
+                Start Chat
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
+        >
+          {quickActions.map((action, index) => {
+            const Icon = action.icon
+            return (
+              <button
+                key={index}
+                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all group"
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-white font-medium">{action.label}</p>
+              </button>
+            )
+          })}
+        </motion.div>
+
+        {/* Recent Conversations */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="text-2xl font-bold text-white mb-6">Recent Conversations</h2>
+          <div className="space-y-3">
+            {recentConversations.map((conv) => (
+              <button
+                key={conv.id}
+                className="w-full bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-left group"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-white font-medium text-lg">{conv.title}</h3>
+                  <span className="text-purple-300 text-sm">{conv.time}</span>
+                </div>
+                <p className="text-purple-200 text-sm">{conv.preview}</p>
+              </button>
             ))}
           </div>
-        )}
-      </div>
+        </motion.div>
 
-      {/* Real Quick Actions */}
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-        <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => window.location.href = '/app/chat'}
-            className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition-colors"
-          >
-            <span className="text-2xl block mb-2">💬</span>
-            <span className="text-sm">Start Chat</span>
-          </button>
-          <button
-            onClick={() => window.location.href = '/app/cognitive-processes'}
-            className="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-lg transition-colors"
-          >
-            <span className="text-2xl block mb-2">🧠</span>
-            <span className="text-sm">New Process</span>
-          </button>
-          <button
-            onClick={() => window.location.href = '/app/artifacts'}
-            className="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-lg transition-colors"
-          >
-            <span className="text-2xl block mb-2">📦</span>
-            <span className="text-sm">Create Artifact</span>
-          </button>
-        </div>
+        {/* Trust Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-12 text-center"
+        >
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-green-500/20 border border-green-500/30">
+            <Heart className="w-4 h-4 text-green-400" />
+            <span className="text-green-400 text-sm font-medium">
+              Your conversations are private and secure
+            </span>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
-}
-
-function getActivityIcon(type: string): string {
-  const icons: Record<string, string> = {
-    cognitive_process: '🧠',
-    memory: '💾',
-    tool: '🔧',
-    capability: '🔐',
-    approval: '✅',
-    error: '❌',
-  }
-  return icons[type] || '📋'
-}
-
-function formatTimestamp(timestamp: string): string {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
-  if (minutes < 1) return 'Just now'
-  if (minutes < 60) return `${minutes} minutes ago`
-  if (hours < 24) return `${hours} hours ago`
-  return `${days} days ago`
 }

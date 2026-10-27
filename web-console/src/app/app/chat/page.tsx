@@ -1,123 +1,179 @@
 'use client'
 
-import { useState } from 'react'
-import { api } from '@/lib/api'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip } from 'lucide-react'
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
-  timestamp: string
+  timestamp: Date
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: "Hi! I'm SIGIL, your AI companion. I remember our conversations and I'm here to help you with anything. What's on your mind today?",
+      timestamp: new Date(),
+    },
+  ])
   const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isTyping, setIsTyping] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSendMessage = async () => {
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const handleSend = async () => {
     if (!input.trim()) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
     }
 
     setMessages([...messages, userMessage])
     setInput('')
-    setLoading(true)
-    setError(null)
+    setIsTyping(true)
 
-    try {
-      const response = await api.generateText({
-        prompt: input,
-        model: 'Qwen/Qwen3-30B-A3B-Instruct-2507',
-        max_tokens: 1000,
-      })
-
+    // Simulate AI response
+    setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.choices[0].text,
-        timestamp: new Date().toISOString(),
+        content: "I understand. Let me help you with that. I remember that we've talked about similar topics before, and I can build on that understanding.",
+        timestamp: new Date(),
       }
+      setMessages(prev => [...prev, assistantMessage])
+      setIsTyping(false)
+    }, 1500)
+  }
 
-      setMessages([...messages, userMessage, assistantMessage])
-    } catch (err) {
-      setError('Failed to generate response')
-      console.error('Chat error:', err)
-    } finally {
-      setLoading(false)
-    }
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="text-center text-slate-400 py-8">
-            <p className="text-lg mb-2">Start a conversation</p>
-            <p className="text-sm">Ask NEXORA Omega anything about your workspace</p>
-          </div>
-        ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[70%] rounded-lg p-4 ${
-                  message.role === 'user'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-700 text-slate-200'
-                }`}
-              >
-                <p className="text-sm">{message.content}</p>
-                <p className="text-xs mt-2 opacity-70">
-                  {new Date(message.timestamp).toLocaleTimeString()}
-                </p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+      {/* Header */}
+      <div className="bg-white/10 backdrop-blur-lg border-b border-white/20 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
-          ))
-        )}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="bg-slate-700 rounded-lg p-4">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
-              </div>
+            <div>
+              <h1 className="text-white font-bold">SIGIL</h1>
+              <p className="text-purple-300 text-sm">Your AI companion</p>
             </div>
           </div>
-        )}
-        {error && (
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="flex items-center gap-2">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+              <Heart className="w-5 h-5" />
+            </button>
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+              <Clock className="w-5 h-5" />
+            </button>
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+              <MoreVertical className="w-5 h-5" />
+            </button>
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          placeholder="Type your message..."
-          disabled={loading}
-          className="flex-1 bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500 disabled:opacity-50"
-        />
-        <button
-          onClick={handleSendMessage}
-          disabled={loading || !input.trim()}
-          className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white px-6 py-3 rounded-lg transition-colors"
-        >
-          Send
-        </button>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-6 py-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <AnimatePresence>
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[70%] rounded-2xl p-4 ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                      : 'bg-white/10 backdrop-blur-lg text-white border border-white/20'
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-purple-200' : 'text-purple-300'}`}>
+                    {formatTime(message.timestamp)}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start"
+            >
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="bg-white/10 backdrop-blur-lg border-t border-white/20 px-6 py-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-end gap-3">
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+              <Paperclip className="w-5 h-5" />
+            </button>
+            <div className="flex-1 bg-white/10 rounded-2xl border border-white/20 focus-within:border-purple-500 transition-colors">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSend()
+                  }
+                }}
+                placeholder="Type your message..."
+                className="w-full bg-transparent text-white placeholder-purple-300 resize-none focus:outline-none p-4 min-h-[60px] max-h-[200px]"
+                rows={1}
+              />
+            </div>
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+              <Smile className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleSend}
+              disabled={!input.trim()}
+              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50"
+            >
+              <Send className="w-5 h-5" />
+            </button>
+          </div>
+          <p className="text-center text-purple-300 text-xs mt-3">
+            SIGIL remembers your conversations to provide better help
+          </p>
+        </div>
       </div>
     </div>
   )
