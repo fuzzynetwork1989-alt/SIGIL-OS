@@ -21,7 +21,11 @@ const aiResponses = [
   "Great point! Let me break this down for you. First, we should consider the main factors, then look at the specific details.",
   "I appreciate you sharing that with me. This is something I can definitely help you work through. Let's start with the basics.",
   "That makes sense. Here's my take on it - focus on what matters most to you right now, and we can build from there.",
+  "I can help you with that! What specific aspect would you like me to focus on first?",
+  "That's an interesting topic. Let me share some thoughts that might be helpful for your situation.",
 ]
+
+let responseIndex = 0
 
 export default function ChatPage() {
   const router = useRouter()
@@ -59,15 +63,17 @@ export default function ChatPage() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response with varied responses
-    const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)]
+    // Get varied response using index that cycles through responses
+    const response = aiResponses[responseIndex % aiResponses.length]
+    responseIndex = (responseIndex + 1) % aiResponses.length
+
     const responseTime = 1000 + Math.random() * 2000
 
     setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: randomResponse,
+        content: response,
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, assistantMessage])
@@ -87,7 +93,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/')}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -100,13 +106,13 @@ export default function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
               <Heart className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
               <Clock className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
               <MoreVertical className="w-5 h-5" />
             </button>
           </div>
@@ -163,7 +169,7 @@ export default function ChatPage() {
       <div className="bg-white/10 backdrop-blur-lg border-t border-white/20 px-6 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-end gap-3">
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
               <Paperclip className="w-5 h-5" />
             </button>
             <div className="flex-1 bg-white/10 rounded-2xl border border-white/20 focus-within:border-purple-500 transition-colors">
@@ -181,13 +187,13 @@ export default function ChatPage() {
                 rows={1}
               />
             </div>
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
               <Smile className="w-5 h-5" />
             </button>
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50"
+              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
               <Send className="w-5 h-5" />
             </button>

@@ -28,6 +28,11 @@ export default function HomePage() {
     { icon: Sparkles, label: 'Personalize', color: 'from-blue-500 to-cyan-500', route: '/app/settings' },
   ]
 
+  const handleNavigate = (route: string) => {
+    console.log('Navigating to:', route)
+    router.push(route)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -65,8 +70,8 @@ export default function HomePage() {
                 </button>
               </div>
               <button
-                onClick={() => router.push('/app/chat')}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all flex items-center gap-2"
+                onClick={() => handleNavigate('/app/chat')}
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer"
               >
                 Start Chat
                 <ChevronRight className="w-4 h-4" />
@@ -87,8 +92,8 @@ export default function HomePage() {
             return (
               <button
                 key={index}
-                onClick={() => router.push(action.route)}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all group"
+                onClick={() => handleNavigate(action.route)}
+                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all group cursor-pointer"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <Icon className="w-6 h-6 text-white" />
@@ -110,8 +115,8 @@ export default function HomePage() {
             {recentConversations.map((conv) => (
               <button
                 key={conv.id}
-                onClick={() => router.push('/app/chat')}
-                className="w-full bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-left group"
+                onClick={() => handleNavigate('/app/chat')}
+                className="w-full bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-left group cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-white font-medium text-lg">{conv.title}</h3>
