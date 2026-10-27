@@ -2,12 +2,14 @@
 # Optimized for small image size and fast builds
 
 # Stage 1: Build
-FROM rust:1.75-slim as builder
+FROM rust:1.85-slim as builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
+    git \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -20,6 +22,7 @@ COPY model-fabric/ ./model-fabric/
 COPY ui-ux/ ./ui-ux/
 COPY dream-weaving/ ./dream-weaving/
 COPY quest-integration/ ./quest-integration/
+COPY .cargo/ ./.cargo/
 
 # Build release binary
 RUN cargo build --release --bin api
@@ -30,6 +33,8 @@ FROM debian:bookworm-slim
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    curl \
+    libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -51,12 +56,14 @@ USER sigil
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Set environment variables
 ENV PORT=8080
 ENV RUST_LOG=info
+ENV SIGIL_HOST=0.0.0.0
+ENV SIGIL_PORT=8080
 
 # Run the application
 CMD ["/app/sigil-api"]
