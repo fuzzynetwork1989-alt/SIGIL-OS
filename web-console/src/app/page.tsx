@@ -25,7 +25,7 @@ export default function HomePage() {
   const quickActions = [
     { icon: MessageSquare, label: 'Start a chat', color: 'from-purple-500 to-pink-500', route: '/app/chat' },
     { icon: Heart, label: 'My memories', color: 'from-pink-500 to-rose-500', route: '/app/memory' },
-    { icon: Sparkles, label: 'Personalize', color: 'from-blue-500 to-cyan-500', route: '/app/settings' },
+    { icon: Sparkles, label: 'Settings', color: 'from-blue-500 to-cyan-500', route: '/app/settings' },
   ]
 
   const handleNavigate = (route: string) => {

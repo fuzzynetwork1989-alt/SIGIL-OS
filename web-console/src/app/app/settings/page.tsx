@@ -451,6 +451,36 @@ export default function SettingsPage() {
             </button>
           </div>
         </motion.div>
+
+        {/* Quick Links */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Quick Links</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>API Keys</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Usage Statistics</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Billing</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Help Center</span>
+            </button>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
