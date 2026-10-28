@@ -18,7 +18,12 @@ import {
   Pause,
   Trash2,
   Download,
-  Upload
+  Upload,
+  Palette,
+  Bell,
+  User,
+  ArrowRight,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
@@ -481,6 +486,156 @@ export default function SettingsPage() {
             </button>
             <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Help Center</span>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Advanced Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Sliders className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Advanced Settings</h3>
+          </div>
+
+          <div className="space-y-4">
+            <ToggleSetting
+              label="Enable Debug Mode"
+              checked={false}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Enable Experimental Features"
+              checked={false}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Enable Beta Features"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Verbose Logging"
+              checked={false}
+              onChange={(v) => {}}
+            />
+          </div>
+        </motion.div>
+
+        {/* Appearance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Palette className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Appearance</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300">Theme</label>
+              <select
+                value="dark"
+                className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors cursor-pointer relative z-20"
+              >
+                <option value="dark">Dark (Default)</option>
+                <option value="light">Light</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+            <ToggleSetting
+              label="Glassmorphism Effects"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Particles Animation"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Smooth Transitions"
+              checked={true}
+              onChange={(v) => {}}
+            />
+          </div>
+        </motion.div>
+
+        {/* Notifications */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Bell className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Notifications</h3>
+          </div>
+
+          <div className="space-y-4">
+            <ToggleSetting
+              label="Desktop Notifications"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Sound Effects"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Haptic Feedback"
+              checked={true}
+              onChange={(v) => {}}
+            />
+            <ToggleSetting
+              label="Achievement Alerts"
+              checked={true}
+              onChange={(v) => {}}
+            />
+          </div>
+        </motion.div>
+
+        {/* Account */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <User className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Account</h3>
+          </div>
+
+          <div className="space-y-4">
+            <button className="w-full flex items-center justify-between p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Edit Profile</span>
+              <ArrowRight className="w-4 h-4 text-purple-400" />
+            </button>
+            <button className="w-full flex items-center justify-between p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Change Password</span>
+              <ArrowRight className="w-4 h-4 text-purple-400" />
+            </button>
+            <button className="w-full flex items-center justify-between p-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white transition-all cursor-pointer relative z-20">
+              <span>Sign Out</span>
+              <LogOut className="w-4 h-4 text-red-400" />
             </button>
           </div>
         </motion.div>
