@@ -62,10 +62,13 @@ export default function SettingsPage() {
   })
 
   const models = [
-    { id: 'gpt-4', name: 'GPT-4', description: 'Most capable model' },
-    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Faster, more cost-effective' },
-    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and efficient' },
-    { id: 'claude-3', name: 'Claude 3', description: 'Anthropic\'s latest model' },
+    { id: 'sigil-companion', name: 'SIGIL Companion', description: 'Your personal AI companion' },
+    { id: 'sigil-mission', name: 'SIGIL Mission', description: 'Goal-oriented task execution' },
+    { id: 'sigil-world', name: 'SIGIL World', description: 'World knowledge and context' },
+    { id: 'sigil-spatial', name: 'SIGIL Spatial', description: 'Spatial reasoning and 3D understanding' },
+    { id: 'sigil-presence', name: 'SIGIL Presence', description: 'Awareness and attention management' },
+    { id: 'sigil-research', name: 'SIGIL Research', description: 'Deep research and analysis' },
+    { id: 'sigil-reasoner', name: 'SIGIL Reasoner', description: 'Logical reasoning and inference' },
   ]
 
   const handleSave = async () => {
