@@ -18,6 +18,7 @@ members = [
     "sigil-core/mission-intelligence",
     "sigil-core/action-intelligence",
     "sigil-core/presence-intelligence",
+    "sigil-core/world-model",
     "model-fabric",
     "ui-ux",
     "dream-weaving",
@@ -25,7 +26,6 @@ members = [
 ]
 exclude = [
     "desktop-client/src-tauri",
-    "sigil-core/world-model",
     "sigil-core/tools",
     "sigil-core/evaluation-os",
     "sigil-core/runtime-orchestration",
