@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createProvider } from '../../../lib/llm-provider'
+import { getModelfileConfig } from '../../../lib/modelfile'
 
 // Chat completion API endpoint
 // This handles real LLM chat requests with streaming support
@@ -9,7 +10,7 @@ export const runtime = 'edge'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { model, messages, temperature = 0.7, maxTokens = 2048, stream = false } = body
+    const { model, messages, temperature, maxTokens, topP, stream = false } = body
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -45,18 +46,33 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Map SIGIL model names to actual provider model names
-    const modelMapping: Record<string, string> = {
-      'sigil-companion': 'gpt-4o-mini',
-      'sigil-mission': 'gpt-4o',
-      'sigil-world': 'gpt-4-turbo',
-      'sigil-spatial': 'gpt-4-turbo',
-      'sigil-presence': 'gpt-4o-mini',
-      'sigil-research': 'gpt-4',
-      'sigil-reasoner': 'gpt-4-turbo',
+    // Get modelfile configuration for the selected SIGIL model
+    let modelfileConfig
+    try {
+      modelfileConfig = getModelfileConfig(model)
+    } catch (error) {
+      // If no modelfile, use defaults
+      modelfileConfig = {
+        model: 'gpt-4o-mini',
+        temperature: 0.7,
+        maxTokens: 2048,
+        topP: 0.9,
+        frequencyPenalty: 0.0,
+        presencePenalty: 0.0,
+        systemPrompt: 'You are a helpful AI assistant.',
+      }
     }
 
-    const actualModel = modelMapping[model] || model
+    // Use modelfile config if not overridden by request
+    const finalTemperature = temperature ?? modelfileConfig.temperature
+    const finalMaxTokens = maxTokens ?? modelfileConfig.maxTokens
+    const finalTopP = topP ?? modelfileConfig.topP
+    const finalModel = modelfileConfig.model
+
+    // Add system prompt if not already present
+    const messagesWithSystem = messages.some(m => m.role === 'system')
+      ? messages
+      : [{ role: 'system', content: modelfileConfig.systemPrompt }, ...messages]
 
     // Create provider instance
     const llmProvider = createProvider(provider, apiKey)
@@ -68,10 +84,10 @@ export async function POST(req: NextRequest) {
         async start(controller) {
           try {
             const streamingResponse = llmProvider.streamChatCompletion({
-              model: actualModel,
-              messages,
-              temperature,
-              maxTokens,
+              model: finalModel,
+              messages: messagesWithSystem,
+              temperature: finalTemperature,
+              maxTokens: finalMaxTokens,
             })
             
             for await (const chunk of streamingResponse) {
@@ -97,10 +113,10 @@ export async function POST(req: NextRequest) {
     } else {
       // Non-streaming response
       const response = await llmProvider.chatCompletion({
-        model: actualModel,
-        messages,
-        temperature,
-        maxTokens,
+        model: finalModel,
+        messages: messagesWithSystem,
+        temperature: finalTemperature,
+        maxTokens: finalMaxTokens,
       })
       
       return NextResponse.json(response)
