@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft } from 'lucide-react'
+import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft, Trash2, Copy, Download } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Message {
@@ -63,7 +63,6 @@ export default function ChatPage() {
     setInput('')
     setIsTyping(true)
 
-    // Get varied response using index that cycles through responses
     const response = aiResponses[responseIndex % aiResponses.length]
     responseIndex = (responseIndex + 1) % aiResponses.length
 
@@ -85,15 +84,34 @@ export default function ChatPage() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
+  const handleCopyMessage = (content: string) => {
+    navigator.clipboard.writeText(content)
+  }
+
+  const handleDeleteMessage = (id: string) => {
+    setMessages(messages.filter(m => m.id !== id))
+  }
+
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: "Hi! I'm SIGIL, your AI companion. I remember our conversations and I'm here to help you with anything. What's on your mind today?",
+        timestamp: new Date(),
+      },
+    ])
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative">
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-lg border-b border-white/20 px-6 py-4">
+      <div className="bg-white/10 backdrop-blur-lg border-b border-white/20 px-6 py-4 relative z-20">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/')}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -106,13 +124,20 @@ export default function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
+            <button 
+              onClick={handleClearChat}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Clear chat"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
               <Heart className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
               <Clock className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
+            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
               <MoreVertical className="w-5 h-5" />
             </button>
           </div>
@@ -120,7 +145,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-8">
+      <div className="flex-1 overflow-y-auto px-6 py-8 relative z-10">
         <div className="max-w-4xl mx-auto space-y-6">
           <AnimatePresence>
             {messages.map((message) => (
@@ -130,17 +155,37 @@ export default function ChatPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[70%] rounded-2xl p-4 ${
-                    message.role === 'user'
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                      : 'bg-white/10 backdrop-blur-lg text-white border border-white/20'
-                  }`}
-                >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
-                  <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-purple-200' : 'text-purple-300'}`}>
-                    {formatTime(message.timestamp)}
-                  </p>
+                <div className="flex items-end gap-2">
+                  {message.role === 'assistant' && (
+                    <div className="flex gap-1 mb-2">
+                      <button
+                        onClick={() => handleCopyMessage(message.content)}
+                        className="p-1 rounded bg-white/10 hover:bg-white/20 text-purple-300 cursor-pointer relative z-30"
+                        title="Copy"
+                      >
+                        <Copy className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMessage(message.id)}
+                        className="p-1 rounded bg-white/10 hover:bg-white/20 text-purple-300 cursor-pointer relative z-30"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[70%] rounded-2xl p-4 relative z-20 ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                        : 'bg-white/10 backdrop-blur-lg text-white border border-white/20'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-purple-200' : 'text-purple-300'}`}>
+                      {formatTime(message.timestamp)}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -166,13 +211,13 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="bg-white/10 backdrop-blur-lg border-t border-white/20 px-6 py-4">
+      <div className="bg-white/10 backdrop-blur-lg border-t border-white/20 px-6 py-4 relative z-20">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-end gap-3">
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
               <Paperclip className="w-5 h-5" />
             </button>
-            <div className="flex-1 bg-white/10 rounded-2xl border border-white/20 focus-within:border-purple-500 transition-colors">
+            <div className="flex-1 bg-white/10 rounded-2xl border border-white/20 focus-within:border-purple-500 transition-colors relative z-20">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -183,17 +228,17 @@ export default function ChatPage() {
                   }
                 }}
                 placeholder="Type your message..."
-                className="w-full bg-transparent text-white placeholder-purple-300 resize-none focus:outline-none p-4 min-h-[60px] max-h-[200px]"
+                className="w-full bg-transparent text-white placeholder-purple-300 resize-none focus:outline-none p-4 min-h-[60px] max-h-[200px] relative z-30"
                 rows={1}
               />
             </div>
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer">
+            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
               <Smile className="w-5 h-5" />
             </button>
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-30"
             >
               <Send className="w-5 h-5" />
             </button>

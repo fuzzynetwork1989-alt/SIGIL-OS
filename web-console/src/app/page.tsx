@@ -34,8 +34,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+      <div className="max-w-4xl mx-auto px-6 py-12 relative z-10">
         {/* Greeting Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -65,13 +65,16 @@ export default function HomePage() {
             />
             <div className="flex justify-between items-center mt-4">
               <div className="flex gap-2">
-                <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors">
+                <button 
+                  onClick={() => {}}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-20"
+                >
                   <Sparkles className="w-5 h-5" />
                 </button>
               </div>
               <button
                 onClick={() => handleNavigate('/app/chat')}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer relative z-20"
               >
                 Start Chat
                 <ChevronRight className="w-4 h-4" />
@@ -85,7 +88,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 relative z-10"
         >
           {quickActions.map((action, index) => {
             const Icon = action.icon
@@ -93,7 +96,7 @@ export default function HomePage() {
               <button
                 key={index}
                 onClick={() => handleNavigate(action.route)}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all group cursor-pointer"
+                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all group cursor-pointer relative z-20"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <Icon className="w-6 h-6 text-white" />
@@ -109,6 +112,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="relative z-10"
         >
           <h2 className="text-2xl font-bold text-white mb-6">Recent Conversations</h2>
           <div className="space-y-3">
@@ -116,7 +120,7 @@ export default function HomePage() {
               <button
                 key={conv.id}
                 onClick={() => handleNavigate('/app/chat')}
-                className="w-full bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-left group cursor-pointer"
+                className="w-full bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-left group cursor-pointer relative z-20"
               >
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-white font-medium text-lg">{conv.title}</h3>
@@ -133,7 +137,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-12 text-center"
+          className="mt-12 text-center relative z-10"
         >
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-green-500/20 border border-green-500/30">
             <Heart className="w-4 h-4 text-green-400" />
