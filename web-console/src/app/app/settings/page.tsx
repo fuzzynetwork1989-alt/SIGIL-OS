@@ -1,187 +1,456 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  Sliders,
+  Zap,
+  Cpu,
+  Save,
+  RotateCcw,
+  Check,
+  Loader2,
+  Sparkles,
+  Volume2,
+  Shield,
+  Globe,
+  Play,
+  Pause,
+  Trash2,
+  Download,
+  Upload
+} from 'lucide-react'
+import { cn } from '../../lib/utils'
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState('profile')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
-  const tabs = [
-    { id: 'profile', label: 'Profile' },
-    { id: 'security', label: 'Security' },
-    { id: 'notifications', label: 'Notifications' },
-    { id: 'appearance', label: 'Appearance' },
-    { id: 'advanced', label: 'Advanced' },
+  const [settings, setSettings] = useState({
+    // Model Settings
+    selectedModel: 'gpt-4',
+    temperature: 0.7,
+    maxTokens: 2048,
+    topP: 0.9,
+    frequencyPenalty: 0.5,
+    presencePenalty: 0.5,
+
+    // Voice
+    voiceEnabled: true,
+    voiceSpeed: 1.0,
+    voicePitch: 1.0,
+
+    // OWO Vest
+    owoVestEnabled: false,
+    owoVestIntensity: 50,
+    owoVestPatterns: {
+      notification: true,
+      aiResponse: true,
+      achievement: true,
+      heartbeat: true,
+    },
+
+    // Privacy
+    dataRetention: '30days',
+    localProcessing: true,
+    encryptionEnabled: true,
+
+    // Chat
+    streamingEnabled: true,
+    showTimestamps: true,
+    autoSaveChats: true,
+  })
+
+  const models = [
+    { id: 'gpt-4', name: 'GPT-4', description: 'Most capable model' },
+    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Faster, more cost-effective' },
+    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and efficient' },
+    { id: 'claude-3', name: 'Claude 3', description: 'Anthropic\'s latest model' },
   ]
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-slate-400">Manage your account and preferences</p>
+  const handleSave = async () => {
+    setSaving(true)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleReset = () => {
+    setSettings({
+      selectedModel: 'gpt-4',
+      temperature: 0.7,
+      maxTokens: 2048,
+      topP: 0.9,
+      frequencyPenalty: 0.5,
+      presencePenalty: 0.5,
+      voiceEnabled: true,
+      voiceSpeed: 1.0,
+      voicePitch: 1.0,
+      owoVestEnabled: false,
+      owoVestIntensity: 50,
+      owoVestPatterns: {
+        notification: true,
+        aiResponse: true,
+        achievement: true,
+        heartbeat: true,
+      },
+      dataRetention: '30days',
+      localProcessing: true,
+      encryptionEnabled: true,
+      streamingEnabled: true,
+      showTimestamps: true,
+      autoSaveChats: true,
+    })
+  }
+
+  const SliderSetting = ({ label, value, onChange, min = 0, max = 1, step = 0.1 }: any) => (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <label className="text-sm text-gray-300">{label}</label>
+        <span className="text-sm text-purple-400 font-mono">{value.toFixed(2)}</span>
       </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
+      />
+    </div>
+  )
 
-      <div className="bg-slate-800 rounded-lg border border-slate-700">
-        <div className="flex border-b border-slate-700">
-          {tabs.map((tab) => (
+  const ToggleSetting = ({ label, checked, onChange }: any) => (
+    <div className="flex items-center justify-between">
+      <label className="text-sm text-gray-300">{label}</label>
+      <button
+        onClick={() => onChange(!checked)}
+        className={`w-12 h-6 rounded-full transition-all relative cursor-pointer ${
+          checked ? 'bg-purple-500' : 'bg-white/10'
+        }`}
+      >
+        <motion.div
+          layout
+          className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${
+            checked ? 'left-6.5' : 'left-0.5'
+          }`}
+        />
+      </button>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
+            <p className="text-gray-400">Customize your SIGIL experience</p>
+          </div>
+          <div className="flex gap-3">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-4 font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              onClick={handleReset}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer relative z-20"
             >
-              {tab.label}
+              <RotateCcw className="w-4 h-4" />
+              Reset
             </button>
-          ))}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-20"
+            >
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : saved ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
+            </button>
+          </div>
         </div>
 
-        <div className="p-6">
-          {activeTab === 'profile' && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  defaultValue="User Name"
-                  className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  defaultValue="user@example.com"
-                  className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors">
-                Save Changes
-              </button>
+        {/* Model Selection */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Cpu className="w-5 h-5 text-purple-400" />
             </div>
-          )}
+            <h3 className="text-lg font-semibold text-white">Model Selection</h3>
+          </div>
 
-          {activeTab === 'security' && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors">
-                Update Password
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'notifications' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">Email Notifications</p>
-                  <p className="text-slate-400 text-sm">Receive notifications via email</p>
+          <div className="space-y-3">
+            {models.map((model) => (
+              <button
+                key={model.id}
+                onClick={() => setSettings({ ...settings, selectedModel: model.id })}
+                className={cn(
+                  'w-full p-4 rounded-xl border-2 transition-all text-left cursor-pointer relative z-20',
+                  settings.selectedModel === model.id
+                    ? 'bg-purple-500/20 border-purple-500'
+                    : 'bg-white/5 border-white/10 hover:border-white/20'
+                )}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-white font-medium">{model.name}</h4>
+                    <p className="text-sm text-gray-400">{model.description}</p>
+                  </div>
+                  {settings.selectedModel === model.id && (
+                    <Check className="w-5 h-5 text-purple-400" />
+                  )}
                 </div>
-                <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition-colors">
-                  Enabled
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">Push Notifications</p>
-                  <p className="text-slate-400 text-sm">Receive push notifications</p>
-                </div>
-                <button className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded transition-colors">
-                  Disabled
-                </button>
-              </div>
-            </div>
-          )}
+              </button>
+            ))}
+          </div>
+        </motion.div>
 
-          {activeTab === 'appearance' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Theme
-                </label>
-                <select className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500">
-                  <option>Dark</option>
-                  <option>Light</option>
-                  <option>System</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Language
-                </label>
-                <select className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500">
-                  <option>English</option>
-                  <option>Spanish</option>
-                  <option>French</option>
-                </select>
-              </div>
+        {/* Model Parameters */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Sliders className="w-5 h-5 text-purple-400" />
             </div>
-          )}
+            <h3 className="text-lg font-semibold text-white">Model Parameters</h3>
+          </div>
 
-          {activeTab === 'advanced' && (
-            <div className="space-y-4">
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4">
-                <p className="text-yellow-400 text-sm mb-2">
-                  ⚠️ Advanced settings require careful consideration
-                </p>
-                <p className="text-slate-400 text-xs">
-                  Changes to advanced settings may affect system behavior and performance.
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Model Routing Profile
-                </label>
-                <select className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500">
-                  <option>Default</option>
-                  <option>Performance</option>
-                  <option>Quality</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Memory Retention Policy
-                </label>
-                <select className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-slate-600 focus:outline-none focus:border-purple-500">
-                  <option>Standard (90 days)</option>
-                  <option>Extended (1 year)</option>
-                  <option>Unlimited</option>
-                </select>
-              </div>
+          <div className="space-y-6">
+            <SliderSetting
+              label="Temperature"
+              value={settings.temperature}
+              onChange={(v) => setSettings({ ...settings, temperature: v })}
+            />
+            <SliderSetting
+              label="Max Tokens"
+              value={settings.maxTokens}
+              onChange={(v) => setSettings({ ...settings, maxTokens: v })}
+              min={256}
+              max={4096}
+              step={256}
+            />
+            <SliderSetting
+              label="Top P"
+              value={settings.topP}
+              onChange={(v) => setSettings({ ...settings, topP: v })}
+            />
+            <SliderSetting
+              label="Frequency Penalty"
+              value={settings.frequencyPenalty}
+              onChange={(v) => setSettings({ ...settings, frequencyPenalty: v })}
+            />
+            <SliderSetting
+              label="Presence Penalty"
+              value={settings.presencePenalty}
+              onChange={(v) => setSettings({ ...settings, presencePenalty: v })}
+            />
+          </div>
+        </motion.div>
+
+        {/* Voice Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Volume2 className="w-5 h-5 text-purple-400" />
             </div>
-          )}
-        </div>
+            <h3 className="text-lg font-semibold text-white">Voice Settings</h3>
+          </div>
+
+          <div className="space-y-6">
+            <ToggleSetting
+              label="Enable Voice"
+              checked={settings.voiceEnabled}
+              onChange={(v) => setSettings({ ...settings, voiceEnabled: v })}
+            />
+            <SliderSetting
+              label="Voice Speed"
+              value={settings.voiceSpeed}
+              onChange={(v) => setSettings({ ...settings, voiceSpeed: v })}
+              min={0.5}
+              max={2.0}
+              step={0.1}
+            />
+            <SliderSetting
+              label="Voice Pitch"
+              value={settings.voicePitch}
+              onChange={(v) => setSettings({ ...settings, voicePitch: v })}
+              min={0.5}
+              max={2.0}
+              step={0.1}
+            />
+          </div>
+        </motion.div>
+
+        {/* OWO Vest Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Zap className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">OWO Vest Haptics</h3>
+          </div>
+
+          <div className="space-y-6">
+            <ToggleSetting
+              label="Enable OWO Vest"
+              checked={settings.owoVestEnabled}
+              onChange={(v) => setSettings({ ...settings, owoVestEnabled: v })}
+            />
+            <SliderSetting
+              label="Haptic Intensity"
+              value={settings.owoVestIntensity}
+              onChange={(v) => setSettings({ ...settings, owoVestIntensity: v })}
+              min={0}
+              max={100}
+              step={5}
+            />
+            <div className="space-y-3">
+              <label className="text-sm text-gray-300">Haptic Patterns</label>
+              <ToggleSetting
+                label="AI Response"
+                checked={settings.owoVestPatterns.aiResponse}
+                onChange={(v) => setSettings({
+                  ...settings,
+                  owoVestPatterns: { ...settings.owoVestPatterns, aiResponse: v }
+                })}
+              />
+              <ToggleSetting
+                label="Heartbeat"
+                checked={settings.owoVestPatterns.heartbeat}
+                onChange={(v) => setSettings({
+                  ...settings,
+                  owoVestPatterns: { ...settings.owoVestPatterns, heartbeat: v }
+                })}
+              />
+              <ToggleSetting
+                label="Achievements"
+                checked={settings.owoVestPatterns.achievement}
+                onChange={(v) => setSettings({
+                  ...settings,
+                  owoVestPatterns: { ...settings.owoVestPatterns, achievement: v }
+                })}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Privacy Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Shield className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Privacy & Security</h3>
+          </div>
+
+          <div className="space-y-6">
+            <ToggleSetting
+              label="Local Processing Only"
+              checked={settings.localProcessing}
+              onChange={(v) => setSettings({ ...settings, localProcessing: v })}
+            />
+            <ToggleSetting
+              label="Enable Encryption"
+              checked={settings.encryptionEnabled}
+              onChange={(v) => setSettings({ ...settings, encryptionEnabled: v })}
+            />
+          </div>
+        </motion.div>
+
+        {/* Chat Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Chat Settings</h3>
+          </div>
+
+          <div className="space-y-6">
+            <ToggleSetting
+              label="Streaming Responses"
+              checked={settings.streamingEnabled}
+              onChange={(v) => setSettings({ ...settings, streamingEnabled: v })}
+            />
+            <ToggleSetting
+              label="Show Timestamps"
+              checked={settings.showTimestamps}
+              onChange={(v) => setSettings({ ...settings, showTimestamps: v })}
+            />
+            <ToggleSetting
+              label="Auto-Save Chats"
+              checked={settings.autoSaveChats}
+              onChange={(v) => setSettings({ ...settings, autoSaveChats: v })}
+            />
+          </div>
+        </motion.div>
+
+        {/* Data Management */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/20">
+              <Globe className="w-5 h-5 text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Data Management</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <Download className="w-5 h-5 text-purple-400" />
+              <span>Export Chats</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <Upload className="w-5 h-5 text-purple-400" />
+              <span>Import Chats</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-white transition-all cursor-pointer relative z-20">
+              <Trash2 className="w-5 h-5 text-red-400" />
+              <span>Clear All Data</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <Play className="w-5 h-5 text-purple-400" />
+              <span>Sync Now</span>
+            </button>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
