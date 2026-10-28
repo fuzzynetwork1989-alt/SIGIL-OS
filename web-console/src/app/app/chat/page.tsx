@@ -39,7 +39,9 @@ export default function ChatPage() {
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -80,6 +82,25 @@ export default function ChatPage() {
     }, responseTime)
   }
 
+  const handleFileUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      console.log('File selected:', file.name)
+      // TODO: Implement actual file upload logic
+    }
+  }
+
+  const handleEmojiClick = (emoji: string) => {
+    setInput(input + emoji)
+    setShowEmojiPicker(false)
+  }
+
+  const emojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🔥', '✨', '🎉']
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
@@ -103,6 +124,21 @@ export default function ChatPage() {
     ])
   }
 
+  const handleFavorite = () => {
+    console.log('Favorite clicked')
+    // TODO: Implement favorite functionality
+  }
+
+  const handleHistory = () => {
+    console.log('History clicked')
+    // TODO: Implement history functionality
+  }
+
+  const handleMore = () => {
+    console.log('More options clicked')
+    // TODO: Implement more options
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative">
       {/* Header */}
@@ -124,20 +160,32 @@ export default function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={handleClearChat}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
               title="Clear chat"
             >
               <Trash2 className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
+            <button
+              onClick={handleFavorite}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Favorite"
+            >
               <Heart className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
+            <button
+              onClick={handleHistory}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="History"
+            >
               <Clock className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
+            <button
+              onClick={handleMore}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="More options"
+            >
               <MoreVertical className="w-5 h-5" />
             </button>
           </div>
@@ -214,7 +262,17 @@ export default function ChatPage() {
       <div className="bg-white/10 backdrop-blur-lg border-t border-white/20 px-6 py-4 relative z-20">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-end gap-3">
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              onClick={handleFileUpload}
+              className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Attach file"
+            >
               <Paperclip className="w-5 h-5" />
             </button>
             <div className="flex-1 bg-white/10 rounded-2xl border border-white/20 focus-within:border-purple-500 transition-colors relative z-20">
@@ -232,9 +290,30 @@ export default function ChatPage() {
                 rows={1}
               />
             </div>
-            <button className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
-              <Smile className="w-5 h-5" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+                title="Add emoji"
+              >
+                <Smile className="w-5 h-5" />
+              </button>
+              {showEmojiPicker && (
+                <div className="absolute bottom-full right-0 mb-2 p-3 bg-slate-800 rounded-xl border border-white/20 shadow-xl z-40">
+                  <div className="grid grid-cols-5 gap-2">
+                    {emojis.map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => handleEmojiClick(emoji)}
+                        className="text-2xl hover:bg-white/10 rounded p-1 cursor-pointer"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               onClick={handleSend}
               disabled={!input.trim()}

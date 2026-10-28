@@ -10,6 +10,26 @@ export default function MemoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
 
+  const handleDownloadMemory = (memory: typeof memories[0]) => {
+    const data = JSON.stringify(memory, null, 2)
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${memory.title.replace(/\s+/g, '_')}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDeleteMemory = (id: number) => {
+    if (confirm('Are you sure you want to delete this memory?')) {
+      console.log('Delete memory:', id)
+      // TODO: Implement actual delete logic
+    }
+  }
+
   const memories = [
     {
       id: 1,
@@ -146,10 +166,18 @@ export default function MemoryPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30">
+                  <button
+                    onClick={() => handleDownloadMemory(memory)}
+                    className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+                    title="Download"
+                  >
                     <Download className="w-4 h-4" />
                   </button>
-                  <button className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors cursor-pointer relative z-30">
+                  <button
+                    onClick={() => handleDeleteMemory(memory.id)}
+                    className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors cursor-pointer relative z-30"
+                    title="Delete"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
