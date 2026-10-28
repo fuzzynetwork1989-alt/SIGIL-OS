@@ -476,13 +476,25 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Profile Builder</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Avatar Builder</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Theme Engine</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Gamification</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+              <span>Social Sharing</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>API Keys</span>
             </button>
             <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Usage Statistics</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
-              <span>Billing</span>
             </button>
             <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Help Center</span>
