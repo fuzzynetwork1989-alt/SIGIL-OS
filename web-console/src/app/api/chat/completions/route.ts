@@ -18,20 +18,45 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get provider and API key from settings or environment
-    // For now, we'll use environment variables
-    const provider = process.env.LLM_PROVIDER || 'openai'
-    const apiKey = process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY
+    // Get API keys from headers (set by client from localStorage)
+    const openaiKey = req.headers.get('X-OpenAI-Key') || process.env.OPENAI_API_KEY
+    const anthropicKey = req.headers.get('X-Anthropic-Key') || process.env.ANTHROPIC_API_KEY
+
+    // Determine which provider to use based on available keys
+    let provider = 'openai'
+    let apiKey = openaiKey
+
+    if (!openaiKey && anthropicKey) {
+      provider = 'anthropic'
+      apiKey = anthropicKey
+    } else if (openaiKey && anthropicKey) {
+      // Both available, use OpenAI by default
+      provider = 'openai'
+      apiKey = openaiKey
+    }
 
     if (!apiKey) {
       return NextResponse.json(
         { 
           error: 'No API key configured',
-          message: 'Please configure an API key in settings or environment variables to enable real AI responses.'
+          message: 'Please configure an API key in Settings → API Keys to enable real AI responses.'
         },
         { status: 400 }
       )
     }
+
+    // Map SIGIL model names to actual provider model names
+    const modelMapping: Record<string, string> = {
+      'sigil-companion': 'gpt-4o-mini',
+      'sigil-mission': 'gpt-4o',
+      'sigil-world': 'gpt-4-turbo',
+      'sigil-spatial': 'gpt-4-turbo',
+      'sigil-presence': 'gpt-4o-mini',
+      'sigil-research': 'gpt-4',
+      'sigil-reasoner': 'gpt-4-turbo',
+    }
+
+    const actualModel = modelMapping[model] || model
 
     // Create provider instance
     const llmProvider = createProvider(provider, apiKey)
@@ -43,7 +68,7 @@ export async function POST(req: NextRequest) {
         async start(controller) {
           try {
             const streamingResponse = llmProvider.streamChatCompletion({
-              model,
+              model: actualModel,
               messages,
               temperature,
               maxTokens,
@@ -72,7 +97,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Non-streaming response
       const response = await llmProvider.chatCompletion({
-        model,
+        model: actualModel,
         messages,
         temperature,
         maxTokens,

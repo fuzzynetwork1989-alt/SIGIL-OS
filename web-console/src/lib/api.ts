@@ -81,18 +81,15 @@ export class SigilAPI {
     maxTokens?: number
     stream?: boolean
   }): Promise<any> {
-    return this.request('/api/chat/completions', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
+    // Get API keys from localStorage
+    const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
+    const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
+    const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
+    
+    if (!openaiKey && !anthropicKey) {
+      throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
+    }
 
-  async streamChatCompletion(data: {
-    model: string
-    messages: Array<{ role: string; content: string }>
-    temperature?: number
-    maxTokens?: number
-  }): Promise<ReadableStream> {
     const url = `${this.baseUrl}/api/chat/completions`
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -102,6 +99,52 @@ export class SigilAPI {
       headers['Authorization'] = `Bearer ${this.token}`
     }
 
+    // Pass API keys in headers for the server to use
+    if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
+    if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'API error')
+    }
+
+    return response.json()
+  }
+
+  async streamChatCompletion(data: {
+    model: string
+    messages: Array<{ role: string; content: string }>
+    temperature?: number
+    maxTokens?: number
+  }): Promise<ReadableStream> {
+    // Get API keys from localStorage
+    const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
+    const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
+    const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
+    
+    if (!openaiKey && !anthropicKey) {
+      throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
+    }
+
+    const url = `${this.baseUrl}/api/chat/completions`
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    }
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`
+    }
+
+    // Pass API keys in headers for the server to use
+    if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
+    if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
+
     const response = await fetch(url, {
       method: 'POST',
       headers,
@@ -109,7 +152,8 @@ export class SigilAPI {
     })
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`)
+      const error = await response.json()
+      throw new Error(error.message || 'API error')
     }
 
     return response.body!
