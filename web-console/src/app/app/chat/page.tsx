@@ -2,30 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft, Trash2, Copy, Download } from 'lucide-react'
+import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft, Trash2, Copy, Download, StopCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { api } from '../../lib/api'
 
 interface Message {
   id: string
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
 }
-
-const aiResponses = [
-  "That's a great question! Let me think about that for a moment. Based on what you've shared, I'd suggest focusing on the key points first.",
-  "I understand what you're looking for. Here's my perspective on this - it's important to consider both the short-term and long-term implications.",
-  "Interesting! I remember we talked about something similar before. Building on that, I think you might want to explore this approach.",
-  "That's a thoughtful question. From my understanding, there are a few different ways to approach this. Let me share the most effective one.",
-  "I'm here to help with that. Based on our previous conversations, I know you prefer practical solutions, so here's what I'd recommend.",
-  "Great point! Let me break this down for you. First, we should consider the main factors, then look at the specific details.",
-  "I appreciate you sharing that with me. This is something I can definitely help you work through. Let's start with the basics.",
-  "That makes sense. Here's my take on it - focus on what matters most to you right now, and we can build from there.",
-  "I can help you with that! What specific aspect would you like me to focus on first?",
-  "That's an interesting topic. Let me share some thoughts that might be helpful for your situation.",
-]
-
-let responseIndex = 0
 
 export default function ChatPage() {
   const router = useRouter()
@@ -39,9 +25,11 @@ export default function ChatPage() {
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [selectedModel, setSelectedModel] = useState('sigil-companion')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -52,7 +40,7 @@ export default function ChatPage() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || isStreaming) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -63,23 +51,96 @@ export default function ChatPage() {
 
     setMessages([...messages, userMessage])
     setInput('')
+    setIsStreaming(true)
     setIsTyping(true)
 
-    const response = aiResponses[responseIndex % aiResponses.length]
-    responseIndex = (responseIndex + 1) % aiResponses.length
+    // Prepare conversation history
+    const conversationHistory = messages.map(m => ({
+      role: m.role,
+      content: m.content,
+    }))
+    conversationHistory.push({ role: 'user', content: input })
 
-    const responseTime = 1000 + Math.random() * 2000
+    try {
+      abortControllerRef.current = new AbortController()
+      
+      // Stream the response
+      const stream = await api.streamChatCompletion({
+        model: selectedModel,
+        messages: conversationHistory,
+        temperature: 0.7,
+        maxTokens: 2048,
+      })
 
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+      const reader = stream.getReader()
+      const decoder = new TextDecoder()
+      let assistantContent = ''
+      const assistantMessageId = (Date.now() + 1).toString()
+
+      // Add empty assistant message that will be updated
+      setMessages(prev => [...prev, {
+        id: assistantMessageId,
         role: 'assistant',
-        content: response,
+        content: '',
         timestamp: new Date(),
+      }])
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') continue
+
+            try {
+              const parsed = JSON.parse(data)
+              const content = parsed.choices?.[0]?.delta?.content || ''
+              
+              if (content) {
+                assistantContent += content
+                setMessages(prev => prev.map(m => 
+                  m.id === assistantMessageId 
+                    ? { ...m, content: assistantContent }
+                    : m
+                ))
+              }
+
+              if (parsed.choices?.[0]?.finish_reason === 'stop') {
+                setIsStreaming(false)
+                setIsTyping(false)
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
       }
-      setMessages(prev => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('Chat error:', error)
+      setIsStreaming(false)
       setIsTyping(false)
-    }, responseTime)
+      
+      // Add error message
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+      }])
+    }
+  }
+
+  const handleStopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      setIsStreaming(false)
+      setIsTyping(false)
+    }
   }
 
   const handleFileUpload = () => {
@@ -90,7 +151,8 @@ export default function ChatPage() {
     const file = e.target.files?.[0]
     if (file) {
       console.log('File selected:', file.name)
-      // TODO: Implement actual file upload logic
+      // TODO: Implement actual file upload and analysis
+      setInput(input + `\n[Attached: ${file.name}]`)
     }
   }
 
@@ -100,6 +162,7 @@ export default function ChatPage() {
   }
 
   const emojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🔥', '✨', '🎉']
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -160,6 +223,19 @@ export default function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm focus:outline-none focus:border-purple-500 cursor-pointer relative z-20"
+            >
+              <option value="sigil-companion">SIGIL Companion</option>
+              <option value="sigil-mission">SIGIL Mission</option>
+              <option value="sigil-world">SIGIL World</option>
+              <option value="sigil-spatial">SIGIL Spatial</option>
+              <option value="sigil-presence">SIGIL Presence</option>
+              <option value="sigil-research">SIGIL Research</option>
+              <option value="sigil-reasoner">SIGIL Reasoner</option>
+            </select>
             <button
               onClick={handleClearChat}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
@@ -315,11 +391,11 @@ export default function ChatPage() {
               )}
             </div>
             <button
-              onClick={handleSend}
-              disabled={!input.trim()}
+              onClick={isStreaming ? handleStopGeneration : handleSend}
+              disabled={!input.trim() && !isStreaming}
               className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-30"
             >
-              <Send className="w-5 h-5" />
+              {isStreaming ? <StopCircle className="w-5 h-5" /> : <Send className="w-5 h-5" />}
             </button>
           </div>
           <p className="text-center text-purple-300 text-xs mt-3">

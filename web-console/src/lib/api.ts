@@ -1,9 +1,9 @@
-// NEXORA Omega API Client
-// Typed API client for communicating with NEXORA Omega backend
+// SIGIL OS API Client
+// Typed API client for communicating with SIGIL OS backend
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
-export class NexoraAPI {
+export class SigilAPI {
   private baseUrl: string
   private token: string | null = null
 
@@ -73,86 +73,75 @@ export class NexoraAPI {
     return this.request('/auth/logout', { method: 'POST' })
   }
 
-  // Cognitive Processes
-  async getCognitiveProcesses(): Promise<any[]> {
-    return this.request('/cognitive-processes')
-  }
-
-  async createCognitiveProcess(data: any): Promise<any> {
-    return this.request('/cognitive-processes', {
+  // Chat Completions
+  async createChatCompletion(data: {
+    model: string
+    messages: Array<{ role: string; content: string }>
+    temperature?: number
+    maxTokens?: number
+    stream?: boolean
+  }): Promise<any> {
+    return this.request('/api/chat/completions', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
-  async pauseCognitiveProcess(processId: string): Promise<void> {
-    return this.request(`/cognitive-processes/${processId}/pause`, {
-      method: 'POST',
-    })
-  }
+  async streamChatCompletion(data: {
+    model: string
+    messages: Array<{ role: string; content: string }>
+    temperature?: number
+    maxTokens?: number
+  }): Promise<ReadableStream> {
+    const url = `${this.baseUrl}/api/chat/completions`
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    }
 
-  async resumeCognitiveProcess(processId: string): Promise<void> {
-    return this.request(`/cognitive-processes/${processId}/resume`, {
-      method: 'POST',
-    })
-  }
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`
+    }
 
-  async cancelCognitiveProcess(processId: string): Promise<void> {
-    return this.request(`/cognitive-processes/${processId}/cancel`, {
+    const response = await fetch(url, {
       method: 'POST',
+      headers,
+      body: JSON.stringify({ ...data, stream: true }),
     })
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`)
+    }
+
+    return response.body!
   }
 
   // Memory
   async getMemories(): Promise<any[]> {
-    return this.request('/memory')
+    return this.request('/api/memory')
   }
 
   async createMemory(data: any): Promise<any> {
-    return this.request('/memory', {
+    return this.request('/api/memory', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
   async searchMemory(data: { query: string }): Promise<any> {
-    return this.request('/memory/search', {
+    return this.request('/api/memory/search', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
-  // Capabilities
-  async getCapabilities(): Promise<any[]> {
-    return this.request('/capabilities')
+  // Model Info
+  async getModels(): Promise<any[]> {
+    return this.request('/api/models')
   }
 
-  async grantCapability(data: any): Promise<any> {
-    return this.request('/capabilities', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
-
-  // Workspaces
-  async getWorkspaces(): Promise<any[]> {
-    return this.request('/workspaces')
-  }
-
-  async createWorkspace(data: { name: string }): Promise<any> {
-    return this.request('/workspaces', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
-
-  // Model Gateway
-  async generateText(data: any): Promise<any> {
-    return this.request('/model/generate', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
+  async getModelInfo(modelId: string): Promise<any> {
+    return this.request(`/api/models/${modelId}`)
   }
 }
 
-export const api = new NexoraAPI()
+export const api = new SigilAPI()
