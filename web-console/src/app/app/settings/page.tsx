@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   Sliders,
@@ -28,8 +29,13 @@ import {
 import { cn } from '../../lib/utils'
 
 export default function SettingsPage() {
+  const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  const navigateTo = (path: string) => {
+    router.push(path)
+  }
 
   const [settings, setSettings] = useState({
     // Model Settings
@@ -475,25 +481,25 @@ export default function SettingsPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/profile')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Profile Builder</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/avatar')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Avatar Builder</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/theme')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Theme Engine</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/gamification')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Gamification</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/social')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Social Sharing</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/api-keys')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>API Keys</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
+            <button onClick={() => navigateTo('/app/usage')} className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">
               <span>Usage Statistics</span>
             </button>
             <button className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer relative z-20">

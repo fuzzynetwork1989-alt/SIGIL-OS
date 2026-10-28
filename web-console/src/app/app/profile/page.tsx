@@ -70,6 +70,10 @@ export default function ProfileBuilderPage() {
     ],
   })
 
+  const navigateToAvatar = () => {
+    router.push('/app/avatar')
+  }
+
   const traitLabels = {
     creativity: 'Creativity',
     empathy: 'Empathy',
@@ -173,6 +177,13 @@ export default function ProfileBuilderPage() {
                   className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors resize-none cursor-pointer relative z-20"
                 />
               </div>
+              <button
+                onClick={navigateToAvatar}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 transition-all cursor-pointer relative z-20"
+              >
+                <Camera className="w-4 h-4" />
+                Customize Avatar
+              </button>
             </div>
           </div>
         </motion.div>
