@@ -1,8 +1,8 @@
 {
-  "name": "nexora-omega-monorepo",
+  "name": "sigil-os-monorepo",
   "version": "0.0.1",
   "private": true,
-  "description": "NEXORA Omega - A post-AI powered operating system and cognitive companion platform",
+  "description": "SIGIL OS - Your AI Companion with Self-Evolving Intelligence",
   "workspaces": [
     "web-console",
     "mobile-client",
