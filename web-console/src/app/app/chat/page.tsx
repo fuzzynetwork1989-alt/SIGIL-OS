@@ -235,6 +235,10 @@ export default function ChatPage() {
               <option value="sigil-presence">SIGIL Presence</option>
               <option value="sigil-research">SIGIL Research</option>
               <option value="sigil-reasoner">SIGIL Reasoner</option>
+              <option value="sigil-vision">SIGIL Vision</option>
+              <option value="sigil-voice">SIGIL Voice</option>
+              <option value="sigil-video">SIGIL Video</option>
+              <option value="sigil-music">SIGIL Music</option>
             </select>
             <button
               onClick={handleClearChat}

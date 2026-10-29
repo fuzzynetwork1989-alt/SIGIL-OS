@@ -85,8 +85,9 @@ export class SigilAPI {
     const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
     const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
     const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
+    const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
     
-    if (!openaiKey && !anthropicKey) {
+    if (!openaiKey && !anthropicKey && !huggingfaceKey) {
       throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
     }
 
@@ -102,6 +103,7 @@ export class SigilAPI {
     // Pass API keys in headers for the server to use
     if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
     if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
+    if (huggingfaceKey) headers['X-HuggingFace-Key'] = huggingfaceKey
 
     const response = await fetch(url, {
       method: 'POST',
@@ -127,8 +129,9 @@ export class SigilAPI {
     const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
     const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
     const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
+    const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
     
-    if (!openaiKey && !anthropicKey) {
+    if (!openaiKey && !anthropicKey && !huggingfaceKey) {
       throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
     }
 
@@ -144,6 +147,7 @@ export class SigilAPI {
     // Pass API keys in headers for the server to use
     if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
     if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
+    if (huggingfaceKey) headers['X-HuggingFace-Key'] = huggingfaceKey
 
     const response = await fetch(url, {
       method: 'POST',

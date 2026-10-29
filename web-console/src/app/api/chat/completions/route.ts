@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     // Get API keys from headers (set by client from localStorage)
     const openaiKey = req.headers.get('X-OpenAI-Key') || process.env.OPENAI_API_KEY
     const anthropicKey = req.headers.get('X-Anthropic-Key') || process.env.ANTHROPIC_API_KEY
+    const huggingfaceKey = req.headers.get('X-HuggingFace-Key') || process.env.HUGGINGFACE_API_KEY
 
     // Determine which provider to use based on available keys
     let provider = 'openai'
@@ -30,8 +31,17 @@ export async function POST(req: NextRequest) {
     if (!openaiKey && anthropicKey) {
       provider = 'anthropic'
       apiKey = anthropicKey
+    } else if (!openaiKey && huggingfaceKey) {
+      provider = 'huggingface'
+      apiKey = huggingfaceKey
+    } else if (openaiKey && anthropicKey && huggingfaceKey) {
+      // All available, prefer HuggingFace for local models
+      provider = 'huggingface'
+      apiKey = huggingfaceKey
+    } else if (openaiKey && huggingfaceKey) {
+      provider = 'huggingface'
+      apiKey = huggingfaceKey
     } else if (openaiKey && anthropicKey) {
-      // Both available, use OpenAI by default
       provider = 'openai'
       apiKey = openaiKey
     }

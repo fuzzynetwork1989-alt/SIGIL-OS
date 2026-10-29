@@ -13,6 +13,7 @@ export default function ApiKeysPage() {
   const [apiKeys, setApiKeys] = useState([
     { id: 1, name: 'OpenAI API Key', provider: 'openai', key: '', lastUsed: 'Never' },
     { id: 2, name: 'Anthropic API Key', provider: 'anthropic', key: '', lastUsed: 'Never' },
+    { id: 3, name: 'HuggingFace API Key', provider: 'huggingface', key: '', lastUsed: 'Never' },
   ])
 
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function ApiKeysPage() {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-blue-500/10 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30">
           <p className="text-blue-400 text-sm">
-            <strong>Enable Real AI:</strong> Add your OpenAI or Anthropic API key to enable real AI responses. Keys are stored locally.
+            <strong>Enable Real AI:</strong> Add your OpenAI, Anthropic, or HuggingFace API key to enable real AI responses. Keys are stored locally.
           </p>
         </motion.div>
 
