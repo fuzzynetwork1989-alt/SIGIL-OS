@@ -42,6 +42,89 @@ export interface ChatCompletionResponse {
   }
 }
 
+// HuggingFace Provider (for local deployment via LM Studio or Inference API)
+export class HuggingFaceProvider {
+  private apiKey: string
+  private baseUrl: string
+
+  constructor(apiKey: string, baseUrl: string = 'https://api-inference.huggingface.co') {
+    this.apiKey = apiKey
+    this.baseUrl = baseUrl
+  }
+
+  async chatCompletion(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
+    const response = await fetch(`${this.baseUrl}/models/${options.model}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: options.model,
+        messages: options.messages,
+        temperature: options.temperature || 0.7,
+        max_tokens: options.maxTokens || 2048,
+        stream: false,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HuggingFace API error: ${response.status}`)
+    }
+
+    return response.json()
+  }
+
+  async *streamChatCompletion(options: ChatCompletionOptions): AsyncGenerator<any> {
+    const response = await fetch(`${this.baseUrl}/models/${options.model}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: options.model,
+        messages: options.messages,
+        temperature: options.temperature || 0.7,
+        max_tokens: options.maxTokens || 2048,
+        stream: true,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HuggingFace API error: ${response.status}`)
+    }
+
+    const reader = response.body?.getReader()
+    const decoder = new TextDecoder()
+
+    if (!reader) {
+      throw new Error('No response body')
+    }
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const chunk = decoder.decode(value)
+      const lines = chunk.split('\n')
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data === '[DONE]') continue
+
+          try {
+            yield JSON.parse(data)
+          } catch (e) {
+            // Skip invalid JSON
+          }
+        }
+      }
+    }
+  }
+}
+
 // OpenAI Provider
 export class OpenAIProvider {
   private apiKey: string
@@ -271,6 +354,8 @@ export function createProvider(provider: string, apiKey: string, baseUrl?: strin
       return new OpenAIProvider(apiKey, baseUrl)
     case 'anthropic':
       return new AnthropicProvider(apiKey, baseUrl)
+    case 'huggingface':
+      return new HuggingFaceProvider(apiKey, baseUrl)
     default:
       throw new Error(`Unknown provider: ${provider}`)
   }
