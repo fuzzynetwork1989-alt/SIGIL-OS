@@ -91,12 +91,16 @@ const MODEL_FILE_MAP: Record<string, string> = {
   'sigil-presence': 'sigil-presence.modelfile',
   'sigil-research': 'sigil-research.modelfile',
   'sigil-reasoner': 'sigil-reasoner.modelfile',
+  'sigil-vision': 'sigil-vision.modelfile',
+  'sigil-voice': 'sigil-voice.modelfile',
+  'sigil-video': 'sigil-video.modelfile',
+  'sigil-music': 'sigil-music.modelfile',
 }
 
 // Default modelfiles (embedded for now, could be loaded from server)
 const DEFAULT_MODEFILES: Record<string, string> = {
   'sigil-companion': `# SIGIL Companion
-model: gpt-4o-mini
+model: meta-llama/Llama-3.2-11B-Instruct
 temperature: 0.8
 max_tokens: 2048
 top_p: 0.9
@@ -105,7 +109,7 @@ presence_penalty: 0.6
 system: |
   You are SIGIL Companion, a warm, friendly, and empathetic AI companion designed to build lasting relationships with users.`,
   'sigil-mission': `# SIGIL Mission
-model: gpt-4o
+model: Qwen/Qwen2.5-14B-Instruct
 temperature: 0.5
 max_tokens: 4096
 top_p: 0.9
@@ -114,7 +118,7 @@ presence_penalty: 0.3
 system: |
   You are SIGIL Mission, a goal-oriented intelligence module designed to help users achieve their objectives through structured planning and execution.`,
   'sigil-world': `# SIGIL World
-model: gpt-4-turbo
+model: Qwen/Qwen2.5-32B-Instruct
 temperature: 0.6
 max_tokens: 4096
 top_p: 0.95
@@ -123,7 +127,7 @@ presence_penalty: 0.4
 system: |
   You are SIGIL World, a world intelligence module designed to understand and contextualize information within the broader scope of human knowledge and experience.`,
   'sigil-spatial': `# SIGIL Spatial
-model: gpt-4-turbo
+model: meta-llama/Llama-3.2-11B-Vision-Instruct
 temperature: 0.4
 max_tokens: 3072
 top_p: 0.9
@@ -132,7 +136,7 @@ presence_penalty: 0.2
 system: |
   You are SIGIL Spatial, a spatial intelligence module designed to understand and reason about physical space, geometry, and spatial relationships.`,
   'sigil-presence': `# SIGIL Presence
-model: gpt-4o-mini
+model: meta-llama/Llama-3.2-3B-Instruct
 temperature: 0.7
 max_tokens: 1536
 top_p: 0.9
@@ -141,7 +145,7 @@ presence_penalty: 0.5
 system: |
   You are SIGIL Presence, a presence intelligence module designed to maintain awareness, attention, and contextual understanding of the user's current state and environment.`,
   'sigil-research': `# SIGIL Research
-model: gpt-4
+model: Qwen/Qwen2.5-72B-Instruct
 temperature: 0.3
 max_tokens: 8192
 top_p: 0.95
@@ -150,7 +154,7 @@ presence_penalty: 0.1
 system: |
   You are SIGIL Research, a research intelligence module designed to conduct deep analysis, synthesize information, and provide comprehensive research support.`,
   'sigil-reasoner': `# SIGIL Reasoner
-model: gpt-4-turbo
+model: Qwen/Qwen2.5-32B-Instruct
 temperature: 0.2
 max_tokens: 4096
 top_p: 0.95
@@ -158,6 +162,42 @@ frequency_penalty: 0.0
 presence_penalty: 0.0
 system: |
   You are SIGIL Reasoner, a reasoning intelligence module designed to apply logical thinking, inference, and deduction to solve problems and reach sound conclusions.`,
+  'sigil-vision': `# SIGIL Vision
+model: meta-llama/Llama-3.2-11B-Vision-Instruct
+temperature: 0.5
+max_tokens: 2048
+top_p: 0.9
+frequency_penalty: 0.3
+presence_penalty: 0.3
+system: |
+  You are SIGIL Vision, a visual intelligence module designed to understand and reason about images, videos, and visual content.`,
+  'sigil-voice': `# SIGIL Voice
+model: parler-tts/parler-tts-large-v1
+temperature: 0.6
+max_tokens: 1024
+top_p: 0.9
+frequency_penalty: 0.2
+presence_penalty: 0.2
+system: |
+  You are SIGIL Voice, a speech synthesis module designed to convert text to natural, expressive speech.`,
+  'sigil-video': `# SIGIL Video
+model: zai-org/CogVideoX-5b
+temperature: 0.7
+max_tokens: 512
+top_p: 0.9
+frequency_penalty: 0.4
+presence_penalty: 0.4
+system: |
+  You are SIGIL Video, a video generation module designed to create video content from text descriptions.`,
+  'sigil-music': `# SIGIL Music
+model: facebook/musicgen-stereo-large
+temperature: 0.8
+max_tokens: 512
+top_p: 0.95
+frequency_penalty: 0.5
+presence_penalty: 0.5
+system: |
+  You are SIGIL Music, a music generation module designed to create music from text descriptions.`,
 }
 
 export function getModelfileConfig(modelName: string): ModelfileConfig {
