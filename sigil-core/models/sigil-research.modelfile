@@ -1,10 +1,12 @@
 # SIGIL Research Modelfile
 
 # Base Model
-# GPT-4: Best for deep research, analysis, and complex reasoning
-# Alternative: Claude 3 Opus - Superior for research and analytical tasks
-model: gpt-4
-# model: claude-3-opus-20240229
+# Qwen2.5-72B-Instruct: Best for deep research and analysis
+# Alternative: meta-llama/Llama-3.1-405B-Instruct - Largest model for complex research
+# Alternative: NousResearch/Hermes-3-Llama-3.1-405B - Best for deep analysis
+model: Qwen/Qwen2.5-72B-Instruct
+# model: meta-llama/Llama-3.1-405B-Instruct
+# model: NousResearch/Hermes-3-Llama-3.1-405B
 
 # Model Configuration
 temperature: 0.3

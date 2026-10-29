@@ -1,10 +1,12 @@
 # SIGIL Mission Modelfile
 
 # Base Model
-# GPT-4o: Best for goal-oriented task execution and planning
-# Alternative: Claude 3.5 Sonnet - Excellent for structured task planning
-model: gpt-4o
-# model: claude-3-5-sonnet-20241022
+# Qwen2.5-14B-Instruct: Excellent for goal-oriented planning and structured reasoning
+# Alternative: meta-llama/Llama-3.1-70B-Instruct - Strong for complex planning
+# Alternative: NousResearch/Hermes-3-Llama-3.1-405B - Best for complex task planning
+model: Qwen/Qwen2.5-14B-Instruct
+# model: meta-llama/Llama-3.1-70B-Instruct
+# model: NousResearch/Hermes-3-Llama-3.1-405B
 
 # Model Configuration
 temperature: 0.5

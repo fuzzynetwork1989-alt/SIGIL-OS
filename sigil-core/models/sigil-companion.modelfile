@@ -1,10 +1,12 @@
 # SIGIL Companion Modelfile
 
 # Base Model
-# GPT-4o-mini: Fast, cost-effective, excellent for conversational AI
-# Alternative: Claude 3.5 Sonnet - Great for friendly, conversational interactions
-model: gpt-4o-mini
-# model: claude-3-5-sonnet-20241022
+# Llama 3.2 11B: Best for conversational AI, multimodal, runs on-device
+# Alternative: Qwen2.5-7B-Instruct - Excellent conversational model
+# Alternative: mistralai/Mistral-7B-Instruct-v0.3 - Strong conversational model
+model: meta-llama/Llama-3.2-11B-Instruct
+# model: Qwen/Qwen2.5-7B-Instruct
+# model: mistralai/Mistral-7B-Instruct-v0.3
 
 # Model Configuration
 temperature: 0.8

@@ -1,10 +1,12 @@
 # SIGIL World Modelfile
 
 # Base Model
-# GPT-4 Turbo: Excellent for world knowledge and contextual understanding
-# Alternative: Claude 3 Opus - Superior for complex knowledge tasks
-model: gpt-4-turbo
-# model: claude-3-opus-20240229
+# Qwen2.5-32B-Instruct: Best for world knowledge and contextual understanding
+# Alternative: meta-llama/Llama-3.1-70B-Instruct - Strong knowledge base
+# Alternative: meta-llama/Llama-3.1-405B-Instruct - Largest knowledge model
+model: Qwen/Qwen2.5-32B-Instruct
+# model: meta-llama/Llama-3.1-70B-Instruct
+# model: meta-llama/Llama-3.1-405B-Instruct
 
 # Model Configuration
 temperature: 0.6

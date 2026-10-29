@@ -1,10 +1,12 @@
 # SIGIL Reasoner Modelfile
 
 # Base Model
-# GPT-4 Turbo: Excellent for logical reasoning and inference
-# Alternative: Claude 3.5 Sonnet - Strong logical reasoning capabilities
-model: gpt-4-turbo
-# model: claude-3-5-sonnet-20241022
+# Qwen2.5-32B-Instruct: Excellent for logical reasoning and inference
+# Alternative: meta-llama/Llama-3.1-70B-Instruct - Strong logical reasoning
+# Alternative: NousResearch/Hermes-3-Llama-3.1-405B - Best for complex reasoning
+model: Qwen/Qwen2.5-32B-Instruct
+# model: meta-llama/Llama-3.1-70B-Instruct
+# model: NousResearch/Hermes-3-Llama-3.1-405B
 
 # Model Configuration
 temperature: 0.2

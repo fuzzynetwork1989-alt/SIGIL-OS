@@ -1,10 +1,12 @@
 # SIGIL Spatial Modelfile
 
 # Base Model
-# GPT-4 Turbo: Strong spatial reasoning and 3D understanding capabilities
-# Alternative: Claude 3.5 Sonnet - Good for spatial and geometric reasoning
-model: gpt-4-turbo
-# model: claude-3-5-sonnet-20241022
+# meta-llama/Llama-3.2-11B-Vision: Best for spatial reasoning with vision capabilities
+# Alternative: InternVL-1.5-26B - Excellent for spatial and visual reasoning
+# Alternative: Qwen2-VL-7B-Instruct - Strong spatial and visual understanding
+model: meta-llama/Llama-3.2-11B-Vision-Instruct
+# model: OpenGVLab/InternVL-1.5-26B
+# model: Qwen/Qwen2-VL-7B-Instruct
 
 # Model Configuration
 temperature: 0.4

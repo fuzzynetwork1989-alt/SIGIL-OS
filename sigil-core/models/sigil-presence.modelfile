@@ -1,10 +1,12 @@
 # SIGIL Presence Modelfile
 
 # Base Model
-# GPT-4o-mini: Fast and efficient for awareness and attention management
-# Alternative: Claude 3.5 Haiku - Optimized for quick presence tasks
-model: gpt-4o-mini
-# model: claude-3-5-haiku-20241022
+# Llama 3.2 3B: Fast and efficient for awareness and attention management
+# Alternative: microsoft/Phi-3-mini-4k-instruct - Very fast, efficient presence model
+# Alternative: Qwen2.5-3B-Instruct - Small but capable for presence tasks
+model: meta-llama/Llama-3.2-3B-Instruct
+# model: microsoft/Phi-3-mini-4k-instruct
+# model: Qwen/Qwen2.5-3B-Instruct
 
 # Model Configuration
 temperature: 0.7
