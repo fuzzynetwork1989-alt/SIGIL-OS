@@ -2,7 +2,7 @@
 # Optimized for small image size and fast builds
 
 # Stage 1: Build
-FROM rust:1.85-slim as builder
+FROM rust:1.92-slim as builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
