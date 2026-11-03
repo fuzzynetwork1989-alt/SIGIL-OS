@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft, Trash2, Copy, Download, StopCircle } from 'lucide-react'
+import { Send, Sparkles, Heart, Clock, MoreVertical, Smile, Paperclip, ArrowLeft, Trash2, Copy, Download, StopCircle, Eye, Mic, Video, Music, Image as ImageIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { api } from '../../lib/api'
 
@@ -27,8 +27,21 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [selectedModel, setSelectedModel] = useState('sigil-companion')
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showVisionPanel, setShowVisionPanel] = useState(false)
+  const [showVoicePanel, setShowVoicePanel] = useState(false)
+  const [showVideoPanel, setShowVideoPanel] = useState(false)
+  const [showMusicPanel, setShowMusicPanel] = useState(false)
+  const [visionQuery, setVisionQuery] = useState('')
+  const [visionImage, setVisionImage] = useState<File | null>(null)
+  const [voiceText, setVoiceText] = useState('')
+  const [videoPrompt, setVideoPrompt] = useState('')
+  const [musicPrompt, setMusicPrompt] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generationResult, setGenerationResult] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const visionImageRef = useRef<HTMLInputElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = () => {
@@ -202,6 +215,123 @@ export default function ChatPage() {
     // TODO: Implement more options
   }
 
+  // Multimodal handlers
+  const handleVisionUpload = () => {
+    visionImageRef.current?.click()
+  }
+
+  const handleVisionImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setVisionImage(file)
+    }
+  }
+
+  const handleVisionAnalyze = async () => {
+    if (!visionImage || !visionQuery.trim()) return
+
+    setIsGenerating(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', visionImage)
+      formData.append('query', visionQuery)
+      formData.append('model', 'sigil-vision')
+
+      const response = await fetch('/api/vision/analyze', {
+        method: 'POST',
+        headers: {
+          'X-HuggingFace-Key': JSON.parse(localStorage.getItem('sigil_api_keys') || '{}').huggingface || '',
+        },
+        body: formData,
+      })
+
+      const result = await response.json()
+      setGenerationResult(result)
+    } catch (error) {
+      console.error('Vision analysis error:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleVoiceSynthesize = async () => {
+    if (!voiceText.trim()) return
+
+    setIsGenerating(true)
+    try {
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-HuggingFace-Key': JSON.parse(localStorage.getItem('sigil_api_keys') || '{}').huggingface || '',
+        },
+        body: JSON.stringify({
+          text: voiceText,
+          model: 'sigil-voice',
+        }),
+      })
+
+      const result = await response.json()
+      setGenerationResult(result)
+    } catch (error) {
+      console.error('Voice synthesis error:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleVideoGenerate = async () => {
+    if (!videoPrompt.trim()) return
+
+    setIsGenerating(true)
+    try {
+      const response = await fetch('/api/video/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-HuggingFace-Key': JSON.parse(localStorage.getItem('sigil_api_keys') || '{}').huggingface || '',
+        },
+        body: JSON.stringify({
+          prompt: videoPrompt,
+          model: 'sigil-video',
+        }),
+      })
+
+      const result = await response.json()
+      setGenerationResult(result)
+    } catch (error) {
+      console.error('Video generation error:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleMusicGenerate = async () => {
+    if (!musicPrompt.trim()) return
+
+    setIsGenerating(true)
+    try {
+      const response = await fetch('/api/music/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-HuggingFace-Key': JSON.parse(localStorage.getItem('sigil_api_keys') || '{}').huggingface || '',
+        },
+        body: JSON.stringify({
+          prompt: musicPrompt,
+          model: 'sigil-music',
+        }),
+      })
+
+      const result = await response.json()
+      setGenerationResult(result)
+    } catch (error) {
+      console.error('Music generation error:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative">
       {/* Header */}
@@ -268,9 +398,188 @@ export default function ChatPage() {
             >
               <MoreVertical className="w-5 h-5" />
             </button>
+            <button
+              onClick={() => setShowVisionPanel(!showVisionPanel)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Vision analysis"
+            >
+              <Eye className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowVoicePanel(!showVoicePanel)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Voice synthesis"
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowVideoPanel(!showVideoPanel)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Video generation"
+            >
+              <Video className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowMusicPanel(!showMusicPanel)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 transition-colors cursor-pointer relative z-30"
+              title="Music generation"
+            >
+              <Music className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Multimodal Panels */}
+      {showVisionPanel && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-6 py-4 bg-white/10 backdrop-blur-lg border-b border-white/20 relative z-20"
+        >
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Vision Analysis
+            </h3>
+            <div className="flex gap-3">
+              <button
+                onClick={handleVisionUpload}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer relative z-30"
+              >
+                {visionImage ? visionImage.name : 'Select Image'}
+              </button>
+              <input
+                type="text"
+                value={visionQuery}
+                onChange={(e) => setVisionQuery(e.target.value)}
+                placeholder="What would you like to know about this image?"
+                className="flex-1 bg-white/10 rounded-xl px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 border border-white/20 cursor-pointer relative z-20"
+              />
+              <button
+                onClick={handleVisionAnalyze}
+                disabled={!visionImage || !visionQuery.trim() || isGenerating}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-20"
+              >
+                {isGenerating ? 'Analyzing...' : 'Analyze'}
+              </button>
+            </div>
+            {generationResult?.success && generationResult.response && (
+              <div className="mt-3 p-3 bg-white/10 rounded-xl text-white text-sm">
+                {JSON.stringify(generationResult.response)}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {showVoicePanel && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-6 py-4 bg-white/10 backdrop-blur-lg border-b border-white/20 relative z-20"
+        >
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Mic className="w-5 h-5" />
+              Voice Synthesis
+            </h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={voiceText}
+                onChange={(e) => setVoiceText(e.target.value)}
+                placeholder="Enter text to synthesize..."
+                className="flex-1 bg-white/10 rounded-xl px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 border border-white/20 cursor-pointer relative z-20"
+              />
+              <button
+                onClick={handleVoiceSynthesize}
+                disabled={!voiceText.trim() || isGenerating}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-20"
+              >
+                {isGenerating ? 'Synthesizing...' : 'Synthesize'}
+              </button>
+            </div>
+            {generationResult?.success && generationResult.audio && (
+              <div className="mt-3">
+                <audio controls src={generationResult.audio} className="w-full" />
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {showVideoPanel && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-6 py-4 bg-white/10 backdrop-blur-lg border-b border-white/20 relative z-20"
+        >
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Video className="w-5 h-5" />
+              Video Generation
+            </h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={videoPrompt}
+                onChange={(e) => setVideoPrompt(e.target.value)}
+                placeholder="Describe the video you want to generate..."
+                className="flex-1 bg-white/10 rounded-xl px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 border border-white/20 cursor-pointer relative z-20"
+              />
+              <button
+                onClick={handleVideoGenerate}
+                disabled={!videoPrompt.trim() || isGenerating}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-20"
+              >
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
+            {generationResult?.success && generationResult.jobId && (
+              <div className="mt-3 p-3 bg-white/10 rounded-xl text-white text-sm">
+                Job ID: {generationResult.jobId} - Status: {generationResult.status}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {showMusicPanel && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-6 py-4 bg-white/10 backdrop-blur-lg border-b border-white/20 relative z-20"
+        >
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Music className="w-5 h-5" />
+              Music Generation
+            </h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={musicPrompt}
+                onChange={(e) => setMusicPrompt(e.target.value)}
+                placeholder="Describe the music you want to generate..."
+                className="flex-1 bg-white/10 rounded-xl px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 border border-white/20 cursor-pointer relative z-20"
+              />
+              <button
+                onClick={handleMusicGenerate}
+                disabled={!musicPrompt.trim() || isGenerating}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer relative z-20"
+              >
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
+            {generationResult?.success && generationResult.jobId && (
+              <div className="mt-3 p-3 bg-white/10 rounded-xl text-white text-sm">
+                Job ID: {generationResult.jobId} - Status: {generationResult.status}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-8 relative z-10">
@@ -346,6 +655,13 @@ export default function ChatPage() {
               ref={fileInputRef}
               type="file"
               onChange={handleFileChange}
+              className="hidden"
+            />
+            <input
+              ref={visionImageRef}
+              type="file"
+              onChange={handleVisionImageChange}
+              accept="image/*"
               className="hidden"
             />
             <button
