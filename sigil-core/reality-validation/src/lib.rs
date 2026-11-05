@@ -32,8 +32,8 @@ pub mod pipeline;
 pub mod confidence;
 pub mod storage_rules;
 
-pub use validator::RealityValidator;
-pub use cross_checker::CrossChecker;
+pub use validator::{RealityValidator, VerificationResult};
+pub use cross_checker::{CrossChecker, CrossCheckResult};
 pub use scorer::ConfidenceScorer;
 pub use pipeline::ValidationPipeline;
 pub use confidence::{ConfidenceLevel, ConfidenceScore};
