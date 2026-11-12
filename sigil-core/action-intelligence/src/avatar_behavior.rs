@@ -1,14 +1,14 @@
 //! Avatar Behavior - manages avatar behavior planning
 
 use errors::ActionError;
-use crate::{AvatarContext, AvatarBehaviorPlan, AvatarBehavior, BehaviorTransition};
+use crate::{AvatarContext, AvatarBehaviorPlan};
 
 /// Avatar Behavior - manages avatar behavior planning
-pub struct AvatarBehavior {
+pub struct AvatarBehaviorPlanner {
     // Configuration and state
 }
 
-impl AvatarBehavior {
+impl AvatarBehaviorPlanner {
     /// Create a new avatar behavior manager
     pub fn new() -> Result<Self, ActionError> {
         Ok(Self {})

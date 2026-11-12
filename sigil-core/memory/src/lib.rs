@@ -11,7 +11,7 @@ pub mod environment;
 pub mod spatial;
 
 use confidence::ConfidenceCalculator;
-use memory::{MemoryEntry, MemoryOperation, MemoryStore, MemoryType};
+pub use memory::{MemoryEntry, MemoryType};
 use vector_db::VectorDatabase;
 use environment::EnvironmentModel;
 use spatial::SpatialMemory;
@@ -135,7 +135,7 @@ impl MemorySystem {
     
     /// Retrieve a memory by ID
     pub async fn retrieve_memory(&self, id: Uuid) -> Result<MemoryEntry> {
-        self.vector_db.retrieve_memory(id).await
+        Ok(self.vector_db.retrieve_memory(id).await?)
     }
     
     /// Search memories by similarity
@@ -146,9 +146,10 @@ impl MemorySystem {
         limit: usize,
     ) -> Result<Vec<MemoryEntry>> {
         let query_embedding = self.generate_embedding(&query).await?;
-        self.vector_db
+        Ok(self
+            .vector_db
             .search_by_embedding(&query_embedding, memory_type, limit)
-            .await
+            .await?)
     }
     
     /// Update a memory
@@ -163,12 +164,13 @@ impl MemorySystem {
             ..old_memory
         };
         
-        self.vector_db.update_memory(&updated_memory).await
+        self.vector_db.update_memory(&updated_memory).await?;
+        Ok(())
     }
     
     /// Delete a memory
     pub async fn delete_memory(&self, id: Uuid) -> Result<()> {
-        self.vector_db.delete_memory(id).await
+        Ok(self.vector_db.delete_memory(id).await?)
     }
     
     /// Generate embedding (placeholder implementation)

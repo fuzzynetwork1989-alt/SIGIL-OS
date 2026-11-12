@@ -25,7 +25,7 @@ pub struct ContextManager {
 impl ContextManager {
     /// Create a new context manager
     pub async fn new() -> Result<Self> {
-        let assembler = Arc::new(ContextAssembler::new().await?);
+        let assembler = Arc::new(ContextAssembler::new()?);
         let validator = Arc::new(ContextValidator::new());
         let timeline = Arc::new(ContextTimeline::new());
         

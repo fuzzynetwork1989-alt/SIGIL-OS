@@ -3,7 +3,7 @@
 //! Responsible for verification, cross-checking, confidence scoring, and knowledge integrity.
 
 use errors::RealityValidationError;
-use crate::{Observation, VerificationResult};
+use crate::Observation;
 
 /// Reality Validator - validates observations against known knowledge
 pub struct RealityValidator {

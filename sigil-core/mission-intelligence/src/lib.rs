@@ -6,7 +6,7 @@
 //!
 //! # Mission Structure
 //!
-//! ```
+//! ```text
 //! Mission
 //! ├── Objectives
 //! ├── Milestones

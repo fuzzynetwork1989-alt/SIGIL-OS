@@ -11,7 +11,7 @@ pub mod avatar_behavior;
 pub use planner::ActionPlanner;
 pub use tool_use::ToolUse;
 pub use mission_update::MissionUpdate;
-pub use avatar_behavior::AvatarBehavior;
+pub use avatar_behavior::AvatarBehaviorPlanner;
 
 use errors::ActionError;
 
@@ -20,7 +20,7 @@ pub struct ActionIntelligence {
     planner: ActionPlanner,
     tool_use: ToolUse,
     mission_update: MissionUpdate,
-    avatar_behavior: AvatarBehavior,
+    avatar_behavior: AvatarBehaviorPlanner,
 }
 
 impl ActionIntelligence {
@@ -30,7 +30,7 @@ impl ActionIntelligence {
             planner: ActionPlanner::new()?,
             tool_use: ToolUse::new()?,
             mission_update: MissionUpdate::new()?,
-            avatar_behavior: AvatarBehavior::new()?,
+            avatar_behavior: AvatarBehaviorPlanner::new()?,
         })
     }
 

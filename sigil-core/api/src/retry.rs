@@ -29,7 +29,7 @@ pub async fn retry_with_backoff<F, Fut, T, E>(config: RetryConfig, operation: F)
 where
     F: Fn() -> Fut,
     Fut: std::future::Future<Output = Result<T, E>>,
-    E: std::error::Error + Send + Sync + 'static,
+    E: std::fmt::Display + Send + Sync + 'static,
 {
     let mut delay = config.initial_delay;
     let mut last_error: Option<anyhow::Error> = None;
@@ -93,7 +93,7 @@ impl CircuitBreaker {
     where
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = Result<T, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: std::fmt::Display + Send + Sync + 'static,
     {
         // Check if circuit is open and timeout has passed
         if self.state == CircuitState::Open {
@@ -150,11 +150,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_retry_success() {
-        let mut call_count = 0;
+        use std::sync::{
+            atomic::{AtomicUsize, Ordering},
+            Arc,
+        };
+
+        let call_count = Arc::new(AtomicUsize::new(0));
         let result = retry_with_backoff(RetryConfig::default(), || {
-            call_count += 1;
+            let count = call_count.fetch_add(1, Ordering::SeqCst) + 1;
             async move {
-                if call_count < 2 {
+                if count < 2 {
                     Err::<(), anyhow::Error>(anyhow::anyhow!("Not yet"))
                 } else {
                     Ok(())
@@ -164,7 +169,7 @@ mod tests {
         .await;
 
         assert!(result.is_ok());
-        assert_eq!(call_count, 2);
+        assert_eq!(call_count.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]
