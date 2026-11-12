@@ -44,7 +44,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha
             type=sha,format=long
             type=raw,value=latest,enable={{is_default_branch}}
 
@@ -63,7 +63,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/sigil-os:${{ github.sha }}
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/sigil-os:sha-${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results.sarif'
 
