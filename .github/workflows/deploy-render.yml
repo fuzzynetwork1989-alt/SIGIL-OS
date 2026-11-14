@@ -40,17 +40,17 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev
+
       - name: Run tests
         run: cargo test --workspace
 
       - name: Build release binary
         run: cargo build --release --bin api
 
-      - name: Login to Render
-        uses: render-inc/cli@v1.5.6
-        with:
-          render-auth-token: ${{ secrets.RENDER_AUTH_TOKEN }}
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-
       - name: Deploy to Render
-        run: render deploy
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_AUTH_TOKEN }}

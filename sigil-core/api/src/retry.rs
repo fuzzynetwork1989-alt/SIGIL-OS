@@ -25,12 +25,11 @@ impl Default for RetryConfig {
 }
 
 /// Retry an operation with exponential backoff
-pub async fn retry_with_backoff<F, Fut, T, E>(config: RetryConfig, mut operation: F) -> Result<T>
+pub async fn retry_with_backoff<F, Fut, T, E>(config: RetryConfig, operation: F) -> Result<T>
 where
-    F: FnMut() -> Fut,
+    F: Fn() -> Fut,
     Fut: std::future::Future<Output = Result<T, E>>,
-    E: std::error::Error + Send + Sync + 'static,
-    anyhow::Error: From<E>,
+    E: std::fmt::Display + Send + Sync + 'static,
 {
     let mut delay = config.initial_delay;
     let mut last_error: Option<anyhow::Error> = None;
@@ -94,7 +93,7 @@ impl CircuitBreaker {
     where
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = Result<T, E>>,
-        E: std::error::Error + Send + Sync + 'static,
+        E: std::fmt::Display + Send + Sync + 'static,
     {
         // Check if circuit is open and timeout has passed
         if self.state == CircuitState::Open {
@@ -148,26 +147,20 @@ impl CircuitBreaker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use thiserror::Error;
-
-    #[derive(Debug, Error)]
-    #[error("{0}")]
-    struct TestError(String);
 
     #[tokio::test]
     async fn test_retry_success() {
-        use std::sync::atomic::{AtomicU32, Ordering};
-        use std::sync::Arc;
-        
-        let call_count = Arc::new(AtomicU32::new(0));
-        let call_count_clone = call_count.clone();
-        
-        let result = retry_with_backoff(RetryConfig::default(), move || {
-            let cc = call_count_clone.clone();
+        use std::sync::{
+            atomic::{AtomicUsize, Ordering},
+            Arc,
+        };
+
+        let call_count = Arc::new(AtomicUsize::new(0));
+        let result = retry_with_backoff(RetryConfig::default(), || {
+            let count = call_count.fetch_add(1, Ordering::SeqCst) + 1;
             async move {
-                let count = cc.fetch_add(1, Ordering::SeqCst) + 1;
                 if count < 2 {
-                    Err::<(), TestError>(TestError("Not yet".to_string()))
+                    Err::<(), anyhow::Error>(anyhow::anyhow!("Not yet"))
                 } else {
                     Ok(())
                 }
@@ -182,7 +175,7 @@ mod tests {
     #[tokio::test]
     async fn test_retry_failure() {
         let result = retry_with_backoff(RetryConfig::default(), || async move {
-            Err::<(), TestError>(TestError("Always fails".to_string()))
+            Err::<(), anyhow::Error>(anyhow::anyhow!("Always fails"))
         })
         .await;
 

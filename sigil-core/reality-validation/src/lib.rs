@@ -1,25 +1,87 @@
-//! Reality Validation Intelligence - Eighth Cognitive Pillar
-//! Prevents memory pollution through five-stage validation pipeline
-
-use anyhow::Result;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use uuid::Uuid;
+//! Reality Validation Intelligence - Pillar 08 of SCA-1R Cognitive Architecture
+//!
+//! This module implements the reality validation pipeline that prevents memory pollution
+//! and hallucination persistence by validating knowledge before storage.
+//!
+//! # Validation Pipeline
+//!
+//! ```text
+//! Observe → Verify → Cross-Check → Score → Store
+//! ```
+//!
+//! # Confidence Levels
+//!
+//! - VERIFIED (95-100): Permanent Memory
+//! - LIKELY_TRUE (80-94): Monitored Memory
+//! - TENTATIVE (60-79): Temporary Memory
+//! - UNVERIFIED (0-59): Observation Cache
+//!
+//! # Verification Sources
+//!
+//! - Memory Graph
+//! - World Model
+//! - Mission Graph
+//! - Documents
+//! - User Confirmation
+//! - External Sources
 
 pub mod validator;
-pub mod cross_check;
-pub mod scoring;
-pub mod storage;
+pub mod cross_checker;
+pub mod scorer;
+pub mod pipeline;
+pub mod confidence;
+pub mod storage_rules;
 
-pub use validator::RealityValidator;
-pub use cross_check::CrossChecker;
-pub use scoring::ConfidenceScorer;
-pub use storage::StorageRouter;
+pub use validator::{RealityValidator, VerificationResult};
+pub use cross_checker::{CrossChecker, CrossCheckResult};
+pub use scorer::ConfidenceScorer;
+pub use pipeline::ValidationPipeline;
+pub use confidence::{ConfidenceLevel, ConfidenceScore};
+pub use storage_rules::StorageDecision;
 
-/// Knowledge source types
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum KnowledgeSource {
+use errors::RealityValidationError;
+
+/// Main entry point for reality validation
+pub struct RealityValidationEngine {
+    validator: RealityValidator,
+    cross_checker: CrossChecker,
+    scorer: ConfidenceScorer,
+    pipeline: ValidationPipeline,
+}
+
+impl RealityValidationEngine {
+    /// Create a new reality validation engine
+    pub fn new() -> Result<Self, RealityValidationError> {
+        Ok(Self {
+            validator: RealityValidator::new()?,
+            cross_checker: CrossChecker::new()?,
+            scorer: ConfidenceScorer::new()?,
+            pipeline: ValidationPipeline::new()?,
+        })
+    }
+
+    /// Validate an observation through the complete pipeline
+    pub async fn validate_observation(
+        &self,
+        observation: Observation,
+    ) -> Result<ValidatedKnowledge, RealityValidationError> {
+        self.pipeline.validate(observation).await
+    }
+}
+
+/// Input observation to be validated
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Observation {
+    pub id: uuid::Uuid,
+    pub source: ObservationSource,
+    pub content: String,
+    pub metadata: serde_json::Value,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+}
+
+/// Source of the observation
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub enum ObservationSource {
     Conversation,
     Voice,
     Document,
@@ -27,114 +89,29 @@ pub enum KnowledgeSource {
     QuestVision,
     UserInput,
     AgentOutput,
+    External(String),
 }
 
-/// Trust level for sources
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum TrustLevel {
-    Trusted,
-    Known,
-    Guest,
-    Untrusted,
-}
-
-/// Validation status
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum ValidationStatus {
-    Verified,
-    LikelyTrue,
-    Tentative,
-    Unverified,
-    Contradicted,
-}
-
-/// Storage tier based on confidence
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum StorageTier {
-    Permanent,
-    Monitored,
-    Temporary,
-    Cache,
-}
-
-/// Validated knowledge record
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Validated knowledge ready for storage
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ValidatedKnowledge {
-    pub id: Uuid,
-    pub content: String,
-    pub source: SourceInfo,
-    pub confidence: f64,
-    pub validation_status: ValidationStatus,
-    pub cross_check_results: Vec<CrossCheckResult>,
-    pub storage_tier: StorageTier,
-    pub created_at: DateTime<Utc>,
-    pub expires_at: Option<DateTime<Utc>>,
-    pub last_validated: DateTime<Utc>,
+    pub id: uuid::Uuid,
+    pub original_observation: Observation,
+    pub confidence: ConfidenceScore,
+    pub level: ConfidenceLevel,
+    pub storage_decision: StorageDecision,
+    pub verification_sources: Vec<String>,
+    pub contradictions: Vec<String>,
+    pub validated_at: chrono::DateTime<chrono::Utc>,
 }
 
-/// Source information
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SourceInfo {
-    pub source_type: KnowledgeSource,
-    pub trust_level: TrustLevel,
-    pub source_id: Option<String>,
-    pub metadata: HashMap<String, String>,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-/// Cross-check result
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CrossCheckResult {
-    pub check_type: String,
-    pub matched: bool,
-    pub confidence: f64,
-    pub details: String,
-}
-
-/// Observation input
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Observation {
-    pub content: String,
-    pub source: SourceInfo,
-    pub timestamp: DateTime<Utc>,
-}
-
-impl ValidatedKnowledge {
-    pub fn new(content: String, source: SourceInfo) -> Self {
-        Self {
-            id: Uuid::new_v4(),
-            content,
-            source,
-            confidence: 0.0,
-            validation_status: ValidationStatus::Unverified,
-            cross_check_results: Vec::new(),
-            storage_tier: StorageTier::Cache,
-            created_at: Utc::now(),
-            expires_at: None,
-            last_validated: Utc::now(),
-        }
-    }
-
-    pub fn set_confidence(&mut self, confidence: f64) {
-        self.confidence = confidence;
-        self.validation_status = Self::status_from_confidence(confidence);
-        self.storage_tier = Self::tier_from_confidence(confidence);
-    }
-
-    fn status_from_confidence(confidence: f64) -> ValidationStatus {
-        match confidence {
-            95.0..=100.0 => ValidationStatus::Verified,
-            80.0..=94.9 => ValidationStatus::LikelyTrue,
-            60.0..=79.9 => ValidationStatus::Tentative,
-            _ => ValidationStatus::Unverified,
-        }
-    }
-
-    fn tier_from_confidence(confidence: f64) -> StorageTier {
-        match confidence {
-            95.0..=100.0 => StorageTier::Permanent,
-            80.0..=94.9 => StorageTier::Monitored,
-            60.0..=79.9 => StorageTier::Temporary,
-            _ => StorageTier::Cache,
-        }
+    #[tokio::test]
+    async fn test_engine_creation() {
+        let engine = RealityValidationEngine::new();
+        assert!(engine.is_ok());
     }
 }

@@ -3,6 +3,7 @@ use anyhow::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use uuid::Uuid;
 
 /// Knowledge graph storing entities and relationships
 pub struct KnowledgeGraph {

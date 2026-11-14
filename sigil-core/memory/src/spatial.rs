@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_spatial_memory() {
-        let spatial = SpatialMemory::new(Uuid::new_v4());
+        let mut spatial = SpatialMemory::new(Uuid::new_v4());
         let position = SpatialPosition {
             x: 1.0,
             y: 2.0,

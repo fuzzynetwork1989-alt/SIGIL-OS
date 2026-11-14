@@ -13,7 +13,7 @@ pub struct RegistrationRequest {
 }
 
 /// WebAuthn credential
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct RegistrationCredential {
     pub id: String,
     pub raw_id: String,
@@ -23,7 +23,7 @@ pub struct RegistrationCredential {
 }
 
 /// Authenticator attestation response
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct AuthenticatorAttestationResponse {
     pub client_data_json: String,
     pub attestation_object: String,
