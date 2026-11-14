@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contracts.nexora.omega/schemas/capability.json",
+  "title": "Capability",
+  "description": "Schema for NEXORA Omega Capability - scoped authorization grants",
+  "type": "object",
+  "required": [
+    "id",
+    "principal",
+    "resource",
+    "action",
+    "granted_by",
+    "granted_at",
+    "tenant_id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the capability"
+    },
+    "principal": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The user, service, or process that holds this capability"
+    },
+    "resource": {
+      "type": "string",
+      "description": "The resource this capability applies to (e.g., 'workspace:*', 'file:123', 'api:/chat')"
+    },
+    "action": {
+      "type": "string",
+      "description": "The action this capability permits (e.g., 'read', 'write', 'delete', 'execute')"
+    },
+    "conditions": {
+      "type": "object",
+      "description": "Conditions that must be met for this capability to be valid",
+      "properties": {
+        "time_range": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date-time" },
+            "end": { "type": "string", "format": "date-time" }
+          }
+        },
+        "ip_whitelist": {
+          "type": "array",
+          "items": { "type": "string", "format": "ipv4" }
+        },
+        "device_fingerprint": {
+          "type": "string"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "country": { "type": "string" },
+            "region": { "type": "string" }
+          }
+        },
+        "custom": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this capability expires"
+    },
+    "granted_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who granted this capability"
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this capability was granted"
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this capability was revoked (null if not revoked)"
+    },
+    "revoked_by": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Who revoked this capability (null if not revoked)"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The tenant/organization this capability belongs to"
+    },
+    "attenuation_chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "attenuated_by": { "type": "string", "format": "uuid" },
+          "original_conditions": { "type": "object" },
+          "attenuated_conditions": { "type": "object" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "description": "Chain of attenuations if this capability was delegated"
+    },
+    "risk_class": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D", "E"],
+      "description": "Risk classification for approval requirements"
+    },
+    "audit_correlation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlation ID for audit trail"
+    }
+  }
+}

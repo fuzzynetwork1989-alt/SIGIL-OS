@@ -1,0 +1,22 @@
+# SIGIL OS - Minimal Requirements for Real AI Backend
+# Python dependencies for cognitive kernel
+
+# FastAPI and web framework
+fastapi
+uvicorn[standard]
+pydantic
+
+# Database
+supabase
+asyncpg
+
+# Authentication
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# AI/ML
+openai
+
+# Utilities
+python-dotenv

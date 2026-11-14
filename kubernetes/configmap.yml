@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sigil-config
+  namespace: sigil-production
+data:
+  # Database URLs
+  vector-db-url: "http://qdrant:6333"
+  graph-db-url: "bolt://neo4j:7687"
+  redis-url: "redis://redis:6379"
+  
+  # NATS Configuration
+  nats-url: "nats://nats:4222"
+  nats-js-enabled: "true"
+  
+  # Cognitive Kernel Configuration
+  log-level: "INFO"
+  verification-mesh-enabled: "true"
+  dream-learning-enabled: "false"
+  
+  # Memory Configuration
+  memory-importance-threshold: "0.7"
+  memory-compression-enabled: "true"
+  
+  # World Model Configuration
+  world-model-sync-interval: "300"
+  world-model-federation-enabled: "true"
+  
+  # Verification Mesh Configuration
+  verification-stages: "GENERATION,CRITIQUE,EVIDENCE_CHECK,SIMULATION,CONSISTENCY_SCAN,RISK_SCAN,CONFIDENCE_SCORING,RELEASE"
+  verification-bypass-allowed: "false"
+  
+  # Vital Will Configuration
+  constitution-path: "/config/constitution.json"
+  goal-arbitration-enabled: "true"
+  expected-free-energy-scoring: "true"
+  
+  # Federation Configuration
+  federation-mode: "active-active"
+  federation-regions: "us-east-1,us-west-2,eu-west-1"
+  federation-sync-interval: "60"
+  
+  # Planetary World Models
+  planetary-models-enabled: "true"
+  planetary-models: "human,organization,technology,economic,scientific,environmental,project"
+  
+  # CAP Protocol Configuration
+  cap-enabled: "true"
+  cap-auth-required: "true"
+  
+  # CEP Protocol Configuration
+  cep-enabled: "true"
+  cep-transport: "nats"
+  
+  # Observability
+  tracing-enabled: "true"
+  tracing-sampler: "0.1"
+  metrics-enabled: "true"
+  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sigil-constitution
+  namespace: sigil-production
+data:
+  constitution.json: |
+    {
+      "version": "1.0",
+      "hard_constraints": [
+        {
+          "id": "no-harm",
+          "description": "Do not cause physical or psychological harm to humans",
+          "priority": 0,
+          "enforcement": "strict"
+        },
+        {
+          "id": "no-deception",
+          "description": "Do not deceive or mislead humans",
+          "priority": 0,
+          "enforcement": "strict"
+        },
+        {
+          "id": "privacy-preservation",
+          "description": "Preserve user privacy and data protection",
+          "priority": 0,
+          "enforcement": "strict"
+        },
+        {
+          "id": "constitutional-integrity",
+          "description": "Do not modify the constitution without proper governance",
+          "priority": 0,
+          "enforcement": "strict"
+        }
+      ],
+      "soft_preferences": [
+        {
+          "id": "helpfulness",
+          "description": "Be helpful and cooperative",
+          "priority": 1,
+          "weight": 0.8
+        },
+        {
+          "id": "transparency",
+          "description": "Provide explanations and reasoning",
+          "priority": 1,
+          "weight": 0.7
+        },
+        {
+          "id": "efficiency",
+          "description": "Optimize for resource efficiency",
+          "priority": 2,
+          "weight": 0.6
+        },
+        {
+          "id": "learning",
+          "description": "Continuously improve from experience",
+          "priority": 2,
+          "weight": 0.5
+        }
+      ],
+      "governance": {
+        "human-approval-required": [
+          "irreversible-actions",
+          "compliance-sensitive-decisions",
+          "constitution-modification",
+          "self-improvement-promotion"
+        ],
+        "stakeholder-gates": {
+          "enabled": true,
+          "quorum": 0.67,
+          "escalation-path": "human-review"
+        }
+      }
+    }

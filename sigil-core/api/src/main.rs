@@ -3,10 +3,8 @@
 //! Main entry point for the SIGIL OS HTTP API server.
 
 use api::http::{serve, ApiState};
-use api::conversation::ConversationStore;
 use config::Config;
 use std::net::SocketAddr;
-use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -28,11 +26,14 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("🔐 Cryptographic Warrants: {}", if config.sigil.warrants_enabled { "Active" } else { "Disabled" });
     tracing::info!("🌐 HTTP Server: Starting...");
 
-    let state = ApiState {
-        version: env!("CARGO_PKG_VERSION").to_string(),
-        superbrain_enabled: true,
-        conversation_store: Arc::new(ConversationStore::new()),
-    };
+    let state = ApiState::new(
+        env!("CARGO_PKG_VERSION").to_string(),
+        true,
+        config.sigil.warrants_enabled,
+        config.sigil.ledger_enabled,
+        &ApiState::default_ledger_path(),
+        config.sigil.key_pair_path.as_deref(),
+    )?;
 
     // Use configuration for server address
     let addr: SocketAddr = config.server_address().parse()?;

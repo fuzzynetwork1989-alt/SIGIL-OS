@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sigilos.quest">
+
+    <!-- Quest 3 Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Quest-specific permissions -->
+    <uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
+    <uses-permission android:name="com.oculus.permission.EYE_TRACKING" />
+    <uses-permission android:name="com.oculus.permission.FACE_TRACKING" />
+    <uses-permission android:name="com.oculus.permission.SPATIAL_ANCHOR" />
+    <uses-permission android:name="com.oculus.permission.BODY_TRACKING" />
+
+    <!-- Required for OpenXR -->
+    <uses-feature android:name="android.hardware.vr.headtracking" android:required="true" />
+    <uses-feature android:name="android.software.vr.mode" android:required="true" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/sigil_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/sigil_icon"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/AppTheme">
+
+        <!-- Main Quest Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|uiMode"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.oculus.intent.category.VR" />
+            </intent-filter>
+        </activity>
+
+        <!-- XR Activity -->
+        <activity
+            android:name=".XRActivity"
+            android:exported="false"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|uiMode"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+
+        <!-- Meta Quest Services -->
+        <meta-data
+            android:name="com.oculus.passthrough.Passthrough"
+            android:value="true" />
+        <meta-data
+            android:name="com.oculus.handtracking.HandTracking"
+            android:value="true" />
+        <meta-data
+            android:name="com.oculus.eyetracking.EyeTracking"
+            android:value="true" />
+
+    </application>
+
+</manifest>

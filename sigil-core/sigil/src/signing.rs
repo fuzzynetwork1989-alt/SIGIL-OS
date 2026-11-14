@@ -76,6 +76,22 @@ impl SigilSigner {
     pub fn public_key_bytes(&self) -> Vec<u8> {
         self.key_pair.public_key_bytes()
     }
+
+    /// Sign an arbitrary byte payload
+    ///
+    /// Used for device attestation, which binds `device_id`/`actor_id` into
+    /// the signed sigil payload.
+    pub fn sign_bytes(&self, data: &[u8]) -> Vec<u8> {
+        self.key_pair.signing_key.sign(data).to_bytes().to_vec()
+    }
+}
+
+/// Canonical attestation payload binding a device and actor identity
+pub fn attestation_payload(
+    device_id: &uuid::Uuid,
+    actor_id: &uuid::Uuid,
+) -> anyhow::Result<Vec<u8>> {
+    Ok(serde_json::to_vec(&("sigil-attestation", device_id, actor_id))?)
 }
 
 /// Sigil representation for signing (excludes signature field)

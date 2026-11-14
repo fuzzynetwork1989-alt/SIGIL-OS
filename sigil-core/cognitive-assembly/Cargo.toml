@@ -1,21 +1,19 @@
 [package]
 name = "cognitive-assembly"
-version = "0.1.0"
-edition = "2021"
-authors = ["SIGIL OS Team"]
-description = "Cognitive Assembly Intelligence - Pillar 09 of SCA-1R Cognitive Architecture"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
 
 [dependencies]
 sigil = { path = "../sigil" }
-memory = { path = "../memory" }
-world-model = { path = "../world-model" }
-context = { path = "../context" }
-errors = { path = "../errors" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.0", features = ["v4", "serde"] }
-tokio = { version = "1.0", features = ["full"] }
-async-trait = "0.1"
-log = "0.4"
-thiserror = "1.0"
+context-router = { path = "../context-router" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+tracing.workspace = true

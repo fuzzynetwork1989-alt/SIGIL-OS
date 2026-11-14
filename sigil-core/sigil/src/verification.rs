@@ -6,6 +6,7 @@ use ed25519_dalek::{VerifyingKey, Signature, Verifier};
 use serde::Serialize;
 
 use crate::sigil::Sigil;
+use crate::signing::attestation_payload;
 
 /// Verifier for checking sigil signatures
 pub struct SigilVerifier;
@@ -35,6 +36,47 @@ impl SigilVerifier {
             Ok(()) => Ok(true),
             Err(_) => Ok(false),
         }
+    }
+
+    /// Verify an arbitrary byte payload against a public key and signature
+    pub fn verify_bytes(
+        public_key_bytes: &[u8],
+        data: &[u8],
+        signature_bytes: &[u8],
+    ) -> anyhow::Result<bool> {
+        let signature_array: [u8; 64] = signature_bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("Invalid signature length"))?;
+        let signature = Signature::from_bytes(&signature_array);
+
+        let public_key_array: [u8; 32] = public_key_bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("Invalid public key length"))?;
+        let public_key = VerifyingKey::from_bytes(&public_key_array)
+            .map_err(|_| anyhow::anyhow!("Invalid public key"))?;
+
+        match public_key.verify(data, &signature) {
+            Ok(()) => Ok(true),
+            Err(_) => Ok(false),
+        }
+    }
+
+    /// Verify the device attestation binding on a sigil
+    ///
+    /// The attestation must be a signature over the canonical
+    /// (device_id, actor_id) payload produced by the same key recorded in
+    /// `sigil.signature.public_key`. Empty attestations fail.
+    pub fn verify_attestation(sigil: &Sigil) -> anyhow::Result<bool> {
+        if sigil.actor.attestation.is_empty() {
+            return Ok(false);
+        }
+
+        let payload = attestation_payload(&sigil.actor.device_id, &sigil.actor.actor_id)?;
+        Self::verify_bytes(
+            &sigil.signature.public_key,
+            &payload,
+            &sigil.actor.attestation,
+        )
     }
 }
 

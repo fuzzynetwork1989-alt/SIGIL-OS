@@ -18,6 +18,9 @@ use tower_http::trace::TraceLayer;
 use uuid::Uuid;
 use validator::Validate;
 
+use persistence::Ledger;
+use sigil::{SigilKind, SigilManager};
+
 use crate::conversation::{Conversation, ConversationStore, ConversationSummary, Message};
 
 /// Health check response
@@ -73,12 +76,173 @@ struct SuperBrainInfo {
     improvement_triggered: bool,
 }
 
-/// API state with conversation store
+/// API state with conversation store and sigil ledger
 #[derive(Clone)]
 pub struct ApiState {
     pub version: String,
     pub superbrain_enabled: bool,
     pub conversation_store: Arc<ConversationStore>,
+    pub sigil_manager: Arc<SigilManager>,
+    pub ledger: Arc<std::sync::Mutex<Ledger>>,
+    pub warrants_enabled: bool,
+    pub ledger_enabled: bool,
+}
+
+impl ApiState {
+    /// Create API state with an open sigil ledger
+    ///
+    /// `ledger_path` selects the SQLite ledger file. Warrants and ledger
+    /// emission are controlled by the `warrants_enabled` and
+    /// `ledger_enabled` flags.
+    pub fn new(
+        version: String,
+        superbrain_enabled: bool,
+        warrants_enabled: bool,
+        ledger_enabled: bool,
+        ledger_path: &str,
+        identity_path: Option<&std::path::Path>,
+    ) -> anyhow::Result<Self> {
+        let ledger = Ledger::open(ledger_path)?;
+
+        let sigil_manager = match identity_path {
+            Some(path) => Arc::new(SigilManager::load_or_create(path)?),
+            None => Arc::new(SigilManager::new(Uuid::new_v4(), Uuid::new_v4())),
+        };
+
+        Ok(Self {
+            version,
+            superbrain_enabled,
+            conversation_store: Arc::new(ConversationStore::new()),
+            sigil_manager,
+            ledger: Arc::new(std::sync::Mutex::new(ledger)),
+            warrants_enabled,
+            ledger_enabled,
+        })
+    }
+
+    /// Create API state from an already-open ledger
+    pub fn with_ledger(
+        version: String,
+        superbrain_enabled: bool,
+        warrants_enabled: bool,
+        ledger_enabled: bool,
+        ledger: Ledger,
+    ) -> Self {
+        let device_id = Uuid::new_v4();
+        let actor_id = Uuid::new_v4();
+
+        Self {
+            version,
+            superbrain_enabled,
+            conversation_store: Arc::new(ConversationStore::new()),
+            sigil_manager: Arc::new(SigilManager::new(device_id, actor_id)),
+            ledger: Arc::new(std::sync::Mutex::new(ledger)),
+            warrants_enabled,
+            ledger_enabled,
+        }
+    }
+
+    /// Default ledger path from `SIGIL_LEDGER_PATH` or `sigil-ledger.db`
+    pub fn default_ledger_path() -> String {
+        std::env::var("SIGIL_LEDGER_PATH")
+            .unwrap_or_else(|_| "sigil-ledger.db".to_string())
+    }
+}
+
+/// Emit a signed action sigil for an API state change into the ledger
+///
+/// Returns an error when warrants/ledger are enabled but emission fails —
+/// callers must surface that failure rather than silently dropping it.
+fn emit_state_sigil(
+    state: &ApiState,
+    capability: &str,
+    resource_id: Option<Uuid>,
+    outcome: &str,
+) -> anyhow::Result<()> {
+    if !state.warrants_enabled || !state.ledger_enabled {
+        return Ok(());
+    }
+
+    let sigil = state.sigil_manager.create_action_sigil(
+        capability.to_string(),
+        resource_id,
+        "api_state_change".to_string(),
+        Utc::now() + chrono::Duration::hours(1),
+        outcome.to_string(),
+        1.0,
+        vec![],
+        vec![],
+        vec![capability.to_string()],
+    )?;
+
+    state.ledger.lock().unwrap().append(&sigil)
+}
+
+/// Emit a signed inference sigil into the ledger
+///
+/// Same failure contract as `emit_state_sigil`: when warrants/ledger are
+/// enabled, an emission failure is returned to the caller.
+fn emit_inference_sigil(
+    state: &ApiState,
+    model: sigil::ModelTier,
+    criterion: &str,
+    trace_steps: Vec<(String, String, String)>,
+    sources: Vec<String>,
+) -> anyhow::Result<()> {
+    if !state.warrants_enabled || !state.ledger_enabled {
+        return Ok(());
+    }
+
+    let sigil = state.sigil_manager.create_inference_sigil(
+        model,
+        criterion.to_string(),
+        trace_steps,
+        vec![],
+        vec![],
+        sources,
+    )?;
+
+    state.ledger.lock().unwrap().append(&sigil)
+}
+
+/// Emit a signed improvement sigil into the ledger
+fn emit_improvement_sigil(
+    state: &ApiState,
+    variant_description: &str,
+    descent_proof: Vec<u8>,
+    probation_cycles: u32,
+    sources: Vec<String>,
+) -> anyhow::Result<()> {
+    if !state.warrants_enabled || !state.ledger_enabled {
+        return Ok(());
+    }
+
+    let sigil = state.sigil_manager.create_improvement_sigil(
+        variant_description.to_string(),
+        descent_proof,
+        probation_cycles,
+        vec![],
+        vec![],
+        sources,
+    )?;
+
+    state.ledger.lock().unwrap().append(&sigil)
+}
+
+/// Collect all sigils from the ledger for the sigils endpoint
+fn collect_sigils(state: &ApiState) -> anyhow::Result<Vec<sigil::Sigil>> {
+    state.ledger.lock().unwrap().get_all()
+}
+
+/// Human-readable name for a sigil kind
+fn sigil_kind_name(kind: &SigilKind) -> &'static str {
+    match kind {
+        SigilKind::Belief { .. } => "belief",
+        SigilKind::Action { .. } => "action",
+        SigilKind::Memory { .. } => "memory",
+        SigilKind::Inference { .. } => "inference",
+        SigilKind::Improvement { .. } => "improvement",
+    }
 }
 
 /// Create conversation request
@@ -173,6 +337,7 @@ pub fn create_router(state: ApiState) -> Router {
         .route("/api/v1/superbrain/chat", post(superbrain_endpoint))
         .route("/api/v1/dream-weaving", get(dream_weaving_endpoint))
         .route("/api/v1/sigils", get(sigils_endpoint))
+        .route("/api/v1/sigils/verify", get(sigils_verify_endpoint))
         .route("/api/v1/avatar", put(avatar_endpoint))
         .route("/api/v1/superbrain/memory", get(superbrain_memory_endpoint))
         .route(
@@ -220,7 +385,7 @@ async fn health_check(State(state): State<ApiState>) -> Json<HealthResponse> {
 
 /// Chat endpoint
 async fn chat_endpoint(
-    State(_state): State<ApiState>,
+    State(state): State<ApiState>,
     Json(request): Json<ChatRequest>,
 ) -> Result<Json<ChatResponse>, axum::http::StatusCode> {
     // Validate request
@@ -242,6 +407,35 @@ async fn chat_endpoint(
     );
 
     let duration = start.elapsed();
+
+    // Emit a signed inference sigil for this cognitive act
+    let model_tier = if request.use_superbrain {
+        sigil::ModelTier::CloudLarge
+    } else {
+        sigil::ModelTier::OnDeviceSmall
+    };
+    let trace_steps = vec![
+        (
+            "prompt_received".to_string(),
+            request.prompt.clone(),
+            "validated".to_string(),
+        ),
+        (
+            "response_generated".to_string(),
+            "inference_pipeline".to_string(),
+            response_text.clone(),
+        ),
+    ];
+    if let Err(e) = emit_inference_sigil(
+        &state,
+        model_tier,
+        "chat_response_quality",
+        trace_steps,
+        vec!["api:/api/v1/chat".to_string()],
+    ) {
+        tracing::error!("Failed to emit inference sigil for chat: {}", e);
+        return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
 
     Ok(Json(ChatResponse {
         text: response_text.clone(),
@@ -308,12 +502,58 @@ async fn dream_weaving_endpoint(State(_state): State<ApiState>) -> Json<DreamWea
 }
 
 /// Sigils endpoint
-async fn sigils_endpoint(State(_state): State<ApiState>) -> Json<SigilData> {
-    // In production, this would return actual sigil data
-    Json(SigilData {
-        sigils: vec![],
-        total_count: 0,
-    })
+async fn sigils_endpoint(
+    State(state): State<ApiState>,
+) -> Result<Json<SigilData>, axum::http::StatusCode> {
+    let sigils = collect_sigils(&state)
+        .map_err(|e| {
+            tracing::error!("Failed to read sigil ledger: {}", e);
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let entries = sigils
+        .iter()
+        .map(|s| SigilEntry {
+            id: s.id.to_string(),
+            timestamp: s.issued_at.to_rfc3339(),
+            action: sigil_kind_name(&s.kind).to_string(),
+            signature: hex::encode(&s.signature.bytes),
+        })
+        .collect();
+
+    Ok(Json(SigilData {
+        sigils: entries,
+        total_count: sigils.len() as u32,
+    }))
+}
+
+/// Ledger verification result
+#[derive(Serialize)]
+struct SigilVerifyData {
+    valid: bool,
+    total_count: u64,
+    verified_at: String,
+}
+
+/// Sigils verify endpoint — checks every sigil signature in the ledger
+async fn sigils_verify_endpoint(
+    State(state): State<ApiState>,
+) -> Result<Json<SigilVerifyData>, axum::http::StatusCode> {
+    let ledger = state.ledger.lock().unwrap();
+    let valid = ledger.verify_integrity().map_err(|e| {
+        tracing::error!("Ledger verification failed: {}", e);
+        axum::http::StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    let total_count = ledger.count().map_err(|e| {
+        tracing::error!("Failed to count ledger sigils: {}", e);
+        axum::http::StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    Ok(Json(SigilVerifyData {
+        valid,
+        total_count,
+        verified_at: Utc::now().to_rfc3339(),
+    }))
 }
 
 /// Avatar endpoint
@@ -359,13 +599,32 @@ async fn superbrain_personality_endpoint(
 }
 
 /// Super Brain improve endpoint
-async fn superbrain_improve_endpoint(State(_state): State<ApiState>) -> Json<serde_json::Value> {
+async fn superbrain_improve_endpoint(
+    State(state): State<ApiState>,
+) -> Result<Json<serde_json::Value>, axum::http::StatusCode> {
+    // Emit a signed improvement sigil for the self-improvement cycle
+    let descent_proof = format!(
+        "superbrain_improve_cycle:{}",
+        Utc::now().to_rfc3339()
+    )
+    .into_bytes();
+    if let Err(e) = emit_improvement_sigil(
+        &state,
+        "superbrain_self_improvement_cycle",
+        descent_proof,
+        1,
+        vec!["api:/api/v1/superbrain/improve".to_string()],
+    ) {
+        tracing::error!("Failed to emit improvement sigil: {}", e);
+        return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
     // In production, this would trigger a self-improvement cycle
-    Json(serde_json::json!({
+    Ok(Json(serde_json::json!({
         "improvement_triggered": true,
         "cycle_number": 1,
         "improvements": []
-    }))
+    })))
 }
 
 /// Streaming chat endpoint (SSE - like ChatGPT)
@@ -403,14 +662,26 @@ async fn chat_stream_endpoint(
 async fn create_conversation(
     State(state): State<ApiState>,
     Json(request): Json<CreateConversationRequest>,
-) -> Json<Conversation> {
+) -> Result<Json<Conversation>, axum::http::StatusCode> {
     let conversation = state.conversation_store.create_conversation(
         request.user_id,
         request.title,
         request.model,
         request.superbrain_enabled,
     );
-    Json(conversation)
+
+    let resource_id = Uuid::parse_str(&conversation.id).ok();
+    if let Err(e) = emit_state_sigil(
+        &state,
+        "conversation.create",
+        resource_id,
+        "conversation_created",
+    ) {
+        tracing::error!("Failed to emit sigil for conversation.create: {}", e);
+        return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    Ok(Json(conversation))
 }
 
 /// List all conversations for a user
@@ -443,6 +714,16 @@ async fn delete_conversation(
     axum::extract::Path(id): axum::extract::Path<String>,
 ) -> Result<axum::http::StatusCode, axum::http::StatusCode> {
     if state.conversation_store.delete_conversation(&id) {
+        let resource_id = Uuid::parse_str(&id).ok();
+        if let Err(e) = emit_state_sigil(
+            &state,
+            "conversation.delete",
+            resource_id,
+            "conversation_deleted",
+        ) {
+            tracing::error!("Failed to emit sigil for conversation.delete: {}", e);
+            return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
         Ok(axum::http::StatusCode::NO_CONTENT)
     } else {
         Err(axum::http::StatusCode::NOT_FOUND)
@@ -464,7 +745,19 @@ async fn add_message(
     };
 
     match state.conversation_store.add_message(&id, message.clone()) {
-        Ok(_) => Ok(Json(message)),
+        Ok(_) => {
+            let resource_id = Uuid::parse_str(&id).ok();
+            if let Err(e) = emit_state_sigil(
+                &state,
+                "conversation.message",
+                resource_id,
+                "message_added",
+            ) {
+                tracing::error!("Failed to emit sigil for conversation.message: {}", e);
+                return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+            }
+            Ok(Json(message))
+        }
         Err(_) => Err(axum::http::StatusCode::NOT_FOUND),
     }
 }
@@ -495,6 +788,19 @@ pub async fn serve(addr: SocketAddr, state: ApiState) -> anyhow::Result<()> {
 mod tests {
     use super::*;
 
+    fn test_state() -> (ApiState, tempfile::NamedTempFile) {
+        let file = tempfile::NamedTempFile::new().unwrap();
+        let ledger = Ledger::open(file.path().to_str().unwrap()).unwrap();
+        let state = ApiState::with_ledger(
+            "test".to_string(),
+            false,
+            true,
+            true,
+            ledger,
+        );
+        (state, file)
+    }
+
     #[test]
     fn test_health_response_serialization() {
         let response = HealthResponse {
@@ -506,5 +812,93 @@ mod tests {
 
         let serialized = serde_json::to_string(&response).unwrap();
         assert!(serialized.contains("ok"));
+    }
+
+    #[test]
+    fn test_emit_state_sigil_appends_to_ledger() {
+        let (state, _file) = test_state();
+
+        emit_state_sigil(&state, "conversation.create", Some(Uuid::new_v4()), "conversation_created")
+            .unwrap();
+
+        let ledger = state.ledger.lock().unwrap();
+        assert_eq!(ledger.count().unwrap(), 1);
+        assert!(ledger.verify_integrity().unwrap());
+    }
+
+    #[test]
+    fn test_collect_sigils_returns_entries() {
+        let (state, _file) = test_state();
+
+        emit_state_sigil(&state, "conversation.create", Some(Uuid::new_v4()), "conversation_created")
+            .unwrap();
+        emit_state_sigil(&state, "conversation.delete", None, "conversation_deleted")
+            .unwrap();
+
+        let sigils = collect_sigils(&state).unwrap();
+        assert_eq!(sigils.len(), 2);
+        assert!(matches!(sigils[0].kind, SigilKind::Action { .. }));
+        assert_eq!(sigil_kind_name(&sigils[0].kind), "action");
+    }
+
+    #[test]
+    fn test_emit_state_sigil_disabled_is_noop() {
+        let file = tempfile::NamedTempFile::new().unwrap();
+        let ledger = Ledger::open(file.path().to_str().unwrap()).unwrap();
+        let state = ApiState::with_ledger(
+            "test".to_string(),
+            false,
+            false, // warrants disabled
+            true,
+            ledger,
+        );
+
+        emit_state_sigil(&state, "conversation.create", None, "conversation_created").unwrap();
+        assert_eq!(state.ledger.lock().unwrap().count().unwrap(), 0);
+    }
+
+    #[test]
+    fn test_emit_inference_sigil_appends_to_ledger() {
+        let (state, _file) = test_state();
+
+        emit_inference_sigil(
+            &state,
+            sigil::ModelTier::OnDeviceSmall,
+            "chat_response_quality",
+            vec![(
+                "step".to_string(),
+                "input".to_string(),
+                "output".to_string(),
+            )],
+            vec!["api:test".to_string()],
+        )
+        .unwrap();
+
+        let ledger = state.ledger.lock().unwrap();
+        assert_eq!(ledger.count().unwrap(), 1);
+        let sigils = ledger.get_all().unwrap();
+        assert!(matches!(sigils[0].kind, SigilKind::Inference { .. }));
+        assert_eq!(sigil_kind_name(&sigils[0].kind), "inference");
+        assert!(ledger.verify_integrity().unwrap());
+    }
+
+    #[test]
+    fn test_emit_improvement_sigil_appends_to_ledger() {
+        let (state, _file) = test_state();
+
+        emit_improvement_sigil(
+            &state,
+            "test_variant",
+            b"proof".to_vec(),
+            3,
+            vec!["api:test".to_string()],
+        )
+        .unwrap();
+
+        let ledger = state.ledger.lock().unwrap();
+        assert_eq!(ledger.count().unwrap(), 1);
+        let sigils = ledger.get_all().unwrap();
+        assert!(matches!(sigils[0].kind, SigilKind::Improvement { .. }));
+        assert_eq!(sigil_kind_name(&sigils[0].kind), "improvement");
     }
 }

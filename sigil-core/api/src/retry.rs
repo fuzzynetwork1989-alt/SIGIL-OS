@@ -25,11 +25,12 @@ impl Default for RetryConfig {
 }
 
 /// Retry an operation with exponential backoff
-pub async fn retry_with_backoff<F, Fut, T, E>(config: RetryConfig, operation: F) -> Result<T>
+pub async fn retry_with_backoff<F, Fut, T, E>(config: RetryConfig, mut operation: F) -> Result<T>
 where
-    F: Fn() -> Fut,
+    F: FnMut() -> Fut,
     Fut: std::future::Future<Output = Result<T, E>>,
     E: std::error::Error + Send + Sync + 'static,
+    anyhow::Error: From<E>,
 {
     let mut delay = config.initial_delay;
     let mut last_error: Option<anyhow::Error> = None;
@@ -147,15 +148,26 @@ impl CircuitBreaker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use thiserror::Error;
+
+    #[derive(Debug, Error)]
+    #[error("{0}")]
+    struct TestError(String);
 
     #[tokio::test]
     async fn test_retry_success() {
-        let mut call_count = 0;
-        let result = retry_with_backoff(RetryConfig::default(), || {
-            call_count += 1;
+        use std::sync::atomic::{AtomicU32, Ordering};
+        use std::sync::Arc;
+        
+        let call_count = Arc::new(AtomicU32::new(0));
+        let call_count_clone = call_count.clone();
+        
+        let result = retry_with_backoff(RetryConfig::default(), move || {
+            let cc = call_count_clone.clone();
             async move {
-                if call_count < 2 {
-                    Err::<(), anyhow::Error>(anyhow::anyhow!("Not yet"))
+                let count = cc.fetch_add(1, Ordering::SeqCst) + 1;
+                if count < 2 {
+                    Err::<(), TestError>(TestError("Not yet".to_string()))
                 } else {
                     Ok(())
                 }
@@ -164,13 +176,13 @@ mod tests {
         .await;
 
         assert!(result.is_ok());
-        assert_eq!(call_count, 2);
+        assert_eq!(call_count.load(Ordering::SeqCst), 2);
     }
 
     #[tokio::test]
     async fn test_retry_failure() {
         let result = retry_with_backoff(RetryConfig::default(), || async move {
-            Err::<(), anyhow::Error>(anyhow::anyhow!("Always fails"))
+            Err::<(), TestError>(TestError("Always fails".to_string()))
         })
         .await;
 

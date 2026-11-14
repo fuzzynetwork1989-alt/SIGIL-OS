@@ -142,7 +142,7 @@ mod tests {
     fn test_credential_store() {
         let mut store = CredentialStore::new();
         
-        let credential = RegistrationCredential {
+        let _credential = RegistrationCredential {
             id: "test-id".to_string(),
             raw_id: "test-raw-id".to_string(),
             response: AuthenticatorAttestationResponse {
@@ -152,7 +152,15 @@ mod tests {
             credential_type: "public-key".to_string(),
         };
 
-        store.store("test-user".to_string(), credential.clone());
+        store.store("test-user".to_string(), RegistrationCredential {
+            id: "test-id".to_string(),
+            raw_id: "test-raw-id".to_string(),
+            response: AuthenticatorAttestationResponse {
+                client_data_json: "{}".to_string(),
+                attestation_object: "{}".to_string(),
+            },
+            credential_type: "public-key".to_string(),
+        });
         
         assert!(store.exists("test-user"));
         assert_eq!(store.get("test-user").unwrap().id, "test-id");
