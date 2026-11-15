@@ -128,3 +128,17 @@ CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
 
 CREATE TRIGGER update_user_preferences_updated_at BEFORE UPDATE ON user_preferences
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Usage events table (billing / rate limiting / analytics)
+CREATE TABLE IF NOT EXISTS usage_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    event_type VARCHAR(50) NOT NULL,
+    model VARCHAR(100),
+    tokens_used INTEGER DEFAULT 0,
+    metadata JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_usage_events_created_at ON usage_events(created_at);

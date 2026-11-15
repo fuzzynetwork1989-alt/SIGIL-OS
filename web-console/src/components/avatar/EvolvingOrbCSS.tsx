@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
-import { Sparkles, Brain, Zap, Infinity, Atom, Flame, Star, Heart, Activity, Target, Compass, Globe, Shield, Lock, Key, Fingerprint, Scan, Radar, Wifi, Signal, CheckCircle, XCircle, AlertTriangle, Info, HelpCircle, Bot, Layers, Hexagon, Cube, Lightbulb, TrendingUp, Award, Trophy, Medal, Crown, Gem, Diamond, Circle, Sun, Moon, Cloud, Lightning, Rocket, RefreshCw, Clock, Eye, EyeOff, Visibility, VisibilityOff } from 'lucide-react';
+import { Sparkles, Flame, Zap, Diamond, Globe, Crown, Infinity as InfinityIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface EvolutionStage {
@@ -86,7 +86,7 @@ const EVOLUTION_STAGES: EvolutionStage[] = [
     color: '#6366f1',
     size: 144,
     complexity: 6,
-    icon: Infinity,
+    icon: InfinityIcon,
   },
   {
     name: 'Ascendant',
@@ -113,21 +113,21 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
   const [showEvolutionEffect, setShowEvolutionEffect] = useState(false);
   const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, life: number, angle: number}>>([]);
   const [pulsePhase, setPulsePhase] = useState(0);
-  
+
   // Animation ref
   const orbRef = useRef<HTMLDivElement>(null);
-  
+
   // Calculate current stage based on XP
   useEffect(() => {
-    const newStage = EVOLUTION_STAGES.reduce((prev, curr) => 
+    const newStage = EVOLUTION_STAGES.reduce((prev, curr) =>
       xp >= curr.xpRequired ? curr : prev
     , EVOLUTION_STAGES[0]);
-    
+
     if (newStage.level !== currentStage.level) {
       setShowEvolutionEffect(true);
       setCurrentStage(newStage);
       onEvolution?.(newStage);
-      
+
       // Trigger evolution particles
       const newParticles = Array.from({ length: 50 }, (_, i) => ({
         id: Date.now() + i,
@@ -137,7 +137,7 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
         angle: Math.random() * 360,
       }));
       setParticles(newParticles);
-      
+
       setTimeout(() => setShowEvolutionEffect(false), 3000);
     }
   }, [xp, currentStage.level, onEvolution]);
@@ -154,7 +154,7 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
   useEffect(() => {
     if (particles.length > 0) {
       const interval = setInterval(() => {
-        setParticles(prev => 
+        setParticles(prev =>
           prev
             .map(p => ({
               ...p,
@@ -172,8 +172,8 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
 
   const progressToNext = EVOLUTION_STAGES[
     EVOLUTION_STAGES.findIndex(s => s.level === currentStage.level) + 1
-  ] 
-    ? ((xp - currentStage.xpRequired) / 
+  ]
+    ? ((xp - currentStage.xpRequired) /
        (EVOLUTION_STAGES[EVOLUTION_STAGES.findIndex(s => s.level === currentStage.level) + 1].xpRequired - currentStage.xpRequired)) * 100
     : 100;
 
@@ -191,15 +191,15 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
           <motion.div
             key={p.id}
             initial={{ x: 50, y: 50, opacity: 1, scale: 0 }}
-            animate={{ 
-              x: p.x, 
-              y: p.y, 
-              opacity: p.life, 
-              scale: (1 - p.life) * 3 
+            animate={{
+              x: p.x,
+              y: p.y,
+              opacity: p.life,
+              scale: (1 - p.life) * 3
             }}
             exit={{ opacity: 0, scale: 0 }}
             className="absolute w-2 h-2 rounded-full pointer-events-none"
-            style={{ 
+            style={{
               backgroundColor: currentStage.color,
               boxShadow: `0 0 20px ${currentStage.color}, 0 0 40px ${currentStage.color}50`,
             }}
@@ -220,7 +220,7 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
         {/* Outer Glow */}
         <motion.div
           className="absolute inset-0 rounded-full blur-3xl"
-          style={{ 
+          style={{
             backgroundColor: currentStage.color,
             opacity: 0.3 + Math.sin(pulsePhase) * 0.2,
           }}
@@ -236,11 +236,11 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
             width: currentStage.size,
             height: currentStage.size,
             background: `radial-gradient(circle at 30% 30%, ${currentStage.color}40%, ${currentStage.color}80%, ${currentStage.color})`,
-            boxShadow: `0 0 60px ${current.color}50, 0 0 120px ${current.color}30, inset 0 0 30px ${current.color}80`,
+            boxShadow: `0 0 60px ${currentStage.color}50, 0 0 120px ${currentStage.color}30, inset 0 0 30px ${currentStage.color}80`,
           }}
         >
           {/* Inner Pattern */}
-          <div 
+          <div
             className="absolute inset-0 rounded-full opacity-30"
             style={{
               background: `conic-gradient(from 0deg, transparent, ${currentStage.color}40%, transparent, ${currentStage.color}40%, transparent)`,
@@ -250,9 +250,9 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
 
           {/* Icon */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <StageIcon 
-              className="w-1/2 h-1/2 text-white/80" 
-              style={{ 
+            <StageIcon
+              className="w-1/2 h-1/2 text-white/80"
+              style={{
                 animation: cognitiveState === 'learning' ? 'pulse 1s ease-in-out infinite' : 'none'
               }}
             />
@@ -381,7 +381,7 @@ export function OrbAvatar({ xp, cognitiveState, messageCount, onEvolution }: Orb
       <div className="absolute top-4 left-4">
         <motion.div
           className="px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border"
-          style={{ 
+          style={{
             backgroundColor: `${currentStage.color}30`,
             color: currentStage.color,
             borderColor: `${currentStage.color}50`,

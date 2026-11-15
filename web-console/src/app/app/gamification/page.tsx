@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Trophy, Star, Flame, Target, Award, TrendingUp, Medal, Zap, Crown, Gem } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function GamificationPage() {
   const router = useRouter()

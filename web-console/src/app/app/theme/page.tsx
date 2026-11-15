@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Palette, Sun, Moon, Save, RotateCcw, Check, Loader2, Sparkles, Droplet, Zap } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function ThemeEnginePage() {
   const router = useRouter()

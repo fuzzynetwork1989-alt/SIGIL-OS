@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createProvider } from '../../../lib/llm-provider'
-import { getModelfileConfig } from '../../../lib/modelfile'
+import { createProvider } from '@/lib/llm-provider'
+import { getModelfileConfig } from '@/lib/modelfile'
 
 // Chat completion API endpoint
 // This handles real LLM chat requests with streaming support

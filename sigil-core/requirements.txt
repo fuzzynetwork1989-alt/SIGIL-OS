@@ -20,3 +20,4 @@ openai
 
 # Utilities
 python-dotenv
+stripe>=8.0.0

@@ -219,12 +219,12 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Temperature"
             value={settings.temperature}
-            onChange={(v) => setSettings({ ...settings, temperature: v })}
+            onChange={(v: any) => setSettings({ ...settings, temperature: v })}
           />
           <SliderSetting
             label="Max Tokens"
             value={settings.maxTokens}
-            onChange={(v) => setSettings({ ...settings, maxTokens: v })}
+            onChange={(v: any) => setSettings({ ...settings, maxTokens: v })}
             min={256}
             max={4096}
             step={256}
@@ -232,17 +232,17 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Top P"
             value={settings.topP}
-            onChange={(v) => setSettings({ ...settings, topP: v })}
+            onChange={(v: any) => setSettings({ ...settings, topP: v })}
           />
           <SliderSetting
             label="Frequency Penalty"
             value={settings.frequencyPenalty}
-            onChange={(v) => setSettings({ ...settings, frequencyPenalty: v })}
+            onChange={(v: any) => setSettings({ ...settings, frequencyPenalty: v })}
           />
           <SliderSetting
             label="Presence Penalty"
             value={settings.presencePenalty}
-            onChange={(v) => setSettings({ ...settings, presencePenalty: v })}
+            onChange={(v: any) => setSettings({ ...settings, presencePenalty: v })}
           />
         </div>
       </SettingSection>
@@ -253,7 +253,7 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Max Concurrency"
             value={settings.maxConcurrency}
-            onChange={(v) => setSettings({ ...settings, maxConcurrency: v })}
+            onChange={(v: any) => setSettings({ ...settings, maxConcurrency: v })}
             min={1}
             max={10}
             step={1}
@@ -261,7 +261,7 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Batch Size"
             value={settings.batchSize}
-            onChange={(v) => setSettings({ ...settings, batchSize: v })}
+            onChange={(v: any) => setSettings({ ...settings, batchSize: v })}
             min={1}
             max={128}
             step={1}
@@ -269,12 +269,12 @@ export const AdvancedSettings: React.FC = () => {
           <ToggleSetting
             label="Enable Caching"
             checked={settings.cacheEnabled}
-            onChange={(v) => setSettings({ ...settings, cacheEnabled: v })}
+            onChange={(v: any) => setSettings({ ...settings, cacheEnabled: v })}
           />
           <ToggleSetting
             label="Enable Streaming"
             checked={settings.streamingEnabled}
-            onChange={(v) => setSettings({ ...settings, streamingEnabled: v })}
+            onChange={(v: any) => setSettings({ ...settings, streamingEnabled: v })}
           />
         </div>
       </SettingSection>
@@ -285,12 +285,12 @@ export const AdvancedSettings: React.FC = () => {
           <ToggleSetting
             label="Enable Voice"
             checked={settings.voiceEnabled}
-            onChange={(v) => setSettings({ ...settings, voiceEnabled: v })}
+            onChange={(v: any) => setSettings({ ...settings, voiceEnabled: v })}
           />
           <SelectSetting
             label="Voice Language"
             value={settings.voiceLanguage}
-            onChange={(v) => setSettings({ ...settings, voiceLanguage: v })}
+            onChange={(v: any) => setSettings({ ...settings, voiceLanguage: v })}
             options={[
               { value: 'en-US', label: 'English (US)' },
               { value: 'en-GB', label: 'English (UK)' },
@@ -304,7 +304,7 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Voice Speed"
             value={settings.voiceSpeed}
-            onChange={(v) => setSettings({ ...settings, voiceSpeed: v })}
+            onChange={(v: any) => setSettings({ ...settings, voiceSpeed: v })}
             min={0.5}
             max={2.0}
             step={0.1}
@@ -312,7 +312,7 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Voice Pitch"
             value={settings.voicePitch}
-            onChange={(v) => setSettings({ ...settings, voicePitch: v })}
+            onChange={(v: any) => setSettings({ ...settings, voicePitch: v })}
             min={0.5}
             max={2.0}
             step={0.1}
@@ -320,12 +320,12 @@ export const AdvancedSettings: React.FC = () => {
           <SliderSetting
             label="Volume"
             value={settings.volume}
-            onChange={(v) => setSettings({ ...settings, volume: v })}
+            onChange={(v: any) => setSettings({ ...settings, volume: v })}
           />
           <SelectSetting
             label="Audio Quality"
             value={settings.audioQuality}
-            onChange={(v) => setSettings({ ...settings, audioQuality: v })}
+            onChange={(v: any) => setSettings({ ...settings, audioQuality: v })}
             options={[
               { value: 'low', label: 'Low (Faster)' },
               { value: 'medium', label: 'Medium' },
@@ -341,7 +341,7 @@ export const AdvancedSettings: React.FC = () => {
           <SelectSetting
             label="Data Retention"
             value={settings.dataRetention}
-            onChange={(v) => setSettings({ ...settings, dataRetention: v })}
+            onChange={(v: any) => setSettings({ ...settings, dataRetention: v })}
             options={[
               { value: '7days', label: '7 Days' },
               { value: '30days', label: '30 Days' },
@@ -352,17 +352,17 @@ export const AdvancedSettings: React.FC = () => {
           <ToggleSetting
             label="Local Processing Only"
             checked={settings.localProcessing}
-            onChange={(v) => setSettings({ ...settings, localProcessing: v })}
+            onChange={(v: any) => setSettings({ ...settings, localProcessing: v })}
           />
           <ToggleSetting
             label="Enable Encryption"
             checked={settings.encryptionEnabled}
-            onChange={(v) => setSettings({ ...settings, encryptionEnabled: v })}
+            onChange={(v: any) => setSettings({ ...settings, encryptionEnabled: v })}
           />
           <ToggleSetting
             label="Anonymous Mode"
             checked={settings.anonymousMode}
-            onChange={(v) => setSettings({ ...settings, anonymousMode: v })}
+            onChange={(v: any) => setSettings({ ...settings, anonymousMode: v })}
           />
         </div>
       </SettingSection>
@@ -373,12 +373,12 @@ export const AdvancedSettings: React.FC = () => {
           <ToggleSetting
             label="Offline Mode"
             checked={settings.offlineMode}
-            onChange={(v) => setSettings({ ...settings, offlineMode: v })}
+            onChange={(v: any) => setSettings({ ...settings, offlineMode: v })}
           />
           <SelectSetting
             label="Sync Frequency"
             value={settings.syncFrequency}
-            onChange={(v) => setSettings({ ...settings, syncFrequency: v })}
+            onChange={(v: any) => setSettings({ ...settings, syncFrequency: v })}
             options={[
               { value: 'realtime', label: 'Real-time' },
               { value: 'hourly', label: 'Hourly' },
@@ -389,7 +389,7 @@ export const AdvancedSettings: React.FC = () => {
           <SelectSetting
             label="Bandwidth Limit"
             value={settings.bandwidthLimit}
-            onChange={(v) => setSettings({ ...settings, bandwidthLimit: v })}
+            onChange={(v: any) => setSettings({ ...settings, bandwidthLimit: v })}
             options={[
               { value: 'unlimited', label: 'Unlimited' },
               { value: '100mb', label: '100 MB/day' },
@@ -406,17 +406,17 @@ export const AdvancedSettings: React.FC = () => {
           <ToggleSetting
             label="Debug Mode"
             checked={settings.debugMode}
-            onChange={(v) => setSettings({ ...settings, debugMode: v })}
+            onChange={(v: any) => setSettings({ ...settings, debugMode: v })}
           />
           <ToggleSetting
             label="Experimental Features"
             checked={settings.experimentalFeatures}
-            onChange={(v) => setSettings({ ...settings, experimentalFeatures: v })}
+            onChange={(v: any) => setSettings({ ...settings, experimentalFeatures: v })}
           />
           <ToggleSetting
             label="Beta Features"
             checked={settings.betaFeatures}
-            onChange={(v) => setSettings({ ...settings, betaFeatures: v })}
+            onChange={(v: any) => setSettings({ ...settings, betaFeatures: v })}
           />
         </div>
       </SettingSection>

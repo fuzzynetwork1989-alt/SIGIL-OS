@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Share2, Copy, Download, Link2, Twitter, Facebook, Linkedin, QrCode, Lock, Globe, Image, FileText, Check, Loader2 } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function SocialSharingPage() {
   const router = useRouter()

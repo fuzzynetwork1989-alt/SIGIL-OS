@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Eye, Palette, Sparkles, Save, RotateCcw, Check, Loader2, Crown, Wand2, Download, Upload } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function AvatarBuilderPage() {
   const router = useRouter()
