@@ -537,6 +537,7 @@ impl ModelfileParser {
         let mut modelfile = Modelfile::default();
         let mut current_section: Option<String> = None;
         let mut sigil_config = SigilConfig::default();
+        let mut found_from = false;
 
         for line in content.lines() {
             let line = line.trim();
@@ -549,6 +550,7 @@ impl ModelfileParser {
             // Handle FROM statement
             if line.starts_with("FROM ") {
                 modelfile.model = line[5..].trim().to_string();
+                found_from = true;
                 continue;
             }
 
@@ -634,6 +636,15 @@ impl ModelfileParser {
             modelfile.sigil = Some(sigil_config);
         }
 
+        // SIGIL format requires a FROM statement. Without one this is not
+        // SIGIL content, so fail and let parse_str fall through to TOML/YAML
+        // instead of silently returning an empty Modelfile.
+        if !found_from {
+            return Err(ModelFabricError::InvalidModelfile(
+                "SIGIL format requires a FROM statement".to_string(),
+            ));
+        }
+
         Ok(modelfile)
     }
 
@@ -646,7 +657,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "sources" => {
@@ -681,7 +692,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "memory_types" => {
@@ -713,7 +724,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "entity_tracking" => section.entity_tracking = value == "true",
@@ -739,7 +750,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "mission_awareness" => section.mission_awareness = value == "true",
@@ -764,7 +775,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "avatar_awareness" => section.avatar_awareness = value == "true",
@@ -791,7 +802,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "verification_required" => section.verification_required = value == "true",
@@ -815,10 +826,17 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "routing_strategy" => section.routing_strategy = value.to_string(),
+                "available_models" => {
+                    section.available_models = value
+                        .trim_matches(&['[', ']'] as &[_])
+                        .split(',')
+                        .map(|s| s.trim().trim_matches('"').to_string())
+                        .collect();
+                }
                 "default_model" => section.default_model = value.to_string(),
                 "fallback_model" => section.fallback_model = value.to_string(),
                 "complexity_threshold" => section.complexity_threshold = value.parse().unwrap_or(0.7),
@@ -839,7 +857,7 @@ impl ModelfileParser {
         
         if let Some((key, value)) = line.split_once('=') {
             let key = key.trim();
-            let value = value.trim();
+            let value = value.trim().trim_matches('"');
             match key {
                 "enable" => section.enable = value == "true",
                 "learning_enabled" => section.learning_enabled = value == "true",
