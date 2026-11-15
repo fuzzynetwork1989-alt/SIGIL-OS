@@ -24,9 +24,9 @@ export class SigilAPI {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> | undefined),
     }
 
     if (this.token) {
@@ -86,13 +86,13 @@ export class SigilAPI {
     const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
     const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
     const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
-    
+
     if (!openaiKey && !anthropicKey && !huggingfaceKey) {
       throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
     }
 
     const url = `${this.baseUrl}/api/chat/completions`
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     }
 
@@ -130,13 +130,13 @@ export class SigilAPI {
     const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
     const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
     const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
-    
+
     if (!openaiKey && !anthropicKey && !huggingfaceKey) {
       throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
     }
 
     const url = `${this.baseUrl}/api/chat/completions`
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     }
 
@@ -189,6 +189,35 @@ export class SigilAPI {
 
   async getModelInfo(modelId: string): Promise<any> {
     return this.request(`/api/models/${modelId}`)
+  }
+
+  // Cognitive Processes
+  async getCognitiveProcesses(): Promise<any> {
+    return this.request('/api/cognitive-processes')
+  }
+
+  async pauseCognitiveProcess(processId: string): Promise<any> {
+    return this.request(`/api/cognitive-processes/${processId}/pause`, { method: 'POST' })
+  }
+
+  async resumeCognitiveProcess(processId: string): Promise<any> {
+    return this.request(`/api/cognitive-processes/${processId}/resume`, { method: 'POST' })
+  }
+
+  async cancelCognitiveProcess(processId: string): Promise<any> {
+    return this.request(`/api/cognitive-processes/${processId}/cancel`, { method: 'POST' })
+  }
+
+  // Workspaces
+  async getWorkspaces(): Promise<any> {
+    return this.request('/api/workspaces')
+  }
+
+  async createWorkspace(data: { name: string }): Promise<any> {
+    return this.request('/api/workspaces', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   }
 }
 

@@ -1,8 +1,14 @@
 # Cargo configuration to prevent lock issues
 
+[target.x86_64-pc-windows-gnu]
+# MinGW-w64 GCC from MSYS2 (ucrt64). Required because MSVC build tools are
+# not installed and Git's link.exe shadows the MSVC linker.
+linker = "C:/msys64/ucrt64/bin/gcc.exe"
+
 [build]
-# Use single job to prevent lock contention
-jobs = 1
+# Parallel jobs; cargo handles its own locking. Raised from 1 to speed up
+# cold-cache rebuilds after the target/ directory was cleaned.
+jobs = 4
 
 [net]
 # Retry on network failures

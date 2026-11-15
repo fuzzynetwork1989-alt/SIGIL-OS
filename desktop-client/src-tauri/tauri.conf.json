@@ -28,7 +28,9 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/icon.svg"
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/icon.icns"
     ]
   },
   "plugins": {}

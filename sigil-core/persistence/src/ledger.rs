@@ -230,4 +230,46 @@ mod tests {
         assert!(retrieved.is_some());
         assert_eq!(retrieved.unwrap().id, id);
     }
+
+    #[test]
+    fn test_verify_integrity_detects_tampering() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_str().unwrap().to_string();
+        let ledger = Ledger::open(&path).unwrap();
+
+        // Append a properly signed sigil
+        let manager = sigil::SigilManager::new(Uuid::new_v4(), Uuid::new_v4());
+        let sigil = manager
+            .create_belief_sigil(
+                "original proposition".to_string(),
+                0.9,
+                3600,
+                vec![],
+                vec![],
+                vec![],
+            )
+            .unwrap();
+        ledger.append(&sigil).unwrap();
+        assert!(ledger.verify_integrity().unwrap());
+
+        // Tamper with the stored payload: change the proposition without
+        // re-signing. A second connection simulates an attacker with DB
+        // write access bypassing the Ledger API.
+        let mut tampered = sigil.clone();
+        if let sigil::SigilKind::Belief { proposition, .. } = &mut tampered.kind {
+            *proposition = "tampered proposition".to_string();
+        }
+        let tampered_json = serde_json::to_string(&tampered).unwrap();
+
+        {
+            let conn = Connection::open(&path).unwrap();
+            conn.execute(
+                "UPDATE sigils SET data = ?1 WHERE id = ?2",
+                params![tampered_json, sigil.id.to_string()],
+            )
+            .unwrap();
+        }
+
+        assert!(!ledger.verify_integrity().unwrap());
+    }
 }

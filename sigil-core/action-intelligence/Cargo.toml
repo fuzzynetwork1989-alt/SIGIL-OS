@@ -7,7 +7,7 @@ description = "Action Intelligence - Pillar 10 of SCA-1R Cognitive Architecture"
 
 [dependencies]
 sigil = { path = "../sigil" }
-memory = { path = "../memory" }
+# memory = { path = "../memory" }  # Temporarily excluded
 mission-intelligence = { path = "../mission-intelligence" }
 errors = { path = "../errors" }
 serde = { version = "1.0", features = ["derive"] }

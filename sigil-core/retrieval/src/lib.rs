@@ -14,7 +14,7 @@ use ranking::Ranker;
 use compression::ContextCompressor;
 
 /// Retrieval source types
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum RetrievalSource {
     Memory,
     KnowledgeGraph,

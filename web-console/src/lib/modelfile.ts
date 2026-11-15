@@ -200,6 +200,24 @@ system: |
   You are SIGIL Music, a music generation module designed to create music from text descriptions.`,
 }
 
+export async function loadModelfile(modelName: string) {
+  let config: ModelfileConfig
+  try {
+    config = getModelfileConfig(modelName)
+  } catch {
+    config = getModelfileConfig('sigil-companion')
+  }
+  return {
+    model: config.model,
+    system: config.systemPrompt,
+    temperature: config.temperature,
+    max_tokens: config.maxTokens,
+    top_p: config.topP,
+    frequency_penalty: config.frequencyPenalty,
+    presence_penalty: config.presencePenalty,
+  }
+}
+
 export function getModelfileConfig(modelName: string): ModelfileConfig {
   const modelfile = DEFAULT_MODEFILES[modelName]
   if (!modelfile) {

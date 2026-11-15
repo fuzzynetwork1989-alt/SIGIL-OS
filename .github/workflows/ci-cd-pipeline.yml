@@ -1,0 +1,333 @@
+name: SIGIL OS CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: sigil-os
+
+jobs:
+  # Phase 1: Build and Test
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [web-console, mobile, desktop, cognitive-kernel]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        if: matrix.component == 'web-console'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web-console/package-lock.json
+
+      - name: Install web dependencies
+        if: matrix.component == 'web-console'
+        run: |
+          cd web-console
+          npm ci
+          npm run lint
+
+      - name: Build web console
+        if: matrix.component == 'web-console'
+        run: |
+          cd web-console
+          npm run build
+
+      - name: Test web console
+        if: matrix.component == 'web-console'
+        run: |
+          cd web-console
+          npm test -- --coverage
+
+      - name: Setup Python
+        if: matrix.component == 'cognitive-kernel'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        if: matrix.component == 'cognitive-kernel'
+        run: |
+          cd sigil-core
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run Python tests
+        if: matrix.component == 'cognitive-kernel'
+        run: |
+          cd sigil-core
+          pytest --cov=sigil --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          flags: ${{ matrix.component }}
+
+  # Phase 2: Security Scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run dependency audit
+        run: |
+          cd web-console
+          npm audit --audit-level=moderate
+          cd ../sigil-core
+          pip-audit
+
+  # Phase 3: Build Docker Images
+  build-docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan]
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+
+  # Phase 4: Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.sigil-os.io
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.STAGING_KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/sigil-os \
+            sigil-os=${{ needs.build-docker.outputs.image-tag }} \
+            -n sigil-staging
+          kubectl rollout status deployment/sigil-os -n sigil-staging
+
+      - name: Run smoke tests
+        run: |
+          curl -f https://staging.sigil-os.io/health || exit 1
+          curl -f https://staging.sigil-os.io/api/v1/status || exit 1
+
+      - name: Verify verification mesh
+        run: |
+          kubectl exec -n sigil-staging deployment/sigil-os -- \
+            python -c "from sigil.verification import VerificationMesh; vm = VerificationMesh(); assert vm.check_health()"
+
+  # Phase 5: Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-docker, deploy-staging]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://sigil-os.io
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure kubectl for production
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.PRODUCTION_KUBECONFIG }}
+
+      - name: Pre-deployment checks
+        run: |
+          echo "Running pre-deployment validation..."
+          kubectl get nodes
+          kubectl top nodes
+          kubectl get pods -n sigil-production
+
+      - name: Create backup
+        run: |
+          kubectl exec -n sigil-production deployment/postgres -- \
+            pg_dump sigil_db > backup_$(date +%Y%m%d_%H%M%S).sql
+          kubectl exec -n sigil-primary deployment/neo4j -- \
+            neo4j-admin dump --to=/backup/neo4j_$(date +%Y%m%d_%H%M%S)
+
+      - name: Deploy with canary
+        run: |
+          # Update canary deployment first
+          kubectl set image deployment/sigil-os-canary \
+            sigil-os=${{ needs.build-docker.outputs.image-tag }} \
+            -n sigil-production
+          
+          # Wait for canary to be ready
+          kubectl rollout status deployment/sigil-os-canary -n sigil-production
+
+      - name: Run canary validation
+        run: |
+          # Run verification mesh tests on canary
+          kubectl exec -n sigil-production deployment/sigil-os-canary -- \
+            python -m pytest tests/verification_mesh/ -v
+
+      - name: Full rollout
+        run: |
+          # If canary passes, rollout to main deployment
+          kubectl set image deployment/sigil-os \
+            sigil-os=${{ needs.build-docker.outputs.image-tag }} \
+            -n sigil-production
+          kubectl rollout status deployment/sigil-os -n sigil-production
+
+      - name: Post-deployment verification
+        run: |
+          # Run full verification suite
+          kubectl exec -n sigil-production deployment/sigil-os -- \
+            python -m pytest tests/production/ -v
+          
+          # Check metrics
+          kubectl exec -n sigil-production deployment/sigil-os -- \
+            curl -s http://localhost:9090/metrics | grep verification_pass_rate
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          kubectl rollout undo deployment/sigil-os -n sigil-production
+          kubectl rollout status deployment/sigil-os -n sigil-production
+
+  # Phase 6: Planetary Federation Deployment
+  deploy-planetary:
+    name: Deploy to Planetary Tier
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[planetary]')
+    environment:
+      name: planetary
+      url: https://planetary.sigil-os.io
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to multiple regions
+        run: |
+          for region in us-east-1 us-west-2 eu-west-1; do
+            kubectl set image deployment/sigil-os \
+              sigil-os=${{ needs.build-docker.outputs.image-tag }} \
+              -n sigil-planetary-${region}
+            kubectl rollout status deployment/sigil-os -n sigil-planetary-${region}
+          done
+
+      - name: Verify federation consistency
+        run: |
+          python scripts/verify_federation.py \
+            --regions us-east-1,us-west-2,eu-west-1 \
+            --consistency-check
+
+      - name: Run planetary verification mesh
+        run: |
+          kubectl exec -n sigil-planetary-us-east-1 deployment/sigil-os -- \
+            python -m pytest tests/planetary/ -v
+
+  # Phase 7: Monitoring and Alerting Setup
+  setup-monitoring:
+    name: Setup Monitoring
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Prometheus and Grafana
+        run: |
+          kubectl apply -f infra/monitoring/prometheus.yml
+          kubectl apply -f infra/monitoring/grafana.yml
+          kubectl apply -f infra/monitoring/dashboards/
+
+      - name: Configure alerts
+        run: |
+          kubectl apply -f infra/monitoring/alerts/
+          kubectl apply -f infra/monitoring/alertmanager/
+
+      - name: Verify monitoring stack
+        run: |
+          kubectl wait --for=condition=available --timeout=300s \
+            deployment/prometheus -n monitoring
+          kubectl wait --for=condition=available --timeout=300s \
+            deployment/grafana -n monitoring

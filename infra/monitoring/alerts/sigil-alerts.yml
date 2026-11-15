@@ -1,0 +1,224 @@
+groups:
+  - name: sigil_cognitive_kernel
+    interval: 30s
+    rules:
+      # Verification Mesh Alert
+      - alert: VerificationMeshHighFailureRate
+        expr: |
+          rate(sigil_verification_mesh_failures_total[5m]) / 
+          rate(sigil_verification_mesh_attempts_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: cognitive-kernel
+        annotations:
+          summary: "Verification mesh failure rate above 5%"
+          description: "Verification mesh failure rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+      # Dream Learning Alert
+      - alert: DreamLearningBiasDetected
+        expr: sigil_dream_learning_bias_score < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          component: cognitive-kernel
+        annotations:
+          summary: "Dream learning bias detected"
+          description: "Dream learning bias score is {{ $value }}, which is below the 0.7 threshold"
+
+      # Cognitive Cycle Latency
+      - alert: CognitiveCycleHighLatency
+        expr: histogram_quantile(0.95, sigil_cognitive_cycle_duration_seconds) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: cognitive-kernel
+        annotations:
+          summary: "Cognitive cycle P95 latency above 5 seconds"
+          description: "Cognitive cycle P95 latency is {{ $value }}s"
+
+      # Memory Retrieval Failures
+      - alert: MemoryRetrievalHighFailureRate
+        expr: |
+          rate(sigil_memory_retrieval_failures_total[5m]) / 
+          rate(sigil_memory_retrieval_attempts_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: cognitive-kernel
+        annotations:
+          summary: "Memory retrieval failure rate above 10%"
+          description: "Memory retrieval failure rate is {{ $value | humanizePercentage }}"
+
+      # Constitution Violations
+      - alert: ConstitutionViolationDetected
+        expr: rate(sigil_constitution_violations_total[1m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: cognitive-kernel
+        annotations:
+          summary: "Constitution violation detected"
+          description: "Constitution violations are occurring at {{ $value }} violations/minute"
+
+  - name: sigil_infrastructure
+    interval: 30s
+    rules:
+      # PostgreSQL High CPU
+      - alert: PostgreSQLHighCPU
+        expr: rate(postgresql_cpu_usage_seconds_total[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: postgres
+        annotations:
+          summary: "PostgreSQL CPU usage above 80%"
+          description: "PostgreSQL CPU usage is {{ $value | humanizePercentage }}"
+
+      # Redis High Memory
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis memory usage above 90%"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}"
+
+      # Neo4j High Query Latency
+      - alert: Neo4jHighQueryLatency
+        expr: histogram_quantile(0.95, neo4j_query_duration_seconds) > 2
+        for: 10m
+        labels:
+          severity: warning
+          component: neo4j
+        annotations:
+          summary: "Neo4j query P95 latency above 2 seconds"
+          description: "Neo4j query P95 latency is {{ $value }}s"
+
+      # Qdrant Storage High
+      - alert: QdrantStorageHighUsage
+        expr: qdrant_storage_used_bytes / qdrant_storage_capacity_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: qdrant
+        annotations:
+          summary: "Qdrant storage usage above 85%"
+          description: "Qdrant storage usage is {{ $value | humanizePercentage }}"
+
+  - name: sigil_kubernetes
+    interval: 30s
+    rules:
+      # Pod Not Ready
+      - alert: PodNotReady
+        expr: |
+          sum by (namespace, pod) (kube_pod_status_ready{condition="true"} == 0)
+          unless on (namespace, pod) (kube_pod_status_phase{phase="Succeeded"})
+        for: 10m
+        labels:
+          severity: warning
+          component: kubernetes
+        annotations:
+          summary: "Pod not ready for 10 minutes"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been not ready for more than 10 minutes"
+
+      # Pod Crash Looping
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: kubernetes
+        annotations:
+          summary: "Pod is crash looping"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting frequently"
+
+      # Node High CPU
+      - alert: NodeHighCPU
+        expr: |
+          100 - (avg by (instance) (rate(node_cpu_seconds_total{mode!="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: kubernetes
+        annotations:
+          summary: "Node CPU usage above 80%"
+          description: "Node {{ $labels.instance }} CPU usage is {{ $value | humanizePercentage }}"
+
+      # Node High Memory
+      - alert: NodeHighMemory
+        expr: |
+          (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: kubernetes
+        annotations:
+          summary: "Node memory usage above 85%"
+          description: "Node {{ $labels.instance }} memory usage is {{ $value | humanizePercentage }}"
+
+  - name: sigil_federation
+    interval: 60s
+    rules:
+      # Federation Sync Lag
+      - alert: FederationSyncLag
+        expr: sigil_federation_sync_lag_seconds > 300
+        for: 10m
+        labels:
+          severity: warning
+          component: federation
+        annotations:
+          summary: "Federation sync lag above 5 minutes"
+          description: "Federation sync lag is {{ $value }}s"
+
+      # Federation Data Divergence
+      - alert: FederationDataDivergence
+        expr: sigil_federation_divergence_score > 0.1
+        for: 15m
+        labels:
+          severity: critical
+          component: federation
+        annotations:
+          summary: "Federation data divergence detected"
+          description: "Federation divergence score is {{ $value }}"
+
+      # Regional Service Down
+      - alert: RegionalServiceDown
+        expr: up{job="cognitive-kernel"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: federation
+        annotations:
+          summary: "Regional cognitive kernel service down"
+          description: "Cognitive kernel service in region {{ $labels.region }} is down"
+
+  - name: sigil_web_console
+    interval: 30s
+    rules:
+      # High Error Rate
+      - alert: WebConsoleHighErrorRate
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) / 
+          rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: web-console
+        annotations:
+          summary: "Web console error rate above 5%"
+          description: "Web console error rate is {{ $value | humanizePercentage }}"
+
+      # High Response Time
+      - alert: WebConsoleHighResponseTime
+        expr: histogram_quantile(0.95, http_request_duration_seconds) > 2
+        for: 10m
+        labels:
+          severity: warning
+          component: web-console
+        annotations:
+          summary: "Web console P95 response time above 2 seconds"
+          description: "Web console P95 response time is {{ $value }}s"

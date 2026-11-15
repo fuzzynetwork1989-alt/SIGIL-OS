@@ -1,0 +1,21 @@
+{
+  "name": "nexora-cloud-control-plane",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NEXORA Omega Cloud Control Plane services",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.0"
+  },
+  "workspaces": [
+    "services/*"
+  ]
+}

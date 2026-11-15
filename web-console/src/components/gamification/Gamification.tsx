@@ -19,7 +19,8 @@ import {
   Gift,
   Heart,
   Share2,
-  Download
+  Download,
+  Palette
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -130,7 +131,7 @@ export const Gamification: React.FC = () => {
     { rank: 5, name: 'Emma Wilson', xp: 6200, level: 13, avatar: '🌟' },
   ]);
 
-  const rarityColors = {
+  const rarityColors: Record<string, string> = {
     common: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
     rare: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     epic: 'bg-purple-500/20 text-purple-400 border-purple-500/30',

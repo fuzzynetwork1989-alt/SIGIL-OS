@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, User, Brain, Heart, Target, Save, RotateCcw, Check, Loader2, Upload, Camera, X, Plus, Sparkles } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function ProfileBuilderPage() {
   const router = useRouter()

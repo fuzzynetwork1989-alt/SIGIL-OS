@@ -30,6 +30,9 @@ export default function HomeScreen({ navigation }: any) {
     { icon: '💬', label: 'Start a chat', color: ['#8b5cf6', '#ec4899'] },
     { icon: '❤️', label: 'My memories', color: ['#ec4899', '#f43f5e'] },
     { icon: '✨', label: 'Personalize', color: ['#3b82f6', '#06b6d4'] },
+    { icon: '📋', label: 'Tasks', color: ['#10b981', '#059669'] },
+    { icon: '🧠', label: 'Intelligence', color: ['#f59e0b', '#d97706'] },
+    { icon: '🥽', label: 'Quest 3', color: ['#8b5cf6', '#ec4899'] },
   ];
 
   return (
@@ -83,6 +86,38 @@ export default function HomeScreen({ navigation }: any) {
                 <Text style={styles.quickActionLabel}>{action.label}</Text>
               </TouchableOpacity>
             ))}
+          </View>
+
+          {/* Quest 3 Studio Banner */}
+          <View style={styles.questBanner}>
+            <LinearGradient
+              colors={['#8b5cf6', '#ec4899']}
+              style={styles.questBannerGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.questBannerTitle}>🥽 Quest 3 Studio</Text>
+              <Text style={styles.questBannerSubtitle}>Create immersive VR experiences</Text>
+              <TouchableOpacity style={styles.questBannerButton}>
+                <Text style={styles.questBannerButtonText}>Launch Studio →</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+
+          {/* Intelligence Engine Banner */}
+          <View style={styles.intelligenceBanner}>
+            <LinearGradient
+              colors={['#f59e0b', '#d97706']}
+              style={styles.intelligenceBannerGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.intelligenceBannerTitle}>🧠 SIGIL Intelligence</Text>
+              <Text style={styles.intelligenceBannerSubtitle}>Next-gen AI that surpasses everything</Text>
+              <TouchableOpacity style={styles.intelligenceBannerButton}>
+                <Text style={styles.intelligenceBannerButtonText}>Configure →</Text>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
 
           {/* Recent Conversations */}
@@ -173,16 +208,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 30,
+    flexWrap: 'wrap',
   },
   quickActionButton: {
-    flex: 1,
-    marginHorizontal: 4,
+    width: '31%',
+    marginHorizontal: '1%',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 8,
   },
   quickActionIcon: {
     width: 48,
@@ -197,9 +234,71 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  questBanner: {
+    marginBottom: 20,
+  },
+  questBannerGradient: {
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(236, 72, 153, 0.5)',
+  },
+  questBannerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  questBannerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 16,
+  },
+  questBannerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  questBannerButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  intelligenceBanner: {
+    marginBottom: 30,
+  },
+  intelligenceBannerGradient: {
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(245, 158, 11, 0.5)',
+  },
+  intelligenceBannerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  intelligenceBannerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 16,
+  },
+  intelligenceBannerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  intelligenceBannerButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   recentSection: {
     marginBottom: 30,

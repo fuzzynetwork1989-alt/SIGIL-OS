@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       const job = musicJobs.get(jobId)
       if (job) {
         job.status = 'failed'
-        job.error = error.message
+        job.error = error instanceof Error ? error.message : String(error)
         job.completedAt = new Date()
       }
     })
@@ -119,7 +119,7 @@ async function generateMusic(
     job.completedAt = new Date()
   } catch (error) {
     job.status = 'failed'
-    job.error = error.message
+    job.error = error instanceof Error ? error.message : String(error)
     job.completedAt = new Date()
   }
 }

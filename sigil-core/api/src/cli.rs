@@ -4,7 +4,6 @@
 
 use clap::{Parser, Subcommand};
 use std::net::SocketAddr;
-use std::sync::Arc;
 use hex;
 
 /// SIGIL OS - The Post-AI Operating System with Cryptographic Warrant
@@ -110,11 +109,15 @@ pub async fn run() -> anyhow::Result<()> {
         }
         Commands::Serve { addr } => {
             let addr: SocketAddr = addr.parse()?;
-            let state = super::http::ApiState {
-                version: env!("CARGO_PKG_VERSION").to_string(),
-                superbrain_enabled: true,
-                conversation_store: Arc::new(super::conversation::ConversationStore::new()),
-            };
+            let config = config::Config::load();
+            let state = super::http::ApiState::new(
+                env!("CARGO_PKG_VERSION").to_string(),
+                true,
+                config.sigil.warrants_enabled,
+                config.sigil.ledger_enabled,
+                &super::http::ApiState::default_ledger_path(),
+                config.sigil.key_pair_path.as_deref(),
+            )?;
             super::http::serve(addr, state).await?;
             Ok(())
         }

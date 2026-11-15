@@ -1,0 +1,27 @@
+# Code Owners for NEXORA Omega
+
+# Core platform
+platform-core/ @fuzzynetwork1989-alt
+
+# Cloud services
+cloud-control-plane/ @fuzzynetwork1989-alt
+
+# Model family
+model-family/ @fuzzynetwork1989-alt
+
+# Infrastructure
+infra-platform/ @fuzzynetwork1989-alt
+
+# Security and compliance
+docs-governance/security/ @fuzzynetwork1989-alt
+docs-governance/compliance/ @fuzzynetwork1989-alt
+
+# Architecture
+docs-governance/adr/ @fuzzynetwork1989-alt
+docs-governance/architecture/ @fuzzynetwork1989-alt
+
+# Contracts (require review)
+contracts/ @fuzzynetwork1989-alt
+
+# CI/CD
+.github/ @fuzzynetwork1989-alt

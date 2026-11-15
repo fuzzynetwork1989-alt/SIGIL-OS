@@ -17,7 +17,7 @@ import {
   Eye,
   Contrast,
   Wallpaper,
-  MagicWand
+  Wand2
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -257,7 +257,7 @@ export const ThemeEngine: React.FC = () => {
           {[
             { key: 'glassmorphism', label: 'Glassmorphism', icon: Layers },
             { key: 'neonGlow', label: 'Neon Glow', icon: Zap },
-            { key: 'particleEffects', label: 'Particle Effects', icon: MagicWand },
+            { key: 'particleEffects', label: 'Particle Effects', icon: Wand2 },
             { key: 'gradients', label: 'Gradients', icon: Globe },
             { key: 'animations', label: 'Animations', icon: Sliders },
           ].map((effect) => {
@@ -375,7 +375,7 @@ export const ThemeEngine: React.FC = () => {
               onClick={() => setTheme({ ...theme, text: '#FFFFFF', textSecondary: '#E2E8F0' })}
               className="p-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 transition-all"
             >
-              <MagicWand className="w-4 h-4" />
+              <Wand2 className="w-4 h-4" />
             </button>
           </div>
 
@@ -388,7 +388,7 @@ export const ThemeEngine: React.FC = () => {
               onClick={() => setTheme({ ...theme, animations: false })}
               className="p-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 transition-all"
             >
-              <MagicWand className="w-4 h-4" />
+              <Wand2 className="w-4 h-4" />
             </button>
           </div>
         </div>

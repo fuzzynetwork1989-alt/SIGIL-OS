@@ -69,3 +69,17 @@ sigil-mobile/*.ipa
 # Quest 3
 *.apk
 *.aab
+
+# Local model weights (multi-GB, not for VCS)
+/models/
+
+# OS junk
+nul
+~$*
+
+# Android/Gradle build dirs
+**/.gradle/
+**/.cxx/
+local.properties
+*.tsbuildinfo
+.next/

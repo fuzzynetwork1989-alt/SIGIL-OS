@@ -7,7 +7,6 @@ This guide explains how to deploy SIGIL OS to various free hosting platforms.
 - [Prerequisites](#prerequisites)
 - [Platform Comparison](#platform-comparison)
 - [Render Deployment](#render-deployment)
-- [Belmo Deployment](#belmo-deployment)
 - [RustAPI Cloud Deployment](#rustapi-cloud-deployment)
 - [Docker Deployment](#docker-deployment)
 - [Local Testing](#local-testing)
@@ -27,7 +26,6 @@ Before deploying, ensure you have:
 | Platform | Free Tier | Sleep/Idle | Rust Support | Best For |
 |----------|-----------|------------|--------------|----------|
 | **Render** | 750 hours/month | Yes (15 min) | Native | Production-ready, reliable |
-| **Belmo** | 1 service 24/7 | No (always-on) | Specialized | Always-on Rust apps |
 | **RustAPI Cloud** | 3 deploys | Yes (scale-to-zero) | Rust-only | API-focused deployments |
 | **Oracle Cloud** | 2 OCPUs + 12GB RAM | No | Full VPS | Complete control |
 
@@ -98,49 +96,6 @@ render-blueprint apply
 - **Cold start time**: ~5-10 seconds
 - **Database**: Free Postgres expires after 30 days
 - **Custom domains**: Supported on free tier
-
-## Belmo Deployment
-
-Belmo is specialized for Rust and offers always-on free hosting.
-
-### Quick Start
-
-1. **Create a Belmo account**
-   - Visit [belmo.io](https://belmo.io)
-   - Sign up with GitHub
-
-2. **Install Belmo GitHub App**
-   - Go to Belmo Dashboard
-   - Install the GitHub App on your repository
-
-3. **Configure deployment**
-   - Belmo auto-detects your `Cargo.toml`
-   - It uses the `belmo.toml` configuration file
-   - Select the branch and click "Deploy"
-
-4. **Access your app**
-   - Belmo provides a URL like `https://your-app.belmo.io`
-   - Test the health endpoint: `https://your-app.belmo.io/health`
-
-### Using Belmo CLI
-
-```bash
-# Install Belmo CLI
-curl -fsSL https://cli.belmo.io/install.sh | sh
-
-# Login
-belmo login
-
-# Deploy
-belmo deploy
-```
-
-### Important Notes
-
-- **Always-on**: No sleep on free tier
-- **Specialized for Rust**: Optimized builds
-- **Auto-detection**: No Dockerfile needed
-- **Limited features**: Newer platform, fewer integrations
 
 ## RustAPI Cloud Deployment
 
@@ -326,10 +281,6 @@ Common environment variables for SIGIL OS:
 - Log retention: 7 days on free tier
 - Metrics available in dashboard
 
-### Belmo
-- View logs in Belmo Dashboard
-- Real-time log streaming
-
 ### RustAPI Cloud
 - Built-in metrics (traffic, latency, CPU, memory)
 - Health probes tracked automatically
@@ -347,7 +298,6 @@ Common environment variables for SIGIL OS:
 | Platform | Free Tier | Paid Starting | When to Upgrade |
 |----------|-----------|---------------|-----------------|
 | Render | 750 hours/month | $7/month | Production, always-on |
-| Belmo | 1 service 24/7 | Contact sales | Multiple services |
 | RustAPI Cloud | 3 deploys | $5/month | More deploys, larger binaries |
 | Oracle Cloud | 2 OCPUs + 12GB RAM | Pay-as-you-go | More resources |
 
@@ -363,6 +313,5 @@ Common environment variables for SIGIL OS:
 ## Support
 
 - **Render Docs**: [render.com/docs](https://render.com/docs)
-- **Belmo Docs**: [belmo.io/docs](https://belmo.io/docs)
 - **RustAPI Cloud**: [rustapi.cloud/docs](https://rustapi.cloud/docs)
 - **GitHub Issues**: [SIGIL OS Issues](https://github.com/fuzzynetwork1989-alt/SIGIL-OS/issues)

@@ -1,0 +1,30 @@
+# NEXORA Omega GPU Inference Configuration
+# vLLM configuration for model serving
+
+model: "Qwen/Qwen3-30B-A3B-Instruct-2507"
+tensor-parallel-size: 4
+gpu-memory-utilization: 0.9
+max-model-len: 262144
+dtype: float16
+
+# Serving configuration
+host: "0.0.0.0"
+port: 8000
+allowed-origins: ["*"]
+
+# API configuration
+api-key: ${VLLM_API_KEY}
+max-log-len: 100
+
+# Performance tuning
+block-size: 16
+max-num-seqs: 256
+max-num-batched-tokens: 8192
+
+# Monitoring
+enable-metrics: true
+metrics-port: 8001
+
+# Security
+disable-log-requests: false
+disable-log-stats: false

@@ -26,7 +26,7 @@ import {
   ArrowRight,
   LogOut,
 } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -246,12 +246,12 @@ export default function SettingsPage() {
             <SliderSetting
               label="Temperature"
               value={settings.temperature}
-              onChange={(v) => setSettings({ ...settings, temperature: v })}
+              onChange={(v: any) => setSettings({ ...settings, temperature: v })}
             />
             <SliderSetting
               label="Max Tokens"
               value={settings.maxTokens}
-              onChange={(v) => setSettings({ ...settings, maxTokens: v })}
+              onChange={(v: any) => setSettings({ ...settings, maxTokens: v })}
               min={256}
               max={4096}
               step={256}
@@ -259,17 +259,17 @@ export default function SettingsPage() {
             <SliderSetting
               label="Top P"
               value={settings.topP}
-              onChange={(v) => setSettings({ ...settings, topP: v })}
+              onChange={(v: any) => setSettings({ ...settings, topP: v })}
             />
             <SliderSetting
               label="Frequency Penalty"
               value={settings.frequencyPenalty}
-              onChange={(v) => setSettings({ ...settings, frequencyPenalty: v })}
+              onChange={(v: any) => setSettings({ ...settings, frequencyPenalty: v })}
             />
             <SliderSetting
               label="Presence Penalty"
               value={settings.presencePenalty}
-              onChange={(v) => setSettings({ ...settings, presencePenalty: v })}
+              onChange={(v: any) => setSettings({ ...settings, presencePenalty: v })}
             />
           </div>
         </motion.div>
@@ -292,12 +292,12 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Enable Voice"
               checked={settings.voiceEnabled}
-              onChange={(v) => setSettings({ ...settings, voiceEnabled: v })}
+              onChange={(v: any) => setSettings({ ...settings, voiceEnabled: v })}
             />
             <SliderSetting
               label="Voice Speed"
               value={settings.voiceSpeed}
-              onChange={(v) => setSettings({ ...settings, voiceSpeed: v })}
+              onChange={(v: any) => setSettings({ ...settings, voiceSpeed: v })}
               min={0.5}
               max={2.0}
               step={0.1}
@@ -305,7 +305,7 @@ export default function SettingsPage() {
             <SliderSetting
               label="Voice Pitch"
               value={settings.voicePitch}
-              onChange={(v) => setSettings({ ...settings, voicePitch: v })}
+              onChange={(v: any) => setSettings({ ...settings, voicePitch: v })}
               min={0.5}
               max={2.0}
               step={0.1}
@@ -331,12 +331,12 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Enable OWO Vest"
               checked={settings.owoVestEnabled}
-              onChange={(v) => setSettings({ ...settings, owoVestEnabled: v })}
+              onChange={(v: any) => setSettings({ ...settings, owoVestEnabled: v })}
             />
             <SliderSetting
               label="Haptic Intensity"
               value={settings.owoVestIntensity}
-              onChange={(v) => setSettings({ ...settings, owoVestIntensity: v })}
+              onChange={(v: any) => setSettings({ ...settings, owoVestIntensity: v })}
               min={0}
               max={100}
               step={5}
@@ -346,7 +346,7 @@ export default function SettingsPage() {
               <ToggleSetting
                 label="AI Response"
                 checked={settings.owoVestPatterns.aiResponse}
-                onChange={(v) => setSettings({
+                onChange={(v: any) => setSettings({
                   ...settings,
                   owoVestPatterns: { ...settings.owoVestPatterns, aiResponse: v }
                 })}
@@ -354,7 +354,7 @@ export default function SettingsPage() {
               <ToggleSetting
                 label="Heartbeat"
                 checked={settings.owoVestPatterns.heartbeat}
-                onChange={(v) => setSettings({
+                onChange={(v: any) => setSettings({
                   ...settings,
                   owoVestPatterns: { ...settings.owoVestPatterns, heartbeat: v }
                 })}
@@ -362,7 +362,7 @@ export default function SettingsPage() {
               <ToggleSetting
                 label="Achievements"
                 checked={settings.owoVestPatterns.achievement}
-                onChange={(v) => setSettings({
+                onChange={(v: any) => setSettings({
                   ...settings,
                   owoVestPatterns: { ...settings.owoVestPatterns, achievement: v }
                 })}
@@ -389,12 +389,12 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Local Processing Only"
               checked={settings.localProcessing}
-              onChange={(v) => setSettings({ ...settings, localProcessing: v })}
+              onChange={(v: any) => setSettings({ ...settings, localProcessing: v })}
             />
             <ToggleSetting
               label="Enable Encryption"
               checked={settings.encryptionEnabled}
-              onChange={(v) => setSettings({ ...settings, encryptionEnabled: v })}
+              onChange={(v: any) => setSettings({ ...settings, encryptionEnabled: v })}
             />
           </div>
         </motion.div>
@@ -417,17 +417,17 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Streaming Responses"
               checked={settings.streamingEnabled}
-              onChange={(v) => setSettings({ ...settings, streamingEnabled: v })}
+              onChange={(v: any) => setSettings({ ...settings, streamingEnabled: v })}
             />
             <ToggleSetting
               label="Show Timestamps"
               checked={settings.showTimestamps}
-              onChange={(v) => setSettings({ ...settings, showTimestamps: v })}
+              onChange={(v: any) => setSettings({ ...settings, showTimestamps: v })}
             />
             <ToggleSetting
               label="Auto-Save Chats"
               checked={settings.autoSaveChats}
-              onChange={(v) => setSettings({ ...settings, autoSaveChats: v })}
+              onChange={(v: any) => setSettings({ ...settings, autoSaveChats: v })}
             />
           </div>
         </motion.div>
@@ -526,22 +526,22 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Enable Debug Mode"
               checked={false}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Enable Experimental Features"
               checked={false}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Enable Beta Features"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Verbose Logging"
               checked={false}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
           </div>
         </motion.div>
@@ -575,17 +575,17 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Glassmorphism Effects"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Particles Animation"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Smooth Transitions"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
           </div>
         </motion.div>
@@ -608,22 +608,22 @@ export default function SettingsPage() {
             <ToggleSetting
               label="Desktop Notifications"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Sound Effects"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Haptic Feedback"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
             <ToggleSetting
               label="Achievement Alerts"
               checked={true}
-              onChange={(v) => {}}
+              onChange={(v: any) => {}}
             />
           </div>
         </motion.div>

@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contracts.nexora.omega/schemas/event-envelope.json",
+  "title": "EventEnvelope",
+  "description": "Schema for NEXORA Omega Event Envelope - append-only event journal",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "timestamp",
+    "correlation_id",
+    "tenant_id",
+    "data",
+    "metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this event"
+    },
+    "type": {
+      "type": "string",
+      "description": "Event type (e.g., 'cognitive.process.started', 'capability.granted', 'tool.invoked')"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this event occurred"
+    },
+    "causation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the event that caused this event (for causality tracking)"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlation ID for grouping related events"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Tenant/organization this event belongs to"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "User who triggered this event (if applicable)"
+    },
+    "data": {
+      "type": "object",
+      "description": "Event-specific data payload"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["source", "version", "schema_version", "trust_class"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source of this event (e.g., 'cognitive-kernel', 'model-gateway', 'tool-executor')"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the event schema"
+        },
+        "schema_version": {
+          "type": "string",
+          "description": "Schema version for validation"
+        },
+        "trust_class": {
+          "type": "string",
+          "enum": ["trusted", "untrusted", "verified"],
+          "description": "Trust classification of the event source"
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Model version if this event involves model invocation"
+        },
+        "tool_version": {
+          "type": "string",
+          "description": "Tool version if this event involves tool invocation"
+        },
+        "runtime_version": {
+          "type": "string",
+          "description": "Runtime version that generated this event"
+        }
+      }
+    },
+    "budget_consumption": {
+      "type": "object",
+      "description": "Budget consumption tracking for this event",
+      "properties": {
+        "tokens": { "type": "integer" },
+        "cpu_ms": { "type": "integer" },
+        "memory_mb": { "type": "integer" },
+        "cost": { "type": "number" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "description": "Outcome of the operation that generated this event",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "failure", "partial", "timeout"]
+        },
+        "error_code": { "type": "string" },
+        "error_message": { "type": "string" },
+        "retryable": { "type": "boolean" }
+      }
+    }
+  }
+}

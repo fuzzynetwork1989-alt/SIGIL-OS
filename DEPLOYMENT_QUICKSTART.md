@@ -28,22 +28,7 @@ git push origin main
 # 10. Access at: https://sigil-os-api.onrender.com/health
 ```
 
-## Option 2: Belmo (Best for Always-On)
-
-```bash
-# 1. Go to belmo.io and sign up with GitHub
-# 2. Install Belmo GitHub App on your repository
-# 3. In Belmo Dashboard:
-#    - Click "New Deployment"
-#    - Select your repository
-#    - Select branch: main
-#    - Belmo auto-detects Cargo.toml
-# 4. Click "Deploy"
-# 5. Wait 2-4 minutes for first build
-# 6. Access at: https://your-app.belmo.io/health
-```
-
-## Option 3: RustAPI Cloud (Best for APIs)
+## Option 2: RustAPI Cloud (Best for APIs)
 
 ```bash
 # 1. Build release binary
@@ -62,7 +47,7 @@ cargo rustapi deploy cloud
 # 6. Access at: https://your-app.rustapi.cloud/health
 ```
 
-## Option 4: Docker (Most Flexible)
+## Option 3: Docker (Most Flexible)
 
 ```bash
 # 1. Build Docker image
@@ -84,10 +69,8 @@ docker push yourusername/sigil-os:latest
 - ✅ `Dockerfile` - Multi-stage Docker build for small, fast images
 - ✅ `.dockerignore` - Excludes unnecessary files from Docker build
 - ✅ `render.yaml` - Render deployment blueprint
-- ✅ `belmo.toml` - Belmo configuration
 - ✅ `rustapi-config.toml` - RustAPI Cloud configuration
 - ✅ `.github/workflows/deploy-render.yml` - Render CI/CD
-- ✅ `.github/workflows/deploy-belmo.yml` - Belmo CI/CD
 - ✅ `.github/workflows/docker-build.yml` - Docker CI/CD with security scanning
 - ✅ `DEPLOYMENT.md` - Comprehensive deployment guide
 - ✅ `.env.example` - Environment variable template
@@ -118,7 +101,6 @@ curl -X POST https://your-app-url.com/api/v1/superbrain/chat \
 | Use Case | Recommended Platform |
 |----------|---------------------|
 | **Easiest setup** | Render |
-| **Always-on (no sleep)** | Belmo |
 | **API-focused** | RustAPI Cloud |
 | **Full control** | Docker + any platform |
 | **Free database** | Render (30 days) |

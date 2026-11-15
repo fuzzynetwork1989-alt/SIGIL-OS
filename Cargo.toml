@@ -19,6 +19,7 @@ members = [
     "sigil-core/action-intelligence",
     "sigil-core/presence-intelligence",
     "sigil-core/world-model",
+    "sigil-core/context-router",
     "model-fabric",
     "ui-ux",
     "dream-weaving",
@@ -33,6 +34,7 @@ exclude = [
     "sigil-core/economic-engine",
     "sigil-core/agent-ecosystem",
     "sigil-core/testing-framework",
+    "sigil-core/identity-vault",
 ]
 
 [workspace.package]
