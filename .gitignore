@@ -78,6 +78,7 @@ nul
 ~$*
 
 # Android/Gradle build dirs
+**/.gradle/
 **/.cxx/
 local.properties
 *.tsbuildinfo
