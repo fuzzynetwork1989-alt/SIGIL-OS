@@ -1398,6 +1398,8 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
+ "memory",
+ "retrieval",
  "serde",
  "serde_json",
  "sigil",

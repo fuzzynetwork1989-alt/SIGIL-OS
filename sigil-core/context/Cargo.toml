@@ -7,8 +7,8 @@ license.workspace = true
 
 [dependencies]
 sigil = { path = "../sigil" }
-# memory = { path = "../memory" }  # Temporarily excluded
-# retrieval = { path = "../retrieval" }  # Temporarily excluded
+memory = { path = "../memory" }
+retrieval = { path = "../retrieval" }
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
