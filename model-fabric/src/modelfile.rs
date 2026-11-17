@@ -835,6 +835,7 @@ impl ModelfileParser {
                         .trim_matches(&['[', ']'] as &[_])
                         .split(',')
                         .map(|s| s.trim().trim_matches('"').to_string())
+                        .filter(|s| !s.is_empty())
                         .collect();
                 }
                 "default_model" => section.default_model = value.to_string(),
@@ -1244,5 +1245,33 @@ latency_budget_ms = 2000
         assert_eq!(coord.fallback_model, "edge");
         assert_eq!(coord.complexity_threshold, 0.7);
         assert_eq!(coord.latency_budget_ms, 2000);
+    }
+
+    #[test]
+    fn test_parse_available_models_empty_and_trailing_comma() {
+        let content = r#"
+FROM qwen:7b
+
+[model_coordination]
+available_models = []
+"#;
+        let modelfile = ModelfileParser::parse_str(content).unwrap();
+        let sigil = modelfile.sigil.unwrap();
+        let coord = sigil.model_coordination.unwrap();
+        assert!(coord.available_models.is_empty());
+
+        let content = r#"
+FROM qwen:7b
+
+[model_coordination]
+available_models = ["core", "forge",]
+"#;
+        let modelfile = ModelfileParser::parse_str(content).unwrap();
+        let sigil = modelfile.sigil.unwrap();
+        let coord = sigil.model_coordination.unwrap();
+        assert_eq!(
+            coord.available_models,
+            vec!["core".to_string(), "forge".to_string()]
+        );
     }
 }
