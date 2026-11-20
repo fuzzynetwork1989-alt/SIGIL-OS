@@ -7,6 +7,7 @@ use uuid::Uuid;
 pub mod layers;
 pub mod router;
 
+pub use layers::LayerAssembler;
 pub use router::PersistentContextRouter;
 
 /// Unified Cognitive Context
