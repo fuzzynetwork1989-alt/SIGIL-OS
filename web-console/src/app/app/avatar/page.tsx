@@ -1,33 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Eye, Palette, Sparkles, Save, RotateCcw, Check, Loader2, Crown, Wand2, Download, Upload } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 
+const AVATAR_KEY = 'sigil.avatar'
+
+const DEFAULT_AVATAR = {
+  style: 'realistic',
+  bodyType: 'average',
+  skinTone: 'medium',
+  eyeColor: 'blue',
+  eyeShape: 'round',
+  hairStyle: 'modern',
+  hairColor: 'brown',
+  hairLength: 'medium',
+  accessories: 'none',
+  expression: 'friendly',
+  effects: {
+    glow: false,
+    particles: false,
+    animation: 'none',
+  },
+}
+
 export default function AvatarBuilderPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
-  const [avatar, setAvatar] = useState({
-    style: 'realistic',
-    bodyType: 'average',
-    skinTone: 'medium',
-    eyeColor: 'blue',
-    eyeShape: 'round',
-    hairStyle: 'modern',
-    hairColor: 'brown',
-    hairLength: 'medium',
-    accessories: 'none',
-    expression: 'friendly',
-    effects: {
-      glow: false,
-      particles: false,
-      animation: 'none',
-    },
-  })
+  const [avatar, setAvatar] = useState(DEFAULT_AVATAR)
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(AVATAR_KEY)
+      if (raw) setAvatar({ ...DEFAULT_AVATAR, ...JSON.parse(raw) })
+    } catch { /* keep defaults */ }
+    setLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (!loaded) return
+    localStorage.setItem(AVATAR_KEY, JSON.stringify(avatar))
+  }, [avatar, loaded])
 
   const skinTones = ['pale', 'light', 'medium', 'olive', 'tan', 'dark', 'deep']
   const eyeColors = ['blue', 'green', 'brown', 'hazel', 'gray', 'amber', 'purple']
@@ -37,11 +55,14 @@ export default function AvatarBuilderPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Avatar config is persisted to localStorage by the effect above.
+    await new Promise(resolve => setTimeout(resolve, 300))
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
+
+  const handleReset = () => setAvatar({ ...DEFAULT_AVATAR })
 
   const handleRandomize = () => {
     setAvatar({
@@ -398,7 +419,15 @@ export default function AvatarBuilderPage() {
         </motion.div>
 
         {/* Save Actions */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end items-center gap-3">
+          <span className="text-xs text-gray-400 mr-auto">Saved locally in this browser</span>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer relative z-20"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset
+          </button>
           <button
             onClick={handleRandomize}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer relative z-20"

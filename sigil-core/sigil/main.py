@@ -13,6 +13,7 @@ import os
 import json
 import logging
 from datetime import datetime
+from uuid import UUID
 import asyncio
 from dotenv import load_dotenv
 from .llm_provider import llm_provider
@@ -70,10 +71,10 @@ class UserLogin(BaseModel):
     password: str
 
 class UserResponse(BaseModel):
-    id: str
+    id: UUID
     email: str
     full_name: Optional[str]
-    created_at: str
+    created_at: datetime
     is_active: bool
     subscription_tier: str
 
@@ -162,7 +163,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             detail="Database unavailable; authentication persistence is disabled"
         )
 
-    user = await User.get_by_id(user_id)
+    user = await User.get_by_id(UUID(str(user_id)))
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -381,7 +382,7 @@ async def chat_completion(
             payload = decode_access_token(token)
             user_id = payload.get("sub")
             if user_id:
-                current_user = await User.get_by_id(user_id)
+                current_user = await User.get_by_id(UUID(str(user_id)))
         except:
             pass  # Allow anonymous access if auth fails
 
@@ -482,7 +483,7 @@ async def _optional_user(credentials: Optional[HTTPAuthorizationCredentials] = D
         user_id = payload.get("sub")
         if not user_id:
             return None
-        return await User.get_by_id(user_id)
+        return await User.get_by_id(UUID(str(user_id)))
     except Exception:
         return None
 

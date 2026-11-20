@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Sparkles, Heart } from 'lucide-react'
+import { api } from '@/lib/api'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -27,10 +28,13 @@ export default function RegisterPage() {
       return
     }
 
-    // Simulate registration and redirect to home
-    setTimeout(() => {
-      router.push('/')
-    }, 1000)
+    try {
+      await api.register(formData.email, formData.password, formData.name || undefined)
+      router.push('/app/home')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed')
+      setLoading(false)
+    }
   }
 
   return (

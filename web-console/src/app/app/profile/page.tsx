@@ -1,74 +1,75 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, User, Brain, Heart, Target, Save, RotateCcw, Check, Loader2, Upload, Camera, X, Plus, Sparkles } from 'lucide-react'
 import { cn } from '../../../lib/utils'
+import { getStoredUser } from '@/lib/api'
+
+const PROFILE_KEY = 'sigil.profile'
+
+const DEFAULT_PROFILE = {
+  displayName: '',
+  bio: '',
+  avatar: null as string | null,
+  traits: {
+    creativity: 50,
+    empathy: 50,
+    curiosity: 50,
+    humor: 50,
+    assertiveness: 50,
+    adaptability: 50,
+  },
+  aiPersonality: {
+    friendliness: 50,
+    formality: 50,
+    enthusiasm: 50,
+    humor: 50,
+    intellect: 50,
+  },
+  instructions: [] as {
+    id: string
+    title: string
+    content: string
+    category: string
+    enabled: boolean
+  }[],
+  interests: [] as string[],
+  goals: [] as string[],
+}
 
 export default function ProfileBuilderPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
-  const [profile, setProfile] = useState({
-    // Basic Info
-    displayName: 'SIGIL User',
-    bio: 'AI enthusiast exploring the future of cognitive computing',
-    avatar: null as string | null,
+  const [profile, setProfile] = useState(DEFAULT_PROFILE)
 
-    // Personality Traits
-    traits: {
-      creativity: 75,
-      empathy: 80,
-      curiosity: 90,
-      humor: 60,
-      assertiveness: 50,
-      adaptability: 85,
-    },
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(PROFILE_KEY)
+      const user = getStoredUser()
+      const base = raw ? { ...DEFAULT_PROFILE, ...JSON.parse(raw) } : { ...DEFAULT_PROFILE }
+      if (!base.displayName) {
+        base.displayName = user?.full_name || user?.email || ''
+      }
+      setProfile(base)
+    } catch {
+      const user = getStoredUser()
+      setProfile({
+        ...DEFAULT_PROFILE,
+        displayName: user?.full_name || user?.email || '',
+      })
+    }
+    setLoaded(true)
+  }, [])
 
-    // AI Personality
-    aiPersonality: {
-      friendliness: 80,
-      formality: 30,
-      enthusiasm: 70,
-      humor: 50,
-      intellect: 85,
-    },
-
-    // Custom Instructions
-    instructions: [
-      {
-        id: '1',
-        title: 'Communication Style',
-        content: 'Be friendly and approachable. Use conversational language. Show empathy and understanding.',
-        category: 'behavior',
-        enabled: true,
-      },
-      {
-        id: '2',
-        title: 'Response Length',
-        content: 'Keep responses concise but informative. Focus on being helpful rather than verbose.',
-        category: 'response',
-        enabled: true,
-      },
-    ],
-
-    // Interests
-    interests: [
-      'Artificial Intelligence',
-      'Machine Learning',
-      'Technology',
-      'Gaming',
-    ],
-
-    // Goals
-    goals: [
-      'Learn advanced AI concepts',
-      'Build innovative applications',
-      'Connect with like-minded people',
-    ],
-  })
+  useEffect(() => {
+    if (!loaded) return
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
+  }, [profile, loaded])
 
   const navigateToAvatar = () => {
     router.push('/app/avatar')
@@ -85,10 +86,16 @@ export default function ProfileBuilderPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Profile is persisted to localStorage by the effect above; this just
+    // gives the user feedback that the current state is saved.
+    await new Promise(resolve => setTimeout(resolve, 300))
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleReset = () => {
+    setProfile({ ...DEFAULT_PROFILE, displayName: getStoredUser()?.full_name || getStoredUser()?.email || '' })
   }
 
   const addInterest = () => {
@@ -137,7 +144,7 @@ export default function ProfileBuilderPage() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Profile Builder</h1>
-            <p className="text-gray-400">Customize your SIGIL experience</p>
+            <p className="text-gray-400">Customize your SIGIL experience — saved locally in this browser</p>
           </div>
         </div>
 
@@ -414,7 +421,7 @@ export default function ProfileBuilderPage() {
         {/* Save Actions */}
         <div className="flex justify-end gap-3">
           <button
-            onClick={() => {}}
+            onClick={handleReset}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer relative z-20"
           >
             <RotateCcw className="w-4 h-4" />

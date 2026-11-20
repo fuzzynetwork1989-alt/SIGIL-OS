@@ -13,6 +13,7 @@ asyncpg
 # Authentication
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt<4.1
 python-multipart
 
 # AI/ML

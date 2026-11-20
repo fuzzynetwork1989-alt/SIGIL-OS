@@ -1,224 +1,207 @@
-// SIGIL OS API Client
-// Typed API client for communicating with SIGIL OS backend
+// SIGIL OS API client — talks to the cognitive kernel (sigil-core).
+// Base URL: NEXT_PUBLIC_API_URL or http://localhost:8000
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+const API_URL_KEY = 'sigil.apiUrl'
+const DEFAULT_API_URL = 'http://localhost:8000'
 
-export class SigilAPI {
-  private baseUrl: string
-  private token: string | null = null
-
-  constructor(baseUrl: string = API_URL) {
-    this.baseUrl = baseUrl
+function apiUrl(): string {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(API_URL_KEY)
+    if (stored) return stored.replace(/\/+$/, '')
   }
+  const env = process.env.NEXT_PUBLIC_API_URL
+  return (env || DEFAULT_API_URL).replace(/\/+$/, '')
+}
 
-  setToken(token: string) {
-    this.token = token
-  }
+const TOKEN_KEY = 'sigil.token'
+const USER_KEY = 'sigil.user'
 
-  clearToken() {
-    this.token = null
-  }
+export interface SigilUser {
+  id: string
+  email: string
+  full_name: string | null
+  created_at: string
+  is_active: boolean
+  subscription_tier: string
+}
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string> | undefined),
-    }
+export interface Conversation {
+  id: string
+  title: string | null
+  model: string
+  xp_earned: number
+  created_at: string
+  updated_at: string
+}
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
-    }
+export interface MemoryItem {
+  id: string
+  content: string
+  category: string
+  importance: number
+  metadata: Record<string, unknown>
+  created_at: string
+}
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    })
+export interface Mission {
+  id: string
+  name: string
+  description: string
+  status: string
+  progress: number
+  created_at?: string
+  updated_at?: string
+}
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`)
-    }
+export interface HealthResponse {
+  status: string
+  timestamp: string
+  version: string
+  llm_provider: string
+  database: string
+  services: Record<string, string>
+}
 
-    return response.json()
-  }
+export interface UsageSummary {
+  period_days: number
+  total_tokens: number
+  by_model: { model: string; tokens: number; requests: number }[]
+  tier: string
+  monthly_token_limit: number | null
+  percent_used: number
+}
 
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' })
-  }
+export function getToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(TOKEN_KEY)
+}
 
-  // Health check
-  async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    return this.request('/health')
-  }
-
-  // Authentication
-  async login(email: string, password: string): Promise<{ token: string; user: any }> {
-    return this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    })
-  }
-
-  async register(data: { email: string; password: string; name: string }): Promise<{ token: string; user: any }> {
-    return this.request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
-
-  async logout(): Promise<void> {
-    return this.request('/auth/logout', { method: 'POST' })
-  }
-
-  // Chat Completions
-  async createChatCompletion(data: {
-    model: string
-    messages: Array<{ role: string; content: string }>
-    temperature?: number
-    maxTokens?: number
-    stream?: boolean
-  }): Promise<any> {
-    // Get API keys from localStorage
-    const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
-    const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
-    const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
-    const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
-
-    if (!openaiKey && !anthropicKey && !huggingfaceKey) {
-      throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
-    }
-
-    const url = `${this.baseUrl}/api/chat/completions`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
-    }
-
-    // Pass API keys in headers for the server to use
-    if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
-    if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
-    if (huggingfaceKey) headers['X-HuggingFace-Key'] = huggingfaceKey
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.message || 'API error')
-    }
-
-    return response.json()
-  }
-
-  async streamChatCompletion(data: {
-    model: string
-    messages: Array<{ role: string; content: string }>
-    temperature?: number
-    maxTokens?: number
-  }): Promise<ReadableStream> {
-    // Get API keys from localStorage
-    const apiKeys = JSON.parse(localStorage.getItem('sigil_api_keys') || '{}')
-    const openaiKey = apiKeys.openai || process.env.OPENAI_API_KEY
-    const anthropicKey = apiKeys.anthropic || process.env.ANTHROPIC_API_KEY
-    const huggingfaceKey = apiKeys.huggingface || process.env.HUGGINGFACE_API_KEY
-
-    if (!openaiKey && !anthropicKey && !huggingfaceKey) {
-      throw new Error('No API key configured. Please add an API key in Settings → API Keys.')
-    }
-
-    const url = `${this.baseUrl}/api/chat/completions`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
-    }
-
-    // Pass API keys in headers for the server to use
-    if (openaiKey) headers['X-OpenAI-Key'] = openaiKey
-    if (anthropicKey) headers['X-Anthropic-Key'] = anthropicKey
-    if (huggingfaceKey) headers['X-HuggingFace-Key'] = huggingfaceKey
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ ...data, stream: true }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.message || 'API error')
-    }
-
-    return response.body!
-  }
-
-  // Memory
-  async getMemories(): Promise<any[]> {
-    return this.request('/api/memory')
-  }
-
-  async createMemory(data: any): Promise<any> {
-    return this.request('/api/memory', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
-
-  async searchMemory(data: { query: string }): Promise<any> {
-    return this.request('/api/memory/search', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
-
-  // Model Info
-  async getModels(): Promise<any[]> {
-    return this.request('/api/models')
-  }
-
-  async getModelInfo(modelId: string): Promise<any> {
-    return this.request(`/api/models/${modelId}`)
-  }
-
-  // Cognitive Processes
-  async getCognitiveProcesses(): Promise<any> {
-    return this.request('/api/cognitive-processes')
-  }
-
-  async pauseCognitiveProcess(processId: string): Promise<any> {
-    return this.request(`/api/cognitive-processes/${processId}/pause`, { method: 'POST' })
-  }
-
-  async resumeCognitiveProcess(processId: string): Promise<any> {
-    return this.request(`/api/cognitive-processes/${processId}/resume`, { method: 'POST' })
-  }
-
-  async cancelCognitiveProcess(processId: string): Promise<any> {
-    return this.request(`/api/cognitive-processes/${processId}/cancel`, { method: 'POST' })
-  }
-
-  // Workspaces
-  async getWorkspaces(): Promise<any> {
-    return this.request('/api/workspaces')
-  }
-
-  async createWorkspace(data: { name: string }): Promise<any> {
-    return this.request('/api/workspaces', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
+export function getStoredUser(): SigilUser | null {
+  if (typeof window === 'undefined') return null
+  const raw = localStorage.getItem(USER_KEY)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw) as SigilUser
+  } catch {
+    return null
   }
 }
 
-export const api = new SigilAPI()
+export function setSession(accessToken: string, user: SigilUser) {
+  localStorage.setItem(TOKEN_KEY, accessToken)
+  localStorage.setItem(USER_KEY, JSON.stringify(user))
+}
+
+export function clearSession() {
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(USER_KEY)
+}
+
+export function isAuthenticated(): boolean {
+  return Boolean(getToken() && getStoredUser())
+}
+
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+  auth = true
+): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> | undefined),
+  }
+  if (auth) {
+    const token = getToken()
+    if (token) headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const res = await fetch(`${apiUrl()}${path}`, { ...options, headers })
+  if (res.status === 204) return undefined as T
+  const text = await res.text()
+  const body = text ? JSON.parse(text) : null
+  if (!res.ok) {
+    const detail =
+      body && typeof body === 'object' && 'detail' in body
+        ? String((body as { detail: unknown }).detail)
+        : `Request failed (${res.status})`
+    throw new Error(detail)
+  }
+  return body as T
+}
+
+export const api = {
+  // Health
+  health: () => request<HealthResponse>('/health', {}, false),
+
+  // Auth — backend returns { access_token, token_type, user }
+  async login(email: string, password: string) {
+    const res = await request<{ access_token: string; user: SigilUser }>(
+      '/api/v1/auth/login',
+      { method: 'POST', body: JSON.stringify({ email, password }) },
+      false
+    )
+    setSession(res.access_token, res.user)
+    return res.user
+  },
+
+  async register(email: string, password: string, fullName?: string) {
+    const res = await request<{ access_token: string; user: SigilUser }>(
+      '/api/v1/auth/register',
+      {
+        method: 'POST',
+        body: JSON.stringify({ email, password, full_name: fullName || null }),
+      },
+      false
+    )
+    setSession(res.access_token, res.user)
+    return res.user
+  },
+
+  me: () => request<SigilUser>('/api/v1/auth/me'),
+  logout: () => {
+    clearSession()
+  },
+
+  // Conversations
+  listConversations: () => request<Conversation[]>('/api/v1/conversations'),
+  createConversation: (title?: string) =>
+    request<Conversation>('/api/v1/conversations', {
+      method: 'POST',
+      body: JSON.stringify({ title: title ?? null }),
+    }),
+  deleteConversation: (id: string) =>
+    request<void>(`/api/v1/conversations/${id}`, { method: 'DELETE' }),
+
+  // Memory
+  listMemories: (category?: string) =>
+    request<MemoryItem[]>(
+      `/api/v1/memory${category ? `?category=${encodeURIComponent(category)}` : ''}`
+    ),
+  createMemory: (content: string, category: string, importance = 0.5) =>
+    request<MemoryItem>('/api/v1/memory', {
+      method: 'POST',
+      body: JSON.stringify({ content, category, importance }),
+    }),
+
+  // Missions
+  listMissions: () => request<Mission[]>('/api/v1/missions'),
+  createMission: (name: string, description: string, progress = 0) =>
+    request<Mission>('/api/v1/missions', {
+      method: 'POST',
+      body: JSON.stringify({ name, description, status: 'active', progress }),
+    }),
+
+  // Billing / usage
+  getUsage: () => request<UsageSummary>('/api/v1/billing/usage'),
+  getSubscription: () =>
+    request<{
+      tier: string
+      tier_info: Record<string, unknown> | null
+      stripe_customer_id: string | null
+      stripe_subscription_id: string | null
+    }>('/api/v1/billing/subscription'),
+
+  // Models
+  listModels: () =>
+    request<{ object: string; data: { id: string }[] }>('/api/v1/models', {}, false),
+}

@@ -85,31 +85,6 @@ export function NextGenChatInterface({ onBack }: NextGenChatInterfaceProps) {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const calculateXP = useCallback((content: string) => {
-    // XP based on complexity, length, and cognitive value
-    const baseXP = Math.min(content.length * 0.1, 50);
-    const complexityBonus = content.split('.').length * 2;
-    const questionBonus = content.includes('?') ? 10 : 0;
-    const codeBonus = content.includes('```') ? 20 : 0;
-    return Math.round(baseXP + complexityBonus + questionBonus + codeBonus);
-  }, []);
-
-  const generateCognitiveInsight = useCallback((content: string) => {
-    const insights = [
-      "This suggests you're exploring new cognitive pathways",
-      "I'm developing a deeper understanding of your perspective",
-      "This interaction is strengthening our neural connection",
-      "Your question reveals an interesting pattern in your thinking",
-      "I'm integrating this into my growing knowledge graph",
-      "This represents a meaningful cognitive milestone",
-      "Your input is helping me evolve my reasoning capabilities",
-      "I'm forming new associations between concepts",
-      "This experience is enriching my cognitive architecture",
-      "We're building a more sophisticated model of understanding",
-    ];
-    return insights[Math.floor(Math.random() * insights.length)];
-  }, []);
-
   const handleSend = async () => {
     if (!input.trim() || isGenerating) return;
 
@@ -130,32 +105,26 @@ export function NextGenChatInterface({ onBack }: NextGenChatInterfaceProps) {
 
       // Call SIGIL backend
       const response = await sigilProvider.chatCompletion({
-        model: 'gpt-4o-mini',
+        model: 'sigil-companion',
         messages: messages.map(m => ({ role: m.role, content: m.content })).concat([{ role: 'user', content: input }]),
         temperature: 0.7,
         maxTokens: 2048,
         stream: false,
       });
 
-      const xp = calculateXP(input);
-      const insight = generateCognitiveInsight(input);
-
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: response.choices[0].message.content,
         timestamp: new Date(),
-        xpGained: xp,
-        cognitiveInsight: insight,
-        confidence: 0.85 + Math.random() * 0.1,
+        xpGained: response.usage?.total_tokens,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       setMetrics(prev => ({
         ...prev,
-        totalXP: prev.totalXP + xp,
+        totalXP: prev.totalXP + (response.usage?.total_tokens ?? 0),
         messageCount: prev.messageCount + 1,
-        insightsGenerated: prev.insightsGenerated + 1,
       }));
 
       setCognitiveState('learning');
@@ -167,18 +136,12 @@ export function NextGenChatInterface({ onBack }: NextGenChatInterfaceProps) {
     } catch (error) {
       console.error('Error calling SIGIL backend:', error);
 
-      // Fallback to mock response if backend fails
-      const xp = calculateXP(input);
-      const insight = generateCognitiveInsight(input);
-
+      // Backend unreachable: surface a real error, no fabricated reply
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: "I'm having trouble connecting to my cognitive backend. Please ensure the SIGIL backend is running at http://localhost:8000 and that Ollama is running (`ollama serve`) or OPENAI_API_KEY is configured.",
         timestamp: new Date(),
-        xpGained: xp,
-        cognitiveInsight: insight,
-        confidence: 0.5,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -389,7 +352,7 @@ export function NextGenChatInterface({ onBack }: NextGenChatInterfaceProps) {
                     className="mt-2 flex items-center gap-2 text-xs text-purple-300"
                   >
                     <Sparkles className="w-3 h-3" />
-                    +{message.xpGained} XP gained
+                    +{message.xpGained} tokens
                   </motion.div>
                 )}
               </div>
@@ -570,7 +533,7 @@ export function NextGenChatInterface({ onBack }: NextGenChatInterfaceProps) {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                {metrics.totalXP.toLocaleString()} XP
+                {metrics.totalXP.toLocaleString()} tokens
               </span>
               <span className="flex items-center gap-1">
                 <MessageSquare className="w-3 h-3" />
