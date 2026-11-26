@@ -87,7 +87,7 @@ export function mergeDeep<T extends Record<string, any>>(...objects: T[]): T {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-          result[key] = mergeDeep(result[key] || {}, obj[key]);
+          result[key] = mergeDeep((result[key] || {}) as any, obj[key]);
         } else {
           result[key] = obj[key];
         }

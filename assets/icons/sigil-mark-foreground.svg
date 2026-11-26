@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="mark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DDD6FE"/>
+      <stop offset="50%" stop-color="#F0ABFC"/>
+      <stop offset="100%" stop-color="#F9A8D4"/>
+    </linearGradient>
+    <radialGradient id="irisFill" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5D0FE" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#F5D0FE" stop-opacity="0.02"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Mark only, scaled to stay inside Android adaptive-icon safe zone (center 66%) -->
+  <g transform="translate(512,512) scale(0.86)" filter="url(#glow)">
+    <path d="M -290 0 C -150 -140 150 -140 290 0 C 150 140 -150 140 -290 0 Z"
+          fill="none" stroke="url(#mark)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle r="122" fill="url(#irisFill)" stroke="url(#mark)" stroke-width="20"/>
+    <g fill="url(#mark)">
+      <circle cx="0" cy="-122" r="17"/>
+      <circle cx="106" cy="-61" r="17"/>
+      <circle cx="106" cy="61" r="17"/>
+      <circle cx="0" cy="122" r="17"/>
+      <circle cx="-106" cy="61" r="17"/>
+      <circle cx="-106" cy="-61" r="17"/>
+    </g>
+    <circle r="38" fill="url(#mark)"/>
+    <circle r="38" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.5"/>
+  </g>
+
+  <g fill="#FBCFE8" opacity="0.9">
+    <path transform="translate(512,512) translate(-330,-330) scale(1.1)" d="M0 -18 L4.5 -4.5 L18 0 L4.5 4.5 L0 18 L-4.5 4.5 L-18 0 L-4.5 -4.5 Z"/>
+    <path transform="translate(512,512) translate(330,330) scale(0.85)" d="M0 -18 L4.5 -4.5 L18 0 L4.5 4.5 L0 18 L-4.5 4.5 L-18 0 L-4.5 -4.5 Z"/>
+  </g>
+</svg>
